@@ -10,9 +10,15 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 
 ## ✨ Features
 
-- **Suggest a game by name**: type a title and pick it from the results. Cover art and a description are pulled in automatically (from [RAWG](https://rawg.io) if a key is set, otherwise Wikipedia). Add a pitch for why the crew should play it.
-- **Crossplay you can trust**: a built-in list of **110 popular multiplayer games** with crossplay checked in October 2026 (full / partial / none, cross-progression, player counts, free-to-play), each with a link to where it was verified. Anything not on the list can be filled in by whoever suggests it.
+- **Suggest a game by name**: type a title and pick it from the results. A description is pulled in automatically (from [RAWG](https://rawg.io) if a key is set, otherwise Wikipedia). Add a pitch for why the crew should play it.
+- **Cover art for every game**: all 110 built-in games carry official store art (Steam, or the PlayStation / Epic store for games not on Steam). Other games use RAWG or Wikipedia art, then fall back to Steam art; games saved without art fill it in automatically.
+- **Crossplay you can trust**: a built-in list of **110 popular multiplayer games** with crossplay checked in October 2026 and re-checked monthly by a scheduled task (full / partial / none, cross-progression, player counts, free-to-play), each with a link to where it was verified. Anything not on the list can be filled in by whoever suggests it.
 - **"Can we all play together?" check**: every card looks at who voted 👍 or 🤷 and what they play on, then says *"All 4 can play together"* or *"3 of 4 together · split: Sam (PS)"*. It understands awkward cases like Deep Rock Galactic, where Xbox and Game Pass PC play together but Steam and PlayStation don't.
+- **Game nights**: anyone can plan a night with a date, time, game (or "decide later") and a note. Everyone answers In / Maybe / Out, the card checks that everyone who's in can actually play together, and there's an **Add to calendar** button. The next night shows at the top of the queue.
+- **Party-size check**: games show their max party size (e.g. "Up to 4"), and the app warns when more people want in than the game allows, so nobody gets left out on the night.
+- **Activity feed**: a bell in the header shows what's new: suggestions, 👍 votes, status changes, game nights, RSVPs and new members.
+- **Trailers**: a "Watch trailer" button on every game, and a trailer link on every idea.
+- **Your color**: each person picks their own color (purple, blue, teal, green, orange, pink, red or gold). The app takes on that color for them only, it syncs across their devices, and it shows as their avatar ring on the Crew tab and in vote lists.
 - **Voting**: 👍 I'm in, 🤷 maybe, 👎 not for me. The queue sorts by most wanted, with #1, #2… badges.
 - **Who owns it**: each person marks which platform they have it on (or that they don't own it), so you can see who still needs to buy it.
 - **Prices & deals**: live PC price and the best current deal (with % off) from [CheapShark](https://www.cheapshark.com), refreshed every few days. Console price, Game Pass and PS Plus are tick-boxes anyone can fill in.
@@ -23,13 +29,13 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 - **🎲 Pick tonight**: picks a game at random, weighted towards the most-wanted games that the whole interested group can play together.
 - **Filters**: crossplay only, "whole crew fits", free, Game Pass / PS Plus, type, plus sort by most wanted, newest, cheapest or A–Z.
 - **Google sign-in with a join code**: only people with the code you set can see the list. The leader (whoever sets the group up) can remove people and change the code.
-- **Installable app (PWA)**, phone layout with bottom tabs, light / dark / system theme.
+- **Installable app (PWA)**, phone layout with bottom tabs, light / dark / system theme, controller logo.
 
 ---
 
 ## 🧩 How it works
 
-- **Frontend:** `index.html` (HTML + CSS + vanilla JS) and `data.js` (the built-in crossplay list). The Firebase SDK loads from Google's CDN.
+- **Frontend:** `index.html` (HTML + CSS + vanilla JS) and `data.js` (the built-in crossplay list, party sizes and cover art). The Firebase SDK loads from Google's CDN.
 - **Game details:** [RAWG API](https://rawg.io/apidocs) with a free key, or Wikipedia (no key) as the fallback.
 - **PC prices:** [CheapShark API](https://apidocs.cheapshark.com) (no key).
 - **Storage & sync:** Firebase **Firestore** with live updates and **Firebase Auth** (Google). The Firebase web config in `index.html` is designed to be public; access is controlled by the rules in `Firebase/firestore.rules`.

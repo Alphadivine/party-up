@@ -5,37 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Party Up</title>
 <meta name="description" content="Suggest games to play together, vote, and see who can actually crossplay.">
-<meta name="theme-color" content="#14130f">
+<meta name="theme-color" content="#16111f">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f3f1ea; --panel:#ffffff; --panel2:#ebe8de; --line:#d8d3c4; --ink:#1b1a16; --muted:#6c675a;
-  --accent:#4f7d00; --accent-ink:#ffffff; --accent-soft:#e3efc9;
-  --full:#3f7a00; --full-bg:#e2f0cc; --part:#9a5d00; --part-bg:#f8e7c6; --none:#b0302a; --none-bg:#f7d9d6; --unk-bg:#e6e3da;
+  --bg:#f6f3fb; --panel:#ffffff; --panel2:#ece6f6; --line:#d9d0ea; --ink:#1d1530; --muted:#675b80;
+  --accent:#6d28d9; --accent-ink:#ffffff; --accent-soft:#ede4fc;
+  --full:#3f6b00; --full-bg:#e2f0cc; --part:#8a5200; --part-bg:#f8e7c6; --none:#b0302a; --none-bg:#f7d9d6; --unk-bg:#ece6f6;
   --pc:#4b5563; --ps:#1f5fbf; --xb:#2e7d32; --pcms:#0e7490;
-  --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.06);
+  --shadow:0 1px 2px rgba(40,20,80,.06),0 4px 14px rgba(40,20,80,.07);
   --radius:14px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#14130f; --panel:#1e1d18; --panel2:#2a2822; --line:#38352c; --ink:#f1eee4; --muted:#a39d8c;
-    --accent:#c6f135; --accent-ink:#141407; --accent-soft:#2f3a12;
-    --full:#b8ec3b; --full-bg:#28340f; --part:#f5b545; --part-bg:#3b2c12; --none:#ff7a6e; --none-bg:#3d1a17; --unk-bg:#2c2a23;
-    --pc:#a8b0bd; --ps:#6aa2ff; --xb:#6fcf73; --pcms:#4fd1e6;
-    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+    --bg:#16111f; --panel:#1f1829; --panel2:#2a2138; --line:#3a2f4d; --ink:#f1ecfa; --muted:#a89cc0;
+    --accent:#a78bfa; --accent-ink:#160f24; --accent-soft:#2e2147;
+    --full:#a6e36b; --full-bg:#23331a; --part:#f5b545; --part-bg:#3b2c12; --none:#ff7a6e; --none-bg:#3d1a17; --unk-bg:#2a2138;
+    --pc:#b4bccb; --ps:#7aaeff; --xb:#7bd47f; --pcms:#5fd8ea;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#14130f; --panel:#1e1d18; --panel2:#2a2822; --line:#38352c; --ink:#f1eee4; --muted:#a39d8c;
-  --accent:#c6f135; --accent-ink:#141407; --accent-soft:#2f3a12;
-  --full:#b8ec3b; --full-bg:#28340f; --part:#f5b545; --part-bg:#3b2c12; --none:#ff7a6e; --none-bg:#3d1a17; --unk-bg:#2c2a23;
-  --pc:#a8b0bd; --ps:#6aa2ff; --xb:#6fcf73; --pcms:#4fd1e6;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+  --bg:#16111f; --panel:#1f1829; --panel2:#2a2138; --line:#3a2f4d; --ink:#f1ecfa; --muted:#a89cc0;
+  --accent:#a78bfa; --accent-ink:#160f24; --accent-soft:#2e2147;
+  --full:#a6e36b; --full-bg:#23331a; --part:#f5b545; --part-bg:#3b2c12; --none:#ff7a6e; --none-bg:#3d1a17; --unk-bg:#2a2138;
+  --pc:#b4bccb; --ps:#7aaeff; --xb:#7bd47f; --pcms:#5fd8ea;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
@@ -50,7 +51,8 @@ h1,h2,h3,.disp{font-family:"Chakra Petch",system-ui,sans-serif;letter-spacing:.0
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .topbar{display:flex;align-items:center;gap:12px;height:60px}
 .brand{display:flex;align-items:center;gap:10px;font-family:"Chakra Petch";font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.06em}
-.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:15px}
+.brand .mark{width:32px;height:32px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.brand .mark svg{width:24px;height:24px}
 .brand small{font-family:"IBM Plex Sans";font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted);font-size:13px}
 .spacer{flex:1}
 .tabs{display:flex;gap:4px}
@@ -89,7 +91,12 @@ select.sel{height:40px;border:1px solid var(--line);background:var(--panel);bord
 .card:hover{transform:translateY(-2px);border-color:var(--muted)}
 .card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cover{position:relative;aspect-ratio:16/8;background:var(--panel2) center/cover no-repeat;display:flex;align-items:flex-end}
-.cover .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:"Chakra Petch";font-weight:700;font-size:28px;color:var(--muted);text-transform:uppercase;padding:12px;text-align:center}
+.cover .cimg,.dhead .cimg,.gm .th .cimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.gm .th{position:relative;overflow:hidden}
+.ph[hidden]{display:none!important}
+.gm .th .ph{display:none}
+.dhead .ph{display:none}
+.cover .ph{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent-soft),var(--panel2));font-family:"Chakra Petch";font-weight:700;font-size:28px;color:var(--muted);text-transform:uppercase;padding:12px;text-align:center}
 .cover .rank{position:absolute;top:10px;left:10px;background:var(--accent);color:var(--accent-ink);font-family:"Chakra Petch";font-weight:700;border-radius:8px;padding:2px 8px;font-size:13px}
 .cover .stat{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.65);color:#fff;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:600}
 .cbody{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
@@ -139,9 +146,9 @@ select.sel{height:40px;border:1px solid var(--line);background:var(--panel);bord
 dialog{border:0;padding:0;background:var(--panel);color:var(--ink);border-radius:18px;width:min(720px,calc(100vw - 20px));max-height:calc(100vh - 30px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
 dialog::backdrop{background:rgba(10,10,8,.55);backdrop-filter:blur(2px)}
 .dhead{position:relative;aspect-ratio:16/6;background:var(--panel2) center/cover no-repeat}
-.dhead::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--panel) 100%)}
+.dhead::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 30%,var(--panel) 100%)}
 .dhead.noimg{aspect-ratio:auto;height:56px}
-.dclose{position:absolute;top:10px;right:10px;z-index:2;background:rgba(0,0,0,.6);color:#fff;border:0;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px}
+.dclose{position:absolute;top:10px;right:10px;z-index:3;background:rgba(0,0,0,.6);color:#fff;border:0;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px}
 .dbody{padding:4px 22px 22px;display:flex;flex-direction:column;gap:16px}
 .dbody h2{margin:0;font-size:26px;line-height:1.1}
 .box{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
@@ -181,13 +188,52 @@ label.fld textarea{min-height:70px;resize:vertical}
 .pick{text-align:center;padding:26px 22px;display:flex;flex-direction:column;gap:12px;align-items:center}
 .pick .big{font-family:"Chakra Petch";font-size:30px;font-weight:700;line-height:1.1}
 
+/* game nights */
+.nights{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.night{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px}
+.night.past{opacity:.75;box-shadow:none}
+.night .top{display:flex;gap:12px;align-items:center}
+.dateblk{width:64px;flex:none;border-radius:12px;background:var(--accent);color:var(--accent-ink);text-align:center;padding:6px 0;font-family:"Chakra Petch",sans-serif;line-height:1.1}
+.dateblk .d{font-size:26px;font-weight:700}
+.dateblk .m{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.night .when{font-weight:700;font-size:16px}
+.gm{display:flex;gap:10px;align-items:center;background:var(--panel2);border-radius:10px;padding:6px;border:0;text-align:left;cursor:pointer;width:100%;color:var(--ink)}
+.gm .th{width:64px;height:36px;border-radius:6px;background:var(--line) center/cover;flex:none}
+.rsvp{display:flex;gap:6px}
+.rsvp button{flex:1;border:1px solid var(--line);background:var(--panel);border-radius:9px;min-height:40px;cursor:pointer;font-weight:700;font-size:13.5px;color:var(--ink)}
+.rsvp button[aria-pressed="true"].in{background:var(--full-bg);border-color:var(--full);color:var(--full)}
+.rsvp button[aria-pressed="true"].maybe{background:var(--part-bg);border-color:var(--part);color:var(--part)}
+.rsvp button[aria-pressed="true"].out{background:var(--none-bg);border-color:var(--none);color:var(--none)}
+.nextnight{display:flex;align-items:center;gap:10px;margin:14px 0 0;padding:10px 14px;border-radius:12px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);cursor:pointer;width:100%;text-align:left;color:var(--ink);font-size:14px}
+.pastlist{margin:18px 0 110px}
+.pastlist summary{cursor:pointer;font-weight:600;color:var(--muted);margin-bottom:10px}
+/* activity */
+.bell{position:relative}
+.bell svg{width:18px;height:18px}
+.bell .dot{position:absolute;top:5px;right:5px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.feed{display:flex;flex-direction:column;gap:2px;max-height:62vh;overflow:auto}
+.ev{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:0;background:none;text-align:left;width:100%;cursor:pointer;color:var(--ink)}
+.ev:hover{background:var(--panel2)}
+.ev .t{font-size:14px}
+.ev .s{font-size:12px;color:var(--muted)}
+.ev.new{background:var(--accent-soft)}
+/* profile colors */
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatches label{position:relative;cursor:pointer;display:block}
+.swatches input{position:absolute;opacity:0;width:1px;height:1px}
+.swatches span{display:block;width:40px;height:40px;border-radius:50%;border:3px solid var(--panel)}
+.swatches input:checked+span{box-shadow:0 0 0 2px var(--ink)}
+.swatches input:focus-visible+span{outline:3px solid var(--ink);outline-offset:3px}
+.avatar.ring{box-shadow:0 0 0 2px var(--ring,transparent)}
+.tlink{font-size:13px;font-weight:600;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:var(--panel2)}
+
 /* phone */
 nav.bottom{display:none}
 @media (max-width:760px){
   .tabs.desk{display:none}
   .brand small{display:none}
   nav.bottom{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
-  nav.bottom .tab{flex:1;flex-direction:column;gap:1px;font-size:11.5px;padding:6px 2px}
+  nav.bottom .tab{flex:1;flex-direction:column;gap:1px;font-size:11px;padding:6px 1px;min-width:0}
   nav.bottom .tab .ic{font-size:18px}
   nav.bottom .tab .n{position:absolute;margin:-4px 0 0 26px;font-size:10px;padding:0 5px}
   nav.bottom .tab{position:relative}
@@ -203,9 +249,10 @@ nav.bottom{display:none}
 <body>
 <header class="top">
   <div class="wrap topbar">
-    <div class="brand"><span class="mark" aria-hidden="true">▶▶</span><span>Party Up <small id="groupName"></small></span></div>
+    <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M28 30 H72 C84 30 90 38 93 50 L97 68 C99 78 88 84 81 76 L72 66 H28 L19 76 C12 84 1 78 3 68 L7 50 C10 38 16 30 28 30 Z" fill="currentColor"/><rect x="22" y="42" width="6" height="18" rx="1.5" fill="var(--accent)"/><rect x="16" y="48" width="18" height="6" rx="1.5" fill="var(--accent)"/><circle cx="70" cy="46" r="5" fill="var(--accent)"/><circle cx="80" cy="55" r="5" fill="#ffffff"/><path d="M50 8 L58 18 H42 Z" fill="currentColor"/></svg></span><span>Party Up <small id="groupName"></small></span></div>
     <div class="tabs desk" role="tablist" id="tabsDesk"></div>
     <div class="spacer"></div>
+    <button class="ibtn ghost bell hidden" id="actBtn" aria-label="Activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="dot hidden" id="actDot"></span></button>
     <button class="ibtn ghost" id="themeBtn" title="Theme" aria-label="Switch theme">◐</button>
     <button class="ibtn ghost hidden" id="meBtn" aria-label="Your profile"></button>
   </div>
@@ -270,6 +317,7 @@ nav.bottom{display:none}
           <option value="partial">Partly (some platforms only)</option><option value="none">No crossplay</option></select></label>
         <label class="fld">Players<input name="players" placeholder="e.g. 1–4 co-op" maxlength="60"></label>
       </div>
+      <label class="fld">Max party size (how many can play together; blank if no real limit)<input name="maxParty" type="number" min="1" max="100" inputmode="numeric"></label>
       <label class="fld">Crossplay note<input name="crossplayNote" placeholder="e.g. PC and Xbox only" maxlength="120"></label>
       <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">Type
         <div class="checks" id="addModes"></div></div>
@@ -291,6 +339,8 @@ nav.bottom{display:none}
   <form class="dbody" id="meForm">
     <h2 id="meTitle">Your profile</h2>
     <label class="fld">Display name<input name="name" required maxlength="40"></label>
+    <div class="fld" style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)">Your color (changes how the app looks for you, and your ring on the Crew tab)
+      <div class="swatches" id="meAccent" role="radiogroup" aria-label="Your color"></div></div>
     <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">What you play on (first one ticked is your main)
       <div class="checks" id="mePlats"></div></div>
     <div class="two">
@@ -311,6 +361,23 @@ nav.bottom{display:none}
       <button class="ibtn primary">Save</button>
     </div>
   </form>
+</dialog>
+<!-- plan a game night -->
+<dialog id="nightDlg" aria-labelledby="nightTitle">
+  <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
+  <form class="dbody" id="nightForm">
+    <h2 id="nightTitle">Plan a game night</h2>
+    <label class="fld">When<input type="datetime-local" name="when" required></label>
+    <label class="fld">Game<select name="game" id="nightGame"></select></label>
+    <label class="fld">Note (optional)<textarea name="note" maxlength="300" placeholder="e.g. Discord at 8, bring snacks"></textarea></label>
+    <div class="err hidden" id="nightErr"></div>
+    <div class="foot"><button type="button" class="ibtn ghost" data-close>Cancel</button><button class="ibtn primary" id="nightSave">Save night</button></div>
+  </form>
+</dialog>
+<!-- activity -->
+<dialog id="actDlg" aria-labelledby="actTitle">
+  <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
+  <div class="dbody"><h2 id="actTitle">Activity</h2><div class="feed" id="feed"></div></div>
 </dialog>
 <!-- pick -->
 <dialog id="pickDlg"><div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div><div class="pick" id="pickBody"></div></dialog>
@@ -333,7 +400,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -356,12 +423,42 @@ const STATUS = {
 const XP_LABEL = { full: "Full crossplay", partial: "Partial crossplay", none: "No crossplay", unknown: "Crossplay ?" };
 const TABS = [
   { id: "queue",   label: "Queue",   ic: "☰" },
+  { id: "nights",  label: "Nights",  ic: "◷" },
   { id: "playing", label: "Playing", ic: "▶" },
   { id: "played",  label: "Played",  ic: "✓" },
   { id: "ideas",   label: "Ideas",   ic: "✦" },
   { id: "crew",    label: "Crew",    ic: "☺" },
 ];
 const CS_STORES = {1:"Steam",2:"GamersGate",3:"Green Man Gaming",7:"GOG",8:"EA app",11:"Humble",13:"Ubisoft Store",15:"Fanatical",21:"WinGameStore",23:"GameBillet",24:"Voidu",25:"Epic Games Store",27:"Gamesplanet",28:"Gamesload",29:"2Game",30:"IndieGala",31:"Blizzard",33:"DLGamer",34:"Noctre",35:"DreamGame"};
+
+/* ---------- profile colors ---------- */
+// [dark-mode accent, text on it, soft tint], then the same for light mode
+const ACCENTS = {
+  purple: { name: "Purple", d: ["#a78bfa", "#160f24", "#2e2147"], l: ["#6d28d9", "#ffffff", "#ede4fc"] },
+  blue:   { name: "Blue",   d: ["#60a5fa", "#0b1626", "#172a45"], l: ["#1d4ed8", "#ffffff", "#e0eaff"] },
+  teal:   { name: "Teal",   d: ["#2dd4bf", "#06201c", "#12332f"], l: ["#0f766e", "#ffffff", "#d5f3ef"] },
+  green:  { name: "Green",  d: ["#86efac", "#0b2214", "#173322"], l: ["#15803d", "#ffffff", "#dcf5e4"] },
+  orange: { name: "Orange", d: ["#fdba74", "#2a1405", "#3a2412"], l: ["#c2410c", "#ffffff", "#ffe8d9"] },
+  pink:   { name: "Pink",   d: ["#f9a8d4", "#2a0b1c", "#3d1830"], l: ["#be185d", "#ffffff", "#fde4f0"] },
+  red:    { name: "Red",    d: ["#fca5a5", "#2a0b0b", "#3d1717"], l: ["#b91c1c", "#ffffff", "#fde2e2"] },
+  gold:   { name: "Gold",   d: ["#fcd34d", "#241a02", "#3a2f0d"], l: ["#a16207", "#ffffff", "#fbf0cc"] },
+};
+(function injectAccentCss() {
+  let css = "";
+  for (const [k, a] of Object.entries(ACCENTS)) {
+    const L = `--accent:${a.l[0]};--accent-ink:${a.l[1]};--accent-soft:${a.l[2]};`;
+    const D = `--accent:${a.d[0]};--accent-ink:${a.d[1]};--accent-soft:${a.d[2]};`;
+    css += `:root[data-accent="${k}"]{${L}}@media (prefers-color-scheme: dark){:root[data-accent="${k}"]:not([data-theme="light"]){${D}}}:root[data-accent="${k}"][data-theme="dark"]{${D}}`;
+  }
+  const st = document.createElement("style"); st.id = "accentCss"; st.textContent = css; document.head.appendChild(st);
+})();
+const accentOf = m => ACCENTS[m?.accent] ? m.accent : "purple";
+function applyAccent(k, persist = true) {
+  k = ACCENTS[k] ? k : "purple";
+  document.documentElement.dataset.accent = k;
+  if (persist) { try { localStorage.setItem("sq_accent", JSON.stringify(k)); } catch {} }
+}
+try { applyAccent(JSON.parse(localStorage.getItem("sq_accent") || '"purple"'), false); } catch { applyAccent("purple", false); }
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -398,7 +495,7 @@ async function fetchJSON(url, ms = 9000) {
 function initials(n) { return String(n || "?").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase(); }
 function avatar(m, cls = "") {
   if (!m) return `<span class="avatar ${cls}">?</span>`;
-  return `<span class="avatar ${cls}" title="${esc(m.name)}">${m.photo ? `<img src="${esc(m.photo)}" alt="" referrerpolicy="no-referrer">` : esc(initials(m.name))}</span>`;
+  return `<span class="avatar ring ${cls}" style="--ring:${ACCENTS[accentOf(m)].d[0]}" title="${esc(m.name)}">${m.photo ? `<img src="${esc(m.photo)}" alt="" referrerpolicy="no-referrer">` : esc(initials(m.name))}</span>`;
 }
 
 /* ---------- built-in crossplay list ---------- */
@@ -457,20 +554,53 @@ function crewPeople(game) {
   const own = game.owns || {};
   return Object.keys(S.members).map(uid => ({ uid, plat: own[uid] || (S.members[uid].platforms || [])[0] })).filter(p => p.plat);
 }
+function parseMaxParty(s) {
+  s = String(s || "").toLowerCase(); let m;
+  if ((m = s.match(/(\d+)\s*-\s*player/))) return +m[1];
+  if ((m = s.match(/\b(\d+)\s*v\s*(\d+)\b/)) && m[1] === m[2]) return +m[1];
+  if ((m = s.match(/\b\d+\s*[-–]\s*(\d+)\b/))) return +m[1];
+  if ((m = s.match(/up to (\d+)/))) return +m[1];
+  return null;
+}
+const maxPartyOf = g => { const n = Number(g?.maxParty); return Number.isFinite(n) && n > 0 ? n : null; };
+const interestedCount = g => Object.entries(g.votes || {}).filter(([u, v]) => S.members[u] && (v === "yes" || v === "maybe")).length;
+function partyCheck(g, n, who = "want in") {
+  const max = maxPartyOf(g);
+  if (!max || !n || n <= max) return null;
+  return `${max}-player max · ${n} ${who}`;
+}
+const steamHeader = id => `https://cdn.cloudflare.steamstatic.com/steam/apps/${encodeURIComponent(id)}/header.jpg`;
+// Best cover for a game: its own, else the built-in art, else Steam's standard header.
+function coverOf(g) {
+  const b = builtinFor(g.title);
+  const alt = g.steamAppID ? steamHeader(g.steamAppID) : b?.steamAppId ? steamHeader(b.steamAppId) : "";
+  return { src: g.cover || b?.cover || alt || "", alt: (g.cover || b?.cover) && alt !== (g.cover || b?.cover) ? alt : "" };
+}
+function coverImg(g, cls = "cimg") {
+  const c = coverOf(g);
+  if (!c.src) return `<div class="ph">${esc(g.title)}</div>`;
+  return `<img class="${cls}" src="${esc(c.src)}" ${c.alt ? `data-alt="${esc(c.alt)}"` : ""} alt="" loading="lazy" referrerpolicy="no-referrer" onerror="coverFail(this)"><div class="ph" hidden>${esc(g.title)}</div>`;
+}
+window.coverFail = img => {
+  if (img.dataset.alt) { img.src = img.dataset.alt; delete img.dataset.alt; return; }
+  const ph = img.nextElementSibling; img.remove(); if (ph) ph.hidden = false;
+};
+const trailerUrl = t => `https://www.youtube.com/results?search_query=${encodeURIComponent(t + " official trailer")}`;
 function score(g) { let s = 0; for (const v of Object.values(g.votes || {})) s += v === "yes" ? 2 : v === "maybe" ? 1 : v === "no" ? -1 : 0; return s; }
 
 /* ============================================================
    DATA LAYER — Firebase (shared) or Local (demo)
    ============================================================ */
 const GROUP = (new URLSearchParams(location.search).get("group") || CONFIG.DEFAULT_GROUP).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) || "squad";
-const S = { user: null, group: null, members: {}, games: {}, tab: store.get("sq_tab", "queue"), filters: store.get("sq_filters", {}), ready: false };
+const S = { user: null, group: null, members: {}, games: {}, nights: {}, activity: [], tab: store.get("sq_tab", "queue"), filters: store.get("sq_filters", {}), ready: false };
 
 function LocalBackend() {
   const KEY = "sq_demo_" + GROUP;
   let db = store.get(KEY, { group: null, members: {}, games: {}, join: null });
-  const subs = { group: [], members: [], games: [] };
+  db.nights ??= {}; db.activity ??= [];
+  let subs = null;
   const save = () => { store.set(KEY, db); emit(); };
-  const emit = () => { subs.group.forEach(f => f(db.group)); subs.members.forEach(f => f(db.members)); subs.games.forEach(f => f(db.games)); };
+  const emit = () => { if (!subs) return; subs.group?.(db.group); subs.members?.(db.members); subs.games?.(db.games); subs.nights?.(db.nights); subs.activity?.(db.activity); };
   let user = store.get("sq_demo_user", null);
   let authCb = null;
   const setByPath = (obj, path, val) => { const ks = path.split("."); let o = obj; for (const k of ks.slice(0, -1)) o = o[k] ??= {}; if (val === undefined) delete o[ks.at(-1)]; else o[ks.at(-1)] = val; };
@@ -487,7 +617,11 @@ function LocalBackend() {
     async getMember(uid) { return db.members[uid] || null; },
     async createGroup(meta, me, code) { db.group = meta; db.join = code; db.members[me.uid] = me; save(); },
     async join(me, code) { if (code !== db.join) throw new Error("That join code doesn't match."); db.members[me.uid] = { ...me, code }; save(); },
-    watch(onGroup, onMembers, onGames) { subs.group.push(onGroup); subs.members.push(onMembers); subs.games.push(onGames); emit(); return () => {}; },
+    watch(cbs) { subs = cbs; emit(); return () => { subs = null; }; },
+    async addNight(data) { const id = "n" + Date.now().toString(36); db.nights[id] = { ...data, createdAt: Date.now() }; save(); return id; },
+    async patchNight(id, patch) { const n = db.nights[id]; if (!n) return; for (const [k, v] of Object.entries(patch)) setByPath(n, k, v); save(); },
+    async deleteNight(id) { delete db.nights[id]; save(); },
+    async logActivity(e) { db.activity.unshift({ id: "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ...e, at: Date.now() }); db.activity = db.activity.slice(0, 100); save(); },
     async addGame(id, data) { if (db.games[id]) throw new Error("exists"); db.games[id] = { ...data, suggestedAt: Date.now(), updatedAt: Date.now() }; save(); },
     async patchGame(id, patch) { const g = db.games[id]; if (!g) return; for (const [k, v] of Object.entries(patch)) setByPath(g, k, v); g.updatedAt = Date.now(); save(); },
     async deleteGame(id) { delete db.games[id]; save(); },
@@ -540,12 +674,24 @@ async function FirebaseBackend() {
       try { await F.setDoc(sub("members", me.uid), { ...me, code, joinedAt: F.serverTimestamp() }); }
       catch (e) { if (e.code === "permission-denied") throw new Error("That join code doesn't match."); throw e; }
     },
-    watch(onGroup, onMembers, onGames) {
-      const u1 = F.onSnapshot(gref, s => onGroup(s.exists() ? s.data() : null));
-      const u2 = F.onSnapshot(col("members"), q => { const o = {}; q.forEach(d => o[d.id] = d.data()); onMembers(o); }, e => console.warn(e));
-      const u3 = F.onSnapshot(col("games"), q => { const o = {}; q.forEach(d => o[d.id] = d.data()); onGames(o); }, e => console.warn(e));
-      return () => { u1(); u2(); u3(); };
+    watch(cbs) {
+      const map = cb => q => { const o = {}; q.forEach(d => o[d.id] = d.data()); cb(o); };
+      const u = [
+        F.onSnapshot(gref, s => cbs.group(s.exists() ? s.data() : null)),
+        F.onSnapshot(col("members"), map(cbs.members), e => console.warn(e)),
+        F.onSnapshot(col("games"), map(cbs.games), e => console.warn(e)),
+        F.onSnapshot(col("nights"), map(cbs.nights), e => console.warn(e)),
+        F.onSnapshot(F.query(col("activity"), F.orderBy("at", "desc"), F.limit(60)), q => { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); cbs.activity(a); }, e => console.warn(e)),
+      ];
+      return () => u.forEach(f => f());
     },
+    async addNight(data) { const r = await F.addDoc(col("nights"), { ...data, createdAt: F.serverTimestamp() }); return r.id; },
+    patchNight(id, patch) {
+      const p = {}; for (const [k, v] of Object.entries(patch)) p[k] = v === undefined ? F.deleteField() : v;
+      return F.updateDoc(sub("nights", id), p);
+    },
+    deleteNight(id) { return F.deleteDoc(sub("nights", id)); },
+    logActivity(e) { return F.addDoc(col("activity"), { ...e, at: F.serverTimestamp() }); },
     async addGame(id, data) {
       const ref = sub("games", id);
       await F.runTransaction(fs, async tx => {
@@ -643,6 +789,9 @@ async function detailsFor(hit) {
     out.crossProgression = b.crossProgression; out.players = b.players;
     out.modes = [...new Set([...(b.mode || []), ...out.modes])];
     out.freeToPlay = b.freeToPlay;
+    out.maxParty = b.maxParty || null;
+    if (b.cover) out.cover = b.cover;
+    if (b.steamAppId) out.steamAppID = String(b.steamAppId);
     if (b.stores?.gamepass) out.gamepass = true;
     if (b.stores?.psplus) out.psplus = true;
     out.xpSource = b.source;
@@ -677,7 +826,7 @@ async function refreshPrice(id, force) {
   try {
     const p = await pcPrice(g.title, g.steamAppID);
     const patch = { priceAt: Date.now() };
-    if (p) { patch.pcPrice = p; if (p.steamAppID && !g.steamAppID) patch.steamAppID = p.steamAppID; }
+    if (p) { patch.pcPrice = p; if (p.steamAppID && !g.steamAppID) { patch.steamAppID = p.steamAppID; if (!g.cover) patch.cover = steamHeader(p.steamAppID); } }
     else patch.pcPrice = null;
     await B.patchGame(id, patch);
     if (force) toast(p ? `PC price updated: ${fmtPrice(p.price)}` : "No PC store price found");
@@ -706,7 +855,7 @@ function storeLinks(g) {
    RENDER
    ============================================================ */
 function renderTabs() {
-  const counts = { queue: 0, playing: 0, played: 0 };
+  const counts = { queue: 0, playing: 0, played: 0, nights: upcomingNights().length };
   for (const g of Object.values(S.games)) counts[STATUS[g.status || "suggested"]?.tab || "queue"]++;
   const html = TABS.map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${S.tab === t.id}"><span class="ic" aria-hidden="true">${t.ic}</span><span>${t.label}</span>${counts[t.id] ? `<span class="n">${counts[t.id]}</span>` : ""}</button>`).join("");
   $("tabsDesk").innerHTML = html; $("tabsMob").innerHTML = html;
@@ -720,7 +869,7 @@ function matches(g) {
   if (f.free && !g.freeToPlay) return false;
   if (f.sub && !(g.gamepass || g.psplus)) return false;
   if (f.mode && !(g.modes || []).includes(f.mode)) return false;
-  if (f.fits) { const r = fitCheck(g, crewPeople(g)); if (!r || r.state !== "ok") return false; }
+  if (f.fits) { const r = fitCheck(g, crewPeople(g)); if (!r || r.state !== "ok") return false; if (partyCheck(g, Object.keys(S.members).length)) return false; }
   return true;
 }
 function sortGames(list) {
@@ -750,21 +899,23 @@ function voteButtons(id, g, small) {
 }
 function card(id, g, rank) {
   const fit = fitCheck(g, interestedPeople(g));
+  const party = partyCheck(g, interestedCount(g));
   const xp = g.crossplay || "unknown";
   const st = g.status || "suggested";
   return `<article class="card" tabindex="0" data-open="${esc(id)}" aria-label="${esc(g.title)}">
-    <div class="cover" style="${g.cover ? `background-image:url('${esc(g.cover).replace(/'/g, "%27")}')` : ""}">
-      ${g.cover ? "" : `<div class="ph">${esc(g.title)}</div>`}
+    <div class="cover">
+      ${coverImg(g)}
       ${rank ? `<span class="rank">#${rank}</span>` : ""}
       ${st !== "suggested" ? `<span class="stat">${STATUS[st].label}</span>` : ""}
     </div>
     <div class="cbody">
       <h3 class="ctitle">${esc(g.title)}</h3>
       <div class="tags"><span class="xp ${xp}">${XP_LABEL[xp]}</span>${platTags(g.platforms)}
-        ${g.players ? `<span class="tag">${esc(g.players)}</span>` : ""}
+        ${maxPartyOf(g) ? `<span class="tag">Up to ${maxPartyOf(g)}</span>` : g.players ? `<span class="tag">${esc(g.players)}</span>` : ""}
         ${g.gamepass ? `<span class="tag">Game Pass</span>` : ""}${g.psplus ? `<span class="tag">PS Plus</span>` : ""}</div>
       ${g.description ? `<p class="desc">${esc(g.description)}</p>` : ""}
       ${fit ? `<div class="fit ${fit.state === "unknown" ? "warn" : fit.state}"><span aria-hidden="true">${fit.state === "ok" ? "✔" : fit.state === "bad" ? "✖" : "⚠"}</span><span>${esc(fit.text)}</span></div>` : ""}
+      ${party ? `<div class="fit warn"><span aria-hidden="true">⚠</span><span>${esc(party)}</span></div>` : ""}
       <div class="cfoot">${priceLine(g)}${voteButtons(id, g)}</div>
     </div></article>`;
 }
@@ -772,14 +923,23 @@ function card(id, g, rank) {
 function render() {
   if (!S.ready) return;
   renderTabs();
-  $("toolbar").classList.toggle("hidden", S.tab === "crew" || S.tab === "ideas");
+  $("toolbar").classList.toggle("hidden", ["crew", "ideas", "nights"].includes(S.tab));
   const v = $("view");
+  updateBell();
+  if (S.tab === "nights") return renderNights(v);
   if (S.tab === "ideas") return renderIdeas(v);
   if (S.tab === "crew") return renderCrew(v);
   const entries = Object.entries(S.games).filter(([, g]) => (STATUS[g.status || "suggested"]?.tab || "queue") === S.tab);
   const shown = sortGames(entries.filter(([, g]) => matches(g)).map(([id, g]) => ({ ...g, _id: id })));
   const heads = { queue: ["The queue", "Vote 👍 on what you'd play. Most-wanted rises to the top."], playing: ["Now playing", "Games the crew is in right now."], played: ["Played", "Finished and dropped."] };
-  let html = `<div class="sectionhead"><h2>${heads[S.tab][0]}</h2><span class="muted">${heads[S.tab][1]}</span></div><div class="grid">`;
+  let html = "";
+  const next = upcomingNights()[0];
+  if (S.tab === "queue" && next) {
+    const [nid, n] = next; const ng = n.gameId && S.games[n.gameId];
+    const ins = Object.values(n.rsvps || {}).filter(x => x === "in").length;
+    html += `<button class="nextnight" data-tab="nights"><span aria-hidden="true">◷</span><span>Next game night: <b>${esc(fmtNight(n.when))}</b>${ng ? ` · ${esc(ng.title)}` : ""} · ${ins} in</span></button>`;
+  }
+  html += `<div class="sectionhead"><h2>${heads[S.tab][0]}</h2><span class="muted">${heads[S.tab][1]}</span></div><div class="grid">`;
   if (!entries.length) {
     html += S.tab === "queue"
       ? `<div class="empty"><h3>Nothing in the queue yet</h3><p>Hit <b>Suggest a game</b>, or grab one from <b>Ideas</b>, a list of ${BUILTIN.length} multiplayer games with crossplay already checked.</p></div>`
@@ -798,7 +958,7 @@ function renderIdeas(v) {
     (!f.q || norm(b.title).includes(norm(f.q))) &&
     (!f.xp || b.crossplay === f.xp) &&
     (!f.mode || (b.mode || []).includes(f.mode)));
-  v.innerHTML = `<div class="sectionhead"><h2>Ideas</h2><span class="muted">${BUILTIN.length} multiplayer games with crossplay checked (Oct 2026). One tap suggests it to the crew.</span></div>
+  v.innerHTML = `<div class="sectionhead"><h2>Ideas</h2><span class="muted">${BUILTIN.length} multiplayer games, crossplay last checked ${esc(fmtDate(window.BUILTIN_CHECKED))}. One tap suggests it to the crew.</span></div>
    <div class="toolbar" style="padding-top:0">
      <div class="search"><span aria-hidden="true">⌕</span><input id="ideaQ" placeholder="Search ideas…" value="${esc(f.q)}"></div>
      <select class="sel" id="ideaXp"><option value="">Any crossplay</option><option value="full" ${f.xp === "full" ? "selected" : ""}>Full crossplay</option><option value="partial" ${f.xp === "partial" ? "selected" : ""}>Partial</option><option value="none" ${f.xp === "none" ? "selected" : ""}>None</option></select>
@@ -807,7 +967,7 @@ function renderIdeas(v) {
    <div class="ideas">${list.map(b => `<div class="idea">
       <div style="flex:1;min-width:0"><div class="t">${esc(b.title)}</div>
         <div class="tags" style="margin:3px 0"><span class="xp ${b.crossplay}">${XP_LABEL[b.crossplay]}</span>${platTags(b.platforms)}${b.freeToPlay ? `<span class="tag">Free</span>` : ""}</div>
-        <div class="sub">${esc(b.players)} · ${esc(b.crossplayNote)}</div></div>
+        <div class="sub">${esc(b.players)} · ${esc(b.crossplayNote)} · <a href="${esc(trailerUrl(b.title))}" target="_blank" rel="noopener">Trailer ↗</a></div></div>
       ${added.has(norm(b.title)) ? `<span class="tag">In list</span>` : `<button class="ibtn" data-idea="${esc(b.title)}">＋ Suggest</button>`}
     </div>`).join("") || `<div class="empty"><h3>No matches</h3></div>`}</div>`;
   const upd = () => { S.ideaFilter = { q: $("ideaQ").value, xp: $("ideaXp").value, mode: $("ideaMode").value }; const pos = $("ideaQ").selectionStart; renderIdeas(v); const i = $("ideaQ"); if (document.activeElement !== i && S._ideaTyping) { i.focus(); i.setSelectionRange(pos, pos); } };
@@ -845,13 +1005,14 @@ function openGame(id) {
   const xp = g.crossplay || "unknown";
   const notOwn = Object.keys(S.members).filter(u => !(g.owns || {})[u]).length;
   d.innerHTML = `
-   <div class="dhead ${g.cover ? "" : "noimg"}" style="${g.cover ? `background-image:url('${esc(g.cover).replace(/'/g, "%27")}')` : ""}"><button class="dclose" data-close aria-label="Close">×</button></div>
+   <div class="dhead ${coverOf(g).src ? "" : "noimg"}">${coverOf(g).src ? coverImg(g) : ""}<button class="dclose" data-close aria-label="Close">×</button></div>
    <div class="dbody">
      <div><h2 id="gTitle">${esc(g.title)}</h2>
        <div class="tags" style="margin-top:8px"><span class="xp ${xp}">${XP_LABEL[xp]}</span>${platTags(g.platforms)}
        ${(g.modes || []).map(m => `<span class="tag">${MODE_LABEL[m] || esc(m)}</span>`).join("")}
        ${(g.genres || []).map(x => `<span class="tag">${esc(x)}</span>`).join("")}</div>
-       <div class="muted" style="font-size:13px;margin-top:8px">${sugg ? `Suggested by ${esc(sugg.name)}` : "Suggested"} ${timeAgo(tsMs(g.suggestedAt))}${g.released ? ` · Released ${esc(g.released.slice(0, 4))}` : ""}</div></div>
+       <div class="muted" style="font-size:13px;margin-top:8px">${sugg ? `Suggested by ${esc(sugg.name)}` : "Suggested"} ${timeAgo(tsMs(g.suggestedAt))}${g.released ? ` · Released ${esc(g.released.slice(0, 4))}` : ""}</div>
+       <div class="row" style="margin-top:10px"><a class="tlink" href="${esc(trailerUrl(g.title))}" target="_blank" rel="noopener">▶ Watch trailer</a><button class="ibtn" data-plan="${esc(id)}" style="height:32px">◷ Plan a game night</button></div></div>
      ${g.pitch ? `<div class="box" style="background:var(--accent-soft);border-color:transparent"><h3>The pitch</h3><div>“${esc(g.pitch)}”</div></div>` : ""}
      ${g.description ? `<div style="white-space:pre-line;color:var(--muted)">${esc(g.description)}</div>` : ""}
      <div class="box"><h3>Your vote</h3><div class="row">${voteButtons(id, g)}</div>
@@ -863,6 +1024,7 @@ function openGame(id) {
          ${g.crossProgression === true ? `<div class="muted" style="font-size:13px">Cross-progression: yes</div>` : g.crossProgression === false ? `<div class="muted" style="font-size:13px">Cross-progression: no</div>` : ""}
          ${fitI ? `<div class="fit ${fitI.state === "unknown" ? "warn" : fitI.state}"><b>Interested:</b>&nbsp;${esc(fitI.text)}</div>` : ""}
          ${fitC ? `<div class="fit ${fitC.state === "unknown" ? "warn" : fitC.state}"><b>Whole crew:</b>&nbsp;${esc(fitC.text)}</div>` : ""}
+         ${maxPartyOf(g) ? `<div class="${partyCheck(g, Object.keys(S.members).length) ? "fit warn" : "muted"}" style="font-size:13px">Party size: up to ${maxPartyOf(g)}${partyCheck(g, interestedCount(g)) ? ` · ${interestedCount(g)} want in` : ""} · crew of ${Object.keys(S.members).length}</div>` : ""}
          ${g.xpSource ? `<a href="${esc(g.xpSource)}" target="_blank" rel="noopener" class="muted" style="font-size:12px">Where this was checked ↗</a>` : ""}
        </div>
        <div class="box"><h3>Price</h3>
@@ -886,6 +1048,7 @@ function openGame(id) {
          <label class="fld">Console price<input id="cpIn" value="${esc(g.consolePrice || "")}" placeholder="e.g. $39.99 PS Store" maxlength="60"></label>
        </div>
        <div class="checks"><label><input type="checkbox" id="gpIn" ${g.gamepass ? "checked" : ""}> On Game Pass</label><label><input type="checkbox" id="psIn" ${g.psplus ? "checked" : ""}> In PS Plus</label></div>
+       <label class="fld">Max party size<input id="mpIn" type="number" min="1" max="100" inputmode="numeric" value="${maxPartyOf(g) || ""}" placeholder="No limit set"></label>
        <div class="two">
          <label class="fld">Crossplay<select id="xpSel">${["unknown", "full", "partial", "none"].map(k => `<option value="${k}" ${xp === k ? "selected" : ""}>${XP_LABEL[k]}</option>`).join("")}</select></label>
          <label class="fld">Crossplay note<input id="xnIn" value="${esc(g.crossplayNote || "")}" maxlength="120"></label>
@@ -904,9 +1067,13 @@ function openGame(id) {
     const xpv = $("xpSel").value;
     const patch = { status: $("statSel").value, consolePrice: $("cpIn").value.trim(), gamepass: $("gpIn").checked, psplus: $("psIn").checked,
       crossplay: xpv, crossplayNote: $("xnIn").value.trim(), notes: $("notesIn").value.trim() };
+    const mp = parseInt($("mpIn").value, 10); patch.maxParty = mp > 0 ? Math.min(mp, 100) : null;
     if (xpv !== (g.crossplay || "unknown")) patch.groups = encG(defaultGroups(xpv));
     if (patch.status !== (g.status || "suggested") && patch.status === "playing") patch.playedAt = Date.now();
-    try { await B.patchGame(id, patch); toast("Saved"); d.close(); } catch (er) { fail(er); }
+    try {
+      await B.patchGame(id, patch); toast("Saved"); d.close();
+      if (patch.status !== (g.status || "suggested")) logAct("status", { gameId: id, title: g.title, status: patch.status });
+    } catch (er) { fail(er); }
   };
   const del = $("delGame"); if (del) del.onclick = async () => { if (!confirm(`Remove ${g.title} from the list for everyone?`)) return; try { await B.deleteGame(id); d.close(); toast("Removed"); } catch (er) { fail(er); } };
 }
@@ -916,7 +1083,10 @@ function fail(e) { console.error(e); toast(e?.code === "permission-denied" ? "Yo
 async function vote(id, val) {
   const g = S.games[id]; if (!g) return;
   const cur = (g.votes || {})[S.user.uid];
-  try { await B.patchGame(id, { [`votes.${S.user.uid}`]: cur === val ? B.DEL : val }); } catch (e) { fail(e); }
+  try {
+    await B.patchGame(id, { [`votes.${S.user.uid}`]: cur === val ? B.DEL : val });
+    if (val === "yes" && cur !== "yes") logAct("vote", { gameId: id, title: g.title });
+  } catch (e) { fail(e); }
 }
 
 /* ---------- suggest flow ---------- */
@@ -962,6 +1132,7 @@ function showForm(d) {
   f.crossplay.value = pending.crossplay || (pending.crossHint ? "full" : "unknown");
   f.crossplayNote.value = pending.crossplayNote || (pending.crossHint && !pending.crossplay ? "RAWG lists cross-platform multiplayer; double-check" : "");
   f.players.value = pending.players || ""; f.freeToPlay.checked = !!pending.freeToPlay;
+  f.maxParty.value = pending.builtin ? (pending.maxParty || "") : (parseMaxParty(pending.players) || "");
   f.gamepass.checked = !!pending.gamepass; f.psplus.checked = !!pending.psplus; f.consolePrice.value = ""; f.pitch.value = "";
   $("addPlats").innerHTML = BASE_PLATS.map(p => `<label><input type="checkbox" value="${p}" ${(pending.platforms || []).includes(p) ? "checked" : ""}> ${PLATS[p].label.replace(" (Steam / Epic)", "")}</label>`).join("");
   $("addModes").innerHTML = MODES.map(m => `<label><input type="checkbox" value="${m}" ${(pending.modes || []).includes(m) ? "checked" : ""}> ${MODE_LABEL[m]}</label>`).join("");
@@ -986,11 +1157,12 @@ async function saveSuggestion(e) {
     modes: [...$("addModes").querySelectorAll("input:checked")].map(i => i.value),
     genres: pending?.genres || [], released: pending?.released || "", storeUrls: pending?.storeUrls || {}, stores: (BUILTIN.find(b => b.title === pending?.builtin) || {}).stores || {},
     freeToPlay: f.freeToPlay.checked, gamepass: f.gamepass.checked, psplus: f.psplus.checked, consolePrice: f.consolePrice.value.trim(),
-    pitch: f.pitch.value.trim(), xpSource: pending?.xpSource || "", rawgId: pending?.rawgId || null,
+    pitch: f.pitch.value.trim(), xpSource: pending?.xpSource || "", rawgId: pending?.rawgId || null, steamAppID: pending?.steamAppID || null,
     status: "suggested", suggestedBy: S.user.uid, votes: { [S.user.uid]: "yes" }, owns: {}, notes: "",
+    maxParty: parseInt(f.maxParty.value, 10) > 0 ? Math.min(parseInt(f.maxParty.value, 10), 100) : null,
   };
   $("addSave").disabled = true;
-  try { await B.addGame(id, data); $("addDlg").close(); toast(`Suggested ${title}`); refreshPrice(id, false); if (S.tab !== "queue") setTab("queue"); }
+  try { await B.addGame(id, data); $("addDlg").close(); toast(`Suggested ${title}`); logAct("suggest", { gameId: id, title }); refreshPrice(id, false); if (S.tab !== "queue") setTab("queue"); }
   catch (er) { err.textContent = er.message === "exists" ? `${title} is already on the list.` : (er.code === "permission-denied" ? "You don't have permission to add games." : er.message); err.classList.remove("hidden"); }
   finally { $("addSave").disabled = false; }
 }
@@ -1006,7 +1178,7 @@ function pickTonight() {
   const body = $("pickBody");
   if (!pool.length) { body.innerHTML = `<div class="big">Nothing to pick yet</div><p class="muted">Vote 👍 on a few games first.</p>`; $("pickDlg").showModal(); return; }
   // weight by score, bonus if everyone interested can play together
-  const w = pool.map(([id, g]) => { const f = fitCheck(g, interestedPeople(g)); return Math.max(1, score(g)) * (f?.state === "ok" ? 2 : f?.state === "bad" ? 0.3 : 1); });
+  const w = pool.map(([id, g]) => { const f = fitCheck(g, interestedPeople(g)); return Math.max(1, score(g)) * (f?.state === "ok" ? 2 : f?.state === "bad" ? 0.3 : 1) * (partyCheck(g, interestedCount(g)) ? 0.4 : 1); });
   let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0; for (; i < w.length - 1; i++) { r -= w[i]; if (r <= 0) break; }
   const [id, g] = pool[i]; const f = fitCheck(g, interestedPeople(g));
   body.innerHTML = `<div class="muted disp" style="letter-spacing:.12em;text-transform:uppercase;font-size:13px">Tonight you're playing</div><div class="big">${esc(g.title)}</div>
@@ -1016,12 +1188,173 @@ function pickTonight() {
   $("reroll").onclick = pickTonight; $("pickOpen").onclick = () => { $("pickDlg").close(); openGame(id); };
 }
 
+/* ---------- cover backfill ---------- */
+// Games saved without art (e.g. Wikipedia had no image) get the built-in or Steam art, once.
+function backfillCovers() {
+  for (const [id, g] of Object.entries(S.games)) {
+    if (g.cover || backfillCovers.done.has(id)) continue;
+    const c = coverOf(g); backfillCovers.done.add(id);
+    if (c.src) B.patchGame(id, { cover: c.src }).catch(e => console.warn("cover", e));
+  }
+}
+backfillCovers.done = new Set();
+
+/* ---------- game nights ---------- */
+const HOUR = 3600e3;
+function upcomingNights() {
+  const cut = Date.now() - 4 * HOUR;
+  return Object.entries(S.nights).filter(([, n]) => n.when >= cut).sort((a, b) => a[1].when - b[1].when);
+}
+function fmtNight(ms) { return new Date(ms).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+function fmtDate(iso) { const d = new Date(iso + "T12:00:00"); return isNaN(d) ? String(iso || "") : d.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" }); }
+function relDay(ms) {
+  const d0 = new Date(); d0.setHours(0, 0, 0, 0);
+  const days = Math.round((new Date(ms).setHours(0, 0, 0, 0) - d0) / 864e5);
+  if (ms < Date.now() - 4 * HOUR) return timeAgo(ms);
+  if (days <= 0) return new Date(ms).getHours() >= 17 ? "Tonight" : "Today";
+  if (days === 1) return "Tomorrow";
+  return `In ${days} days`;
+}
+function nightCard(id, n, past) {
+  const d = new Date(n.when);
+  const g = n.gameId ? S.games[n.gameId] : null;
+  const r = n.rsvps || {}; const mine = r[S.user.uid];
+  const by = k => Object.entries(r).filter(([u, v]) => v === k && S.members[u]).map(([u]) => S.members[u]);
+  const ins = by("in");
+  const inPeople = Object.keys(r).filter(u => r[u] === "in" && S.members[u]).map(u => ({ uid: u, plat: (g?.owns || {})[u] || (S.members[u].platforms || [])[0] })).filter(p => p.plat);
+  const fit = g && inPeople.length ? fitCheck(g, inPeople) : null;
+  const party = g ? partyCheck(g, ins.length, "in") : null;
+  const canEdit = isLeader() || n.createdBy === S.user.uid;
+  const planner = S.members[n.createdBy];
+  const cnt = k => by(k).length;
+  return `<article class="night ${past ? "past" : ""}" aria-label="Game night ${esc(fmtNight(n.when))}">
+    <div class="top">
+      <div class="dateblk" aria-hidden="true"><div class="m">${esc(d.toLocaleDateString([], { month: "short" }))}</div><div class="d">${d.getDate()}</div><div class="m">${esc(d.toLocaleDateString([], { weekday: "short" }))}</div></div>
+      <div style="flex:1;min-width:0"><div class="when">${esc(d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }))} · ${esc(relDay(n.when))}</div>
+        <div class="muted" style="font-size:13px">Planned by ${esc(planner?.name || "someone")}</div></div>
+    </div>
+    ${g ? `<button class="gm" data-open="${esc(n.gameId)}"><span class="th">${coverOf(g).src ? coverImg(g) : ""}</span><span style="min-width:0"><b>${esc(g.title)}</b><div class="tags" style="margin-top:3px"><span class="xp ${g.crossplay || "unknown"}">${XP_LABEL[g.crossplay || "unknown"]}</span>${maxPartyOf(g) ? `<span class="tag">Up to ${maxPartyOf(g)}</span>` : ""}</div></span></button>`
+      : `<div class="muted" style="font-size:14px">Game: to be decided. Vote in the queue.</div>`}
+    ${n.note ? `<div style="font-size:14px;white-space:pre-line">${esc(n.note)}</div>` : ""}
+    ${fit ? `<div class="fit ${fit.state === "unknown" ? "warn" : fit.state}"><span aria-hidden="true">${fit.state === "ok" ? "✔" : fit.state === "bad" ? "✖" : "⚠"}</span><span>${esc(fit.text.replace("can play together", "who are in can play together"))}</span></div>` : ""}
+    ${party ? `<div class="fit warn"><span aria-hidden="true">⚠</span><span>${esc(party)}</span></div>` : ""}
+    ${past ? "" : `<div class="rsvp" role="group" aria-label="Are you in?">
+      <button class="in" data-rsvp="in" data-night="${esc(id)}" aria-pressed="${mine === "in"}">In${cnt("in") ? " · " + cnt("in") : ""}</button>
+      <button class="maybe" data-rsvp="maybe" data-night="${esc(id)}" aria-pressed="${mine === "maybe"}">Maybe${cnt("maybe") ? " · " + cnt("maybe") : ""}</button>
+      <button class="out" data-rsvp="out" data-night="${esc(id)}" aria-pressed="${mine === "out"}">Out${cnt("out") ? " · " + cnt("out") : ""}</button></div>`}
+    <div class="who">${["in", "maybe", "out"].map(k => by(k).map(m => `<span class="p">${avatar(m, "sm")}${esc(m.name.split(" ")[0])} · ${k === "in" ? "in" : k === "maybe" ? "maybe" : "out"}</span>`).join("")).join("") || `<span class="muted" style="font-size:13px">No replies yet</span>`}</div>
+    ${past ? "" : `<div class="row">
+      <button class="ibtn ghost" data-ics="${esc(id)}" style="height:34px">Add to calendar</button>
+      ${canEdit ? `<button class="ibtn ghost" data-editnight="${esc(id)}" style="height:34px">Edit</button><button class="ibtn ghost danger" data-delnight="${esc(id)}" style="height:34px">Cancel night</button>` : ""}</div>`}
+  </article>`;
+}
+function renderNights(v) {
+  const up = upcomingNights();
+  const past = Object.entries(S.nights).filter(([, n]) => n.when < Date.now() - 4 * HOUR).sort((a, b) => b[1].when - a[1].when).slice(0, 10);
+  v.innerHTML = `<div class="sectionhead"><h2>Game nights</h2><span class="muted">Pick a time, see who's in.</span><div class="spacer"></div><button class="ibtn primary" data-plan="">＋ Plan a night</button></div>
+    <div class="nights">${up.map(([id, n]) => nightCard(id, n, false)).join("") || `<div class="empty"><h3>No game nights planned</h3><p>Hit <b>Plan a night</b>, pick a time and a game (or decide later), and everyone can say if they're in.</p></div>`}</div>
+    ${past.length ? `<details class="pastlist"><summary>Past nights (${past.length})</summary><div class="nights">${past.map(([id, n]) => nightCard(id, n, true)).join("")}</div></details>` : `<div style="height:110px"></div>`}`;
+}
+function toLocalInput(ms) { const d = new Date(ms); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); }
+function openPlan(gameId, editId) {
+  const f = $("nightForm"); const n = editId ? S.nights[editId] : null;
+  let when = n?.when;
+  if (!when) { const d = new Date(); if (d.getHours() >= 18) d.setDate(d.getDate() + 1); d.setHours(20, 0, 0, 0); when = d.getTime(); }
+  f.when.value = toLocalInput(when);
+  const sel = n ? n.gameId : gameId;
+  const games = Object.entries(S.games).filter(([gid, g]) => ["suggested", "next", "playing"].includes(g.status || "suggested") || gid === sel).sort((a, b) => score(b[1]) - score(a[1]));
+  $("nightGame").innerHTML = `<option value="">Decide later</option>` + games.map(([gid, g]) => `<option value="${esc(gid)}" ${gid === sel ? "selected" : ""}>${esc(g.title)}${score(g) > 0 ? ` (${Object.values(g.votes || {}).filter(x => x === "yes").length} 👍)` : ""}</option>`).join("");
+  f.note.value = n?.note || "";
+  $("nightTitle").textContent = n ? "Edit game night" : "Plan a game night";
+  $("nightErr").classList.add("hidden");
+  $("nightDlg").dataset.edit = editId || "";
+  $("nightDlg").showModal();
+}
+async function saveNight(e) {
+  e.preventDefault(); const f = $("nightForm"); const err = $("nightErr");
+  const when = new Date(f.when.value).getTime();
+  if (!Number.isFinite(when)) { err.textContent = "Pick a date and time."; err.classList.remove("hidden"); return; }
+  const gameId = f.game.value || null; const note = f.note.value.trim().slice(0, 300);
+  const editId = $("nightDlg").dataset.edit;
+  $("nightSave").disabled = true;
+  try {
+    if (editId) { await B.patchNight(editId, { when, gameId, note }); toast("Game night updated"); }
+    else {
+      const id = await B.addNight({ when, gameId, note, createdBy: S.user.uid, rsvps: { [S.user.uid]: "in" } });
+      toast("Game night planned");
+      logAct("night", { nightId: id, when, gameId, title: gameId ? S.games[gameId]?.title || "" : "" });
+    }
+    $("nightDlg").close(); if (S.tab !== "nights") setTab("nights");
+  } catch (er) { err.textContent = er.code === "permission-denied" ? "You don't have permission to do that." : er.message; err.classList.remove("hidden"); }
+  finally { $("nightSave").disabled = false; }
+}
+async function rsvp(id, val) {
+  const n = S.nights[id]; if (!n) return;
+  const cur = (n.rsvps || {})[S.user.uid];
+  try {
+    await B.patchNight(id, { [`rsvps.${S.user.uid}`]: cur === val ? B.DEL : val });
+    if (val === "in" && cur !== "in") logAct("rsvp", { nightId: id, when: n.when });
+  } catch (e) { fail(e); }
+}
+function downloadIcs(id) {
+  const n = S.nights[id]; if (!n) return; const g = n.gameId && S.games[n.gameId];
+  const f = ms => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const e = s => String(s || "").replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\n/g, "\\n");
+  const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Party Up//EN", "BEGIN:VEVENT", `UID:${id}@partyup`, `DTSTAMP:${f(Date.now())}`,
+    `DTSTART:${f(n.when)}`, `DTEND:${f(n.when + 3 * HOUR)}`, `SUMMARY:${e("Game night" + (g ? ": " + g.title : ""))}`,
+    `DESCRIPTION:${e([n.note, location.origin + location.pathname].filter(Boolean).join("\n"))}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+  a.download = "game-night.ics"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/* ---------- activity feed ---------- */
+function logAct(type, extra = {}) {
+  if (!B?.logActivity || !S.user) return;
+  const clean = Object.fromEntries(Object.entries({ type, by: S.user.uid, ...extra }).filter(([, v]) => v !== undefined));
+  Promise.resolve(B.logActivity(clean)).catch(e => console.warn("activity", e));
+}
+const actMs = e => tsMs(e.at) || Date.now();
+function unseenCount() { const seen = store.get("sq_seen_" + GROUP, Date.now()); return S.activity.filter(e => e.by !== S.user?.uid && actMs(e) > seen).length; }
+function updateBell() { $("actDot").classList.toggle("hidden", !S.user || !unseenCount()); $("actBtn").setAttribute("aria-label", unseenCount() ? `Activity, ${unseenCount()} new` : "Activity"); }
+function actText(e) {
+  const who = `<b>${esc((S.members[e.by]?.name || "Someone").split(" ")[0])}</b>`;
+  const t = e.title ? `<b>${esc(e.title)}</b>` : "a game";
+  switch (e.type) {
+    case "suggest": return `${who} suggested ${t}`;
+    case "vote": return `${who} is in for ${t}`;
+    case "status": return `${who} moved ${t} to ${esc(STATUS[e.status]?.label || e.status)}`;
+    case "night": return `${who} planned a game night for ${esc(fmtNight(e.when))}${e.title ? ` · ${t}` : ""}`;
+    case "rsvp": return `${who} is in for game night on ${esc(fmtNight(e.when))}`;
+    case "join": return `${who} joined the crew`;
+    default: return `${who} updated the list`;
+  }
+}
+function renderFeed(markSeen) {
+  const seen = S._seenBefore ?? store.get("sq_seen_" + GROUP, Date.now());
+  $("feed").innerHTML = S.activity.map(e => `<button class="ev ${e.by !== S.user.uid && actMs(e) > seen ? "new" : ""}" data-act="${esc(e.id)}">${avatar(S.members[e.by] || { name: "?" }, "sm")}<span style="min-width:0"><div class="t">${actText(e)}</div><div class="s">${esc(timeAgo(actMs(e)) || "just now")}</div></span></button>`).join("")
+    || `<div class="muted" style="padding:20px 0">Nothing yet. Suggestions, votes, game nights and new members show up here.</div>`;
+  if (markSeen) store.set("sq_seen_" + GROUP, Date.now());
+  updateBell();
+}
+function openActivity() { S._seenBefore = store.get("sq_seen_" + GROUP, Date.now()); renderFeed(true); $("actDlg").showModal(); }
+function openActItem(id) {
+  const e = S.activity.find(x => x.id === id); if (!e) return;
+  if (e.gameId && S.games[e.gameId]) { $("actDlg").close(); return openGame(e.gameId); }
+  if (e.nightId || e.type === "night" || e.type === "rsvp") { $("actDlg").close(); return setTab("nights"); }
+  if (e.type === "join") { $("actDlg").close(); return setTab("crew"); }
+}
+$("actDlg").addEventListener("close", () => { S._seenBefore = undefined; });
+
 /* ---------- profile ---------- */
 async function openMe() {
   const m = me() || {}; const f = $("meForm");
   f.name.value = m.name || S.user.displayName || "";
   const h = m.handles || {}; for (const k of ["steam", "epic", "psn", "xbox", "discord"]) f[k].value = h[k] || "";
   renderPlatChecks($("mePlats"), m.platforms || []);
+  const cur = accentOf(m);
+  $("meAccent").innerHTML = Object.entries(ACCENTS).map(([k, a]) => `<label title="${a.name}"><input type="radio" name="accent" value="${k}" ${k === cur ? "checked" : ""} aria-label="${a.name}"><span style="background:${a.d[0]}"></span></label>`).join("");
+  $("meAccent").querySelectorAll("input").forEach(i => i.onchange = () => applyAccent(i.value, false));
+  S._accentSaved = false;
   $("leaderBox").classList.toggle("hidden", !isLeader());
   if (isLeader()) { f.joinCode.value = ""; B.getJoinCode().then(c => { f.joinCode.value = c || ""; }).catch(() => {}); }
   $("meErr").classList.add("hidden");
@@ -1038,12 +1371,13 @@ function renderPlatChecks(el, sel) {
 const readPlats = el => JSON.parse(el.dataset.order || "[]");
 async function saveMe(e) {
   e.preventDefault(); const f = $("meForm");
-  const data = { name: f.name.value.trim().slice(0, 40), platforms: readPlats($("mePlats")),
+  const data = { name: f.name.value.trim().slice(0, 40), platforms: readPlats($("mePlats")), accent: accentOf({ accent: f.accent?.value }),
     handles: Object.fromEntries(["steam", "epic", "psn", "xbox", "discord"].map(k => [k, f[k].value.trim()]).filter(([, v]) => v)) };
   if (!data.name) return;
   try {
     await B.saveMember(S.user.uid, data);
     if (isLeader() && f.joinCode.value.trim()) await B.setJoinCode(f.joinCode.value.trim());
+    S._accentSaved = true; applyAccent(data.accent);
     $("meDlg").close(); toast("Profile saved");
   } catch (er) { $("meErr").textContent = er.message; $("meErr").classList.remove("hidden"); }
 }
@@ -1078,6 +1412,7 @@ function showJoin(groupExists) {
       if (groupExists) await B.join(meData, f.code.value.trim());
       else await B.createGroup({ name: f.gname.value.trim(), leaderUid: S.user.uid }, meData, f.code.value.trim());
       enterApp();
+      logAct("join");
     } catch (er) { $("gateErr").textContent = er.message; $("gateErr").classList.remove("hidden"); }
   };
 }
@@ -1086,11 +1421,19 @@ function enterApp() {
   $("gate").classList.add("hidden"); $("app").classList.remove("hidden"); $("tabsMob").classList.remove("hidden");
   $("demoBanner").classList.toggle("hidden", B.mode !== "local");
   if (unwatch) unwatch();
-  unwatch = B.watch(
-    g => { S.group = g; $("groupName").textContent = g?.name ? "· " + g.name : ""; render(); },
-    m => { S.members = m || {}; if (S.user && !S.members[S.user.uid] && S.ready) { toast("You're no longer in this group"); } updateMe(); render(); },
-    g => { S.games = g || {}; S.ready = true; render(); const d = $("gameDlg"); if (d.open && d.dataset.id && S.games[d.dataset.id] && !d.contains(document.activeElement?.closest?.("input,textarea,select") || null)) refreshDialogVotes(d.dataset.id); },
-  );
+  $("actBtn").classList.remove("hidden");
+  if (store.get("sq_seen_" + GROUP, null) == null) store.set("sq_seen_" + GROUP, Date.now());
+  unwatch = B.watch({
+    group: g => { S.group = g; $("groupName").textContent = g?.name ? "· " + g.name : ""; render(); },
+    members: m => {
+      S.members = m || {}; if (S.user && !S.members[S.user.uid] && S.ready) { toast("You're no longer in this group"); }
+      const mine = me(); if (mine?.accent && !$("meDlg").open) applyAccent(mine.accent);
+      updateMe(); render();
+    },
+    games: g => { S.games = g || {}; S.ready = true; backfillCovers(); render(); const d = $("gameDlg"); if (d.open && d.dataset.id && S.games[d.dataset.id] && !d.contains(document.activeElement?.closest?.("input,textarea,select") || null)) refreshDialogVotes(d.dataset.id); },
+    nights: n => { S.nights = n || {}; render(); },
+    activity: a => { S.activity = a || []; updateBell(); if ($("actDlg").open) renderFeed(false); },
+  });
 }
 function refreshDialogVotes(id) {
   // live-update vote buttons in an open dialog without clobbering edits
@@ -1110,8 +1453,14 @@ applyTheme();
 
 /* ---------- events ---------- */
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f]");
+  const t = e.target.closest("[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f],[data-rsvp],[data-ics],[data-plan],[data-editnight],[data-delnight],[data-act]");
   if (!t) return;
+  if (t.dataset.rsvp) return rsvp(t.dataset.night, t.dataset.rsvp);
+  if (t.dataset.ics) return downloadIcs(t.dataset.ics);
+  if ("plan" in t.dataset) { if ($("gameDlg").open) $("gameDlg").close(); return openPlan(t.dataset.plan || null); }
+  if (t.dataset.editnight) return openPlan(null, t.dataset.editnight);
+  if (t.dataset.delnight) { if (confirm("Cancel this game night for everyone?")) B.deleteNight(t.dataset.delnight).then(() => toast("Game night cancelled")).catch(fail); return; }
+  if (t.dataset.act) return openActItem(t.dataset.act);
   if (t.dataset.tab) return setTab(t.dataset.tab);
   if (t.dataset.vote) { e.stopPropagation(); return vote(t.dataset.id, t.dataset.vote); }
   if (t.dataset.idea) return suggestIdea(t.dataset.idea);
@@ -1137,6 +1486,9 @@ $("addForm").onsubmit = saveSuggestion;
 $("meBtn").onclick = openMe;
 $("meForm").onsubmit = saveMe;
 $("signOutBtn").onclick = () => { $("meDlg").close(); B.signOut(); };
+$("meDlg").addEventListener("close", () => { if (!S._accentSaved) applyAccent(accentOf(me()) , !!me()); });
+$("nightForm").onsubmit = saveNight;
+$("actBtn").onclick = openActivity;
 // restore filter UI
 $("sortSel").value = S.filters.sort || "score"; $("modeSel").value = S.filters.mode || "";
 document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed", !!S.filters[c.dataset.f]));
@@ -1165,7 +1517,7 @@ document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed"
 })();
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-window.__sq = { S, fitCheck, builtinFor, norm, VERSION };
+window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck };
 </script>
 </body>
 </html>

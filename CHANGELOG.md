@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10 — Game nights, activity feed, your color (v1.2.0)
+
+- New look: purple color theme (dark and light) and a controller logo, with new app icons and favicon.
+- Your color: each person picks their own accent color in their profile; the app takes on that color for them only, synced across devices, and it rings their avatar so friends are easy to tell apart.
+- Game nights: a new Nights tab to plan a night (date, time, game or "decide later", note), RSVP In / Maybe / Out, see whether everyone who's in can play together, and add it to a calendar. The next night shows at the top of the queue.
+- Party-size check: max party size for the built-in games (editable on any game); warnings when more people want in than the game allows; "Whole crew fits" now respects it.
+- Activity feed: a bell in the header with a new-items dot, listing suggestions, 👍 votes, status changes, game nights, RSVPs and new members.
+- Trailer button on every game, and trailer links in Ideas.
+- Cover art: official store art for all 110 built-in games; Steam art as a fallback; games saved without art (like Fortnite before) fill it in automatically; broken images fall back cleanly.
+- Ideas tab shows when the crossplay list was last checked; a monthly scheduled task re-checks it.
+- Firestore rules: new rules for game nights and the activity feed, and maxParty/cover added to the fields any member can update. Re-publish `Firebase/firestore.rules`.
+
 ## 2026-10 — Renamed to Party Up (v1.1.0)
 
 - App renamed from Squad Queue to Party Up: page title, header, sign-in screen, installed-app name, README and setup guide.
