@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10 — Renamed to Party Up (v1.1.0)
+
+- App renamed from Squad Queue to Party Up: page title, header, sign-in screen, installed-app name, README and setup guide.
+- Site moved to https://alphadivine.github.io/party-up/ (GitHub repo renamed from squad-queue to party-up).
+- Service worker cache renamed, so installed copies pick up the new name on their next visit.
+- No data changes: the group, games, votes and Firebase project carry over as-is.
+
 ## 2026-10 — First release (v1.0.0)
 
 - Shared game-suggestion board with Google sign-in, a join code, and a group leader.

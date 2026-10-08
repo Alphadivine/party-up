@@ -1,10 +1,10 @@
-# ▶▶ Squad Queue
+# ▶▶ Party Up
 
 A shared "what should we play together?" board for you and your friends. Anyone in the crew can suggest a game, everyone votes, and the app tells you straight away whether the people who want to play can actually **play together across PC, PlayStation and Xbox**, where to buy it, and what it costs.
 
-Squad Queue is a single self-contained `index.html` (plus a data file). No build step, no server of your own: it runs in the browser and stores shared data in a free [Firebase](https://firebase.google.com) (Firestore) project.
+Party Up is a single self-contained `index.html` (plus a data file). No build step, no server of your own: it runs in the browser and stores shared data in a free [Firebase](https://firebase.google.com) (Firestore) project.
 
-> **Live site:** **https://alphadivine.github.io/squad-queue/** *(once deployed)*
+> **Live site:** **https://alphadivine.github.io/party-up/**
 
 ---
 

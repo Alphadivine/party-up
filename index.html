@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Squad Queue</title>
+<title>Party Up</title>
 <meta name="description" content="Suggest games to play together, vote, and see who can actually crossplay.">
 <meta name="theme-color" content="#14130f">
 <link rel="manifest" href="manifest.webmanifest">
@@ -203,7 +203,7 @@ nav.bottom{display:none}
 <body>
 <header class="top">
   <div class="wrap topbar">
-    <div class="brand"><span class="mark" aria-hidden="true">▶▶</span><span>Squad Queue <small id="groupName"></small></span></div>
+    <div class="brand"><span class="mark" aria-hidden="true">▶▶</span><span>Party Up <small id="groupName"></small></span></div>
     <div class="tabs desk" role="tablist" id="tabsDesk"></div>
     <div class="spacer"></div>
     <button class="ibtn ghost" id="themeBtn" title="Theme" aria-label="Switch theme">◐</button>
@@ -333,7 +333,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -1051,7 +1051,7 @@ async function saveMe(e) {
 /* ---------- gate (sign in / create / join) ---------- */
 function gate(html) { $("app").classList.add("hidden"); $("tabsMob").classList.add("hidden"); const g = $("gate"); g.classList.remove("hidden"); g.innerHTML = `<div class="gatecard">${html}</div>`; }
 function showSignIn() {
-  gate(`<h1>Squad Queue</h1><p>Suggest games, vote on what to play next, and see who can actually crossplay.</p>
+  gate(`<h1>Party Up</h1><p>Suggest games, vote on what to play next, and see who can actually crossplay.</p>
     <button class="ibtn primary" id="signInBtn" style="height:46px">${B.mode === "local" ? "Start (demo mode)" : "Sign in with Google"}</button>
     ${B.mode === "local" ? `<p style="font-size:13px">Demo mode: Firebase isn't configured, so data stays in this browser.</p>` : ""}
     <div class="err hidden" id="gateErr"></div>`);

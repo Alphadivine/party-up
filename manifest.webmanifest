@@ -1,6 +1,6 @@
 {
-  "name": "Squad Queue",
-  "short_name": "Squad Queue",
+  "name": "Party Up",
+  "short_name": "Party Up",
   "description": "Suggest games to play together, vote, and check crossplay.",
   "start_url": "./",
   "scope": "./",

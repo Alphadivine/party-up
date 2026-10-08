@@ -1,5 +1,5 @@
-// Squad Queue service worker: network-first for the app shell, offline fallback from cache.
-const CACHE = "squadqueue-v1";
+// Party Up service worker: network-first for the app shell, offline fallback from cache.
+const CACHE = "partyup-v2";
 const SHELL = ["./", "index.html", "data.js", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => {
