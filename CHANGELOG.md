@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10 — Whole theme follows your color (v1.3.1)
+
+- Your color now tints the whole app, not just buttons: backgrounds, cards, borders and text tints all follow it, in dark and light mode. Every color keeps text readable (4.5:1 or better).
+- The phone/browser bar color matches your theme.
+- Status colors (crossplay badges, warnings) stay the same in every theme so they keep their meaning.
+
 ## 2026-10 — Status line, timezones, profile pictures (v1.3.0)
 
 - Status line: a short status on your profile ("Grinding Helldivers · free after 9"), shown on the Crew tab and when hovering your avatar.
