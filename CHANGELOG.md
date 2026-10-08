@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10 — Status line, timezones, profile pictures (v1.3.0)
+
+- Status line: a short status on your profile ("Grinding Helldivers · free after 9"), shown on the Crew tab and when hovering your avatar.
+- Timezones: each person's timezone is detected from their device and can be changed in their profile. Game night times show in your own timezone with its abbreviation, plus friends' local times when they're somewhere else ("Their time: Sam 9:00 PM EST"). Planning a night uses your timezone. The Crew tab shows each person's local time.
+- Profile pictures: choose your Google photo, upload a picture (resized to a small square and saved on your profile, no extra storage needed), pick one of 12 game icons in your color, or use your initials.
+- Firestore rules: profile size limits for uploaded pictures and the status line. Re-publish `Firebase/firestore.rules`.
+
 ## 2026-10 — Game nights, activity feed, your color (v1.2.0)
 
 - New look: purple color theme (dark and light) and a controller logo, with new app icons and favicon.

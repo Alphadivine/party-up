@@ -18,6 +18,8 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 - **Party-size check**: games show their max party size (e.g. "Up to 4"), and the app warns when more people want in than the game allows, so nobody gets left out on the night.
 - **Activity feed**: a bell in the header shows what's new: suggestions, 👍 votes, status changes, game nights, RSVPs and new members.
 - **Trailers**: a "Watch trailer" button on every game, and a trailer link on every idea.
+- **Profiles**: a status line, your timezone (auto-detected, editable) and a profile picture: your Google photo, an uploaded picture, one of 12 game icons, or initials.
+- **Timezone-aware game nights**: times show in your own timezone, with friends' local times when they're in a different one.
 - **Your color**: each person picks their own color (purple, blue, teal, green, orange, pink, red or gold). The app takes on that color for them only, it syncs across their devices, and it shows as their avatar ring on the Crew tab and in vote lists.
 - **Voting**: 👍 I'm in, 🤷 maybe, 👎 not for me. The queue sorts by most wanted, with #1, #2… badges.
 - **Who owns it**: each person marks which platform they have it on (or that they don't own it), so you can see who still needs to buy it.
@@ -81,4 +83,4 @@ Game data from **[RAWG](https://rawg.io)** and **[Wikipedia](https://www.wikiped
 
 ---
 
-_Last updated: October 2026. Full change history in `CHANGELOG.md`._
+_Last updated: October 2026 (v1.3.0). Full change history in `CHANGELOG.md`._

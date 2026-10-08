@@ -227,6 +227,20 @@ label.fld textarea{min-height:70px;resize:vertical}
 .avatar.ring{box-shadow:0 0 0 2px var(--ring,transparent)}
 .tlink{font-size:13px;font-weight:600;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:var(--panel2)}
 
+/* profile pictures */
+.avatar .ic{width:62%;height:62%}
+.avatar.lg{width:72px;height:72px;font-size:24px;border-width:3px}
+.pfrow{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--bg);border-radius:9px;min-height:40px;padding:0 12px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.icongrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;max-width:360px}
+.icongrid button{aspect-ratio:1;border-radius:50%;border:2px solid transparent;cursor:pointer;display:grid;place-items:center;padding:0;min-height:44px}
+.icongrid button svg{width:58%;height:58%}
+.icongrid button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--panel) inset}
+.statusline{font-size:13px;color:var(--muted);font-style:italic;overflow-wrap:anywhere}
+.localtimes{font-size:12.5px;color:var(--muted)}
+
 /* phone */
 nav.bottom{display:none}
 @media (max-width:760px){
@@ -339,6 +353,13 @@ nav.bottom{display:none}
   <form class="dbody" id="meForm">
     <h2 id="meTitle">Your profile</h2>
     <label class="fld">Display name<input name="name" required maxlength="40"></label>
+    <label class="fld">Status (optional, shown on the Crew tab)<input name="statusLine" maxlength="60" placeholder="e.g. Grinding Helldivers · free after 9"></label>
+    <div class="fld" style="display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600;color:var(--muted)">Profile picture
+      <div class="pfrow"><span id="pfPreview"></span><div class="seg" id="pfType" role="group" aria-label="Picture type"></div></div>
+      <div id="pfUpload" class="hidden"><input type="file" id="pfFile" accept="image/*" class="hidden"><button type="button" class="ibtn" id="pfPick">Choose a picture…</button> <span class="muted" style="font-weight:400" id="pfNote"></span></div>
+      <div id="pfIcons" class="icongrid hidden" role="group" aria-label="Pick an icon"></div>
+    </div>
+    <label class="fld">Your timezone (game night times are shown in it)<select name="tz" id="meTz"></select></label>
     <div class="fld" style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)">Your color (changes how the app looks for you, and your ring on the Crew tab)
       <div class="swatches" id="meAccent" role="radiogroup" aria-label="Your color"></div></div>
     <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">What you play on (first one ticked is your main)
@@ -367,7 +388,7 @@ nav.bottom{display:none}
   <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
   <form class="dbody" id="nightForm">
     <h2 id="nightTitle">Plan a game night</h2>
-    <label class="fld">When<input type="datetime-local" name="when" required></label>
+    <label class="fld"><span id="nightWhenLbl">When</span><input type="datetime-local" name="when" required></label>
     <label class="fld">Game<select name="game" id="nightGame"></select></label>
     <label class="fld">Note (optional)<textarea name="note" maxlength="300" placeholder="e.g. Discord at 8, bring snacks"></textarea></label>
     <div class="err hidden" id="nightErr"></div>
@@ -400,7 +421,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.2.0";
+const VERSION = "1.3.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -460,6 +481,45 @@ function applyAccent(k, persist = true) {
 }
 try { applyAccent(JSON.parse(localStorage.getItem("sq_accent") || '"purple"'), false); } catch { applyAccent("purple", false); }
 
+/* ---------- timezones ---------- */
+const DEVICE_TZ = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch { return "UTC"; } })();
+const COMMON_TZ = ["America/New_York", "America/Chicago", "America/Denver", "America/Phoenix", "America/Los_Angeles", "America/Anchorage", "Pacific/Honolulu", "America/Toronto", "America/Mexico_City", "Europe/London", "Europe/Berlin", "Asia/Tokyo", "Australia/Sydney"];
+const validTz = tz => { try { new Intl.DateTimeFormat("en-US", { timeZone: tz }); return true; } catch { return false; } };
+const viewerTz = () => { const t = (typeof S !== "undefined" && S.user && S.members?.[S.user.uid]?.tz) || DEVICE_TZ; return validTz(t) ? t : DEVICE_TZ; };
+function tzParts(ms, tz) {
+  const o = {}; for (const p of new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }).formatToParts(ms)) o[p.type] = p.value;
+  return { y: +o.year, mo: +o.month, d: +o.day, h: +o.hour % 24, mi: +o.minute, s: +o.second };
+}
+const tzOffset = (ms, tz) => { const p = tzParts(ms, tz); return Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi, p.s) - Math.floor(ms / 1000) * 1000; };
+// "2026-10-09T20:00" as wall-clock time in tz → epoch ms
+function zonedToEpoch(str, tz) {
+  const m = String(str).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/); if (!m) return NaN;
+  const guess = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+  let t = guess - tzOffset(guess, tz); t = guess - tzOffset(t, tz); return t;
+}
+const pad2 = n => String(n).padStart(2, "0");
+function toTzInput(ms, tz) { const p = tzParts(ms, tz); return `${p.y}-${pad2(p.mo)}-${pad2(p.d)}T${pad2(p.h)}:${pad2(p.mi)}`; }
+function tzAbbr(tz, ms = Date.now()) { try { return new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "short" }).formatToParts(ms).find(p => p.type === "timeZoneName")?.value || tz; } catch { return tz; } }
+const tzCity = tz => String(tz).split("/").pop().replace(/_/g, " ");
+const fmtTime = (ms, tz) => new Date(ms).toLocaleTimeString([], { timeZone: tz, hour: "numeric", minute: "2-digit" });
+
+/* ---------- avatar icons (original line drawings, 24×24) ---------- */
+const AV_ICONS = {
+  controller: '<path d="M6 11h4M8 9v4M15 12h.01M18 10h.01"/><path d="M17.3 5H6.7a4 4 0 0 0-4 3.6L2 15a3 3 0 0 0 5.2 2.2L9 15h6l1.8 2.2A3 3 0 0 0 22 15l-.7-6.4A4 4 0 0 0 17.3 5z"/>',
+  headset: '<path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/><path d="M19 17v1a3 3 0 0 1-3 3h-3"/>',
+  sword: '<path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6M16 16l4 4M19 21l2-2"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+  skull: '<path d="M12 2a8 8 0 0 0-8 8c0 3 1.5 5 3 6v4h10v-4c1.5-1 3-3 3-6a8 8 0 0 0-8-8z"/><path d="M9 11h.01M15 11h.01M10 20v-2M14 20v-2"/>',
+  ghost: '<path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/><path d="M9 10h.01M15 10h.01"/>',
+  rocket: '<path d="M4.5 16.5c-1.5 1.3-2 4.5-2 4.5s3.2-.5 4.5-2"/><path d="m12 15-3-3a22 22 0 0 1 2-4A13 13 0 0 1 22 2c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/><path d="M9 12H4s.6-3 2-4c1.6-1.1 5 0 5 0M12 15v5s3-.6 4-2c1.1-1.6 0-5 0-5"/>',
+  crown: '<path d="m3 8 4 5 5-8 5 8 4-5-2 10H5z"/><path d="M5 21h14"/>',
+  bolt: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+  flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3.3.3 1.4 1.4 2.8 2.5 2.8z"/>',
+  star: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21 7 14.2l-5-4.9 6.9-1z"/>',
+  dice: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 8h.01M16 8h.01M12 12h.01M8 16h.01M16 16h.01"/>',
+};
+const iconSvg = (k, color) => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${AV_ICONS[k] || AV_ICONS.controller}</svg>`;
+
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -493,9 +553,23 @@ async function fetchJSON(url, ms = 9000) {
   finally { clearTimeout(tm); }
 }
 function initials(n) { return String(n || "?").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase(); }
+function avatarType(m) {
+  const t = m?.avatarType;
+  if (t === "upload" && m.avatarData) return "upload";
+  if (t === "icon") return "icon";
+  if (t === "initials") return "initials";
+  return m?.photo ? "google" : "initials";
+}
 function avatar(m, cls = "") {
   if (!m) return `<span class="avatar ${cls}">?</span>`;
-  return `<span class="avatar ring ${cls}" style="--ring:${ACCENTS[accentOf(m)].d[0]}" title="${esc(m.name)}">${m.photo ? `<img src="${esc(m.photo)}" alt="" referrerpolicy="no-referrer">` : esc(initials(m.name))}</span>`;
+  const a = ACCENTS[accentOf(m)].d;
+  const title = esc(m.name + (m.statusLine ? " — " + m.statusLine : ""));
+  const t = avatarType(m);
+  const base = `class="avatar ring ${cls}" title="${title}"`;
+  if (t === "upload") return `<span ${base} style="--ring:${a[0]}"><img src="${esc(m.avatarData)}" alt=""></span>`;
+  if (t === "icon") return `<span ${base} style="--ring:${a[0]};background:${a[0]}">${iconSvg(m.avatarIcon, a[1])}</span>`;
+  if (t === "initials") return `<span ${base} style="--ring:${a[0]};background:${a[0]};color:${a[1]}">${esc(initials(m.name))}</span>`;
+  return `<span ${base} style="--ring:${a[0]}"><img src="${esc(m.photo)}" alt="" referrerpolicy="no-referrer"></span>`;
 }
 
 /* ---------- built-in crossplay list ---------- */
@@ -982,7 +1056,10 @@ function renderCrew(v) {
   <div class="crew">${ms.map(([uid, m]) => {
     const h = m.handles || {};
     const sugg = Object.values(S.games).filter(g => g.suggestedBy === uid).length;
-    return `<div class="member"><div class="head">${avatar(m)}<div style="flex:1"><b>${esc(m.name)}</b>${uid === S.group?.leaderUid ? `<span class="lead">LEADER</span>` : ""}
+    const tz = validTz(m.tz) ? m.tz : null;
+    return `<div class="member"><div class="head">${avatar(m)}<div style="flex:1;min-width:0"><b>${esc(m.name)}</b>${uid === S.group?.leaderUid ? `<span class="lead">LEADER</span>` : ""}
+      ${m.statusLine ? `<div class="statusline">“${esc(m.statusLine)}”</div>` : ""}
+      ${tz ? `<div class="localtimes">Local time ${esc(fmtTime(Date.now(), tz))} ${esc(tzAbbr(tz))} · ${esc(tzCity(tz))}</div>` : ""}
       <div class="tags" style="margin-top:3px">${(m.platforms || []).map(p => `<span class="plat ${p}">${PLATS[p].short}</span>`).join("") || `<span class="muted" style="font-size:12px">No platforms set</span>`}</div></div></div>
       ${handle("Steam", h.steam)}${handle("Epic", h.epic)}${handle("PSN", h.psn)}${handle("Xbox", h.xbox)}${handle("Discord", h.discord)}
       <div class="muted" style="font-size:12.5px">${sugg} suggestion${sugg === 1 ? "" : "s"}</div>
@@ -1205,19 +1282,27 @@ function upcomingNights() {
   const cut = Date.now() - 4 * HOUR;
   return Object.entries(S.nights).filter(([, n]) => n.when >= cut).sort((a, b) => a[1].when - b[1].when);
 }
-function fmtNight(ms) { return new Date(ms).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+function fmtNight(ms) { return new Date(ms).toLocaleString([], { timeZone: viewerTz(), weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
 function fmtDate(iso) { const d = new Date(iso + "T12:00:00"); return isNaN(d) ? String(iso || "") : d.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" }); }
 function relDay(ms) {
-  const d0 = new Date(); d0.setHours(0, 0, 0, 0);
-  const days = Math.round((new Date(ms).setHours(0, 0, 0, 0) - d0) / 864e5);
+  const tz = viewerTz(); const dn = t => { const p = tzParts(t, tz); return Date.UTC(p.y, p.mo - 1, p.d) / 864e5; };
+  const days = Math.round(dn(ms) - dn(Date.now()));
   if (ms < Date.now() - 4 * HOUR) return timeAgo(ms);
-  if (days <= 0) return new Date(ms).getHours() >= 17 ? "Tonight" : "Today";
+  if (days <= 0) return tzParts(ms, tz).h >= 17 ? "Tonight" : "Today";
   if (days === 1) return "Tomorrow";
   return `In ${days} days`;
 }
 function nightCard(id, n, past) {
-  const d = new Date(n.when);
+  const d = new Date(n.when); const vtz = viewerTz();
   const g = n.gameId ? S.games[n.gameId] : null;
+  // friends in other timezones: "Sam 9:00 PM EDT"
+  const others = {};
+  for (const [u, m] of Object.entries(S.members)) {
+    if (u === S.user.uid || !validTz(m.tz) || (r => r === "out")((n.rsvps || {})[u])) continue;
+    if (tzOffset(n.when, m.tz) === tzOffset(n.when, vtz)) continue;
+    (others[m.tz] ||= []).push(m.name.split(" ")[0]);
+  }
+  const localLine = Object.entries(others).map(([tz, ns]) => `${ns.join(", ")} ${fmtTime(n.when, tz)} ${tzAbbr(tz, n.when)}`).join(" · ");
   const r = n.rsvps || {}; const mine = r[S.user.uid];
   const by = k => Object.entries(r).filter(([u, v]) => v === k && S.members[u]).map(([u]) => S.members[u]);
   const ins = by("in");
@@ -1229,8 +1314,9 @@ function nightCard(id, n, past) {
   const cnt = k => by(k).length;
   return `<article class="night ${past ? "past" : ""}" aria-label="Game night ${esc(fmtNight(n.when))}">
     <div class="top">
-      <div class="dateblk" aria-hidden="true"><div class="m">${esc(d.toLocaleDateString([], { month: "short" }))}</div><div class="d">${d.getDate()}</div><div class="m">${esc(d.toLocaleDateString([], { weekday: "short" }))}</div></div>
-      <div style="flex:1;min-width:0"><div class="when">${esc(d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }))} · ${esc(relDay(n.when))}</div>
+      <div class="dateblk" aria-hidden="true"><div class="m">${esc(d.toLocaleDateString([], { timeZone: vtz, month: "short" }))}</div><div class="d">${tzParts(n.when, vtz).d}</div><div class="m">${esc(d.toLocaleDateString([], { timeZone: vtz, weekday: "short" }))}</div></div>
+      <div style="flex:1;min-width:0"><div class="when">${esc(fmtTime(n.when, vtz))} ${esc(tzAbbr(vtz, n.when))} · ${esc(relDay(n.when))}</div>
+        ${localLine ? `<div class="localtimes">Their time: ${esc(localLine)}</div>` : ""}
         <div class="muted" style="font-size:13px">Planned by ${esc(planner?.name || "someone")}</div></div>
     </div>
     ${g ? `<button class="gm" data-open="${esc(n.gameId)}"><span class="th">${coverOf(g).src ? coverImg(g) : ""}</span><span style="min-width:0"><b>${esc(g.title)}</b><div class="tags" style="margin-top:3px"><span class="xp ${g.crossplay || "unknown"}">${XP_LABEL[g.crossplay || "unknown"]}</span>${maxPartyOf(g) ? `<span class="tag">Up to ${maxPartyOf(g)}</span>` : ""}</div></span></button>`
@@ -1255,11 +1341,16 @@ function renderNights(v) {
     <div class="nights">${up.map(([id, n]) => nightCard(id, n, false)).join("") || `<div class="empty"><h3>No game nights planned</h3><p>Hit <b>Plan a night</b>, pick a time and a game (or decide later), and everyone can say if they're in.</p></div>`}</div>
     ${past.length ? `<details class="pastlist"><summary>Past nights (${past.length})</summary><div class="nights">${past.map(([id, n]) => nightCard(id, n, true)).join("")}</div></details>` : `<div style="height:110px"></div>`}`;
 }
-function toLocalInput(ms) { const d = new Date(ms); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); }
+function toLocalInput(ms) { return toTzInput(ms, viewerTz()); }
 function openPlan(gameId, editId) {
   const f = $("nightForm"); const n = editId ? S.nights[editId] : null;
   let when = n?.when;
-  if (!when) { const d = new Date(); if (d.getHours() >= 18) d.setDate(d.getDate() + 1); d.setHours(20, 0, 0, 0); when = d.getTime(); }
+  if (!when) {
+    const tz = viewerTz(); const p = tzParts(Date.now(), tz);
+    const day = new Date(Date.UTC(p.y, p.mo - 1, p.d + (p.h >= 18 ? 1 : 0)));
+    when = zonedToEpoch(`${day.getUTCFullYear()}-${pad2(day.getUTCMonth() + 1)}-${pad2(day.getUTCDate())}T20:00`, tz);
+  }
+  $("nightWhenLbl").textContent = `When (your time: ${tzAbbr(viewerTz())}, ${tzCity(viewerTz())})`;
   f.when.value = toLocalInput(when);
   const sel = n ? n.gameId : gameId;
   const games = Object.entries(S.games).filter(([gid, g]) => ["suggested", "next", "playing"].includes(g.status || "suggested") || gid === sel).sort((a, b) => score(b[1]) - score(a[1]));
@@ -1272,7 +1363,7 @@ function openPlan(gameId, editId) {
 }
 async function saveNight(e) {
   e.preventDefault(); const f = $("nightForm"); const err = $("nightErr");
-  const when = new Date(f.when.value).getTime();
+  const when = zonedToEpoch(f.when.value, viewerTz());
   if (!Number.isFinite(when)) { err.textContent = "Pick a date and time."; err.classList.remove("hidden"); return; }
   const gameId = f.game.value || null; const note = f.note.value.trim().slice(0, 300);
   const editId = $("nightDlg").dataset.edit;
@@ -1349,6 +1440,14 @@ $("actDlg").addEventListener("close", () => { S._seenBefore = undefined; });
 async function openMe() {
   const m = me() || {}; const f = $("meForm");
   f.name.value = m.name || S.user.displayName || "";
+  f.statusLine.value = m.statusLine || "";
+  const tzNow = validTz(m.tz) ? m.tz : DEVICE_TZ;
+  let all = []; try { all = Intl.supportedValuesOf("timeZone"); } catch { all = COMMON_TZ; }
+  const opt = tz => `<option value="${esc(tz)}" ${tz === tzNow ? "selected" : ""}>${esc(tzCity(tz))} (${esc(tzAbbr(tz))})</option>`;
+  const commons = [...new Set([tzNow, DEVICE_TZ, ...COMMON_TZ])].filter(validTz);
+  $("meTz").innerHTML = `<optgroup label="Common">${commons.map(opt).join("")}</optgroup><optgroup label="All timezones">${all.filter(t => !commons.includes(t)).map(opt).join("")}</optgroup>`;
+  S._pf = { type: avatarType(m), data: m.avatarData || "", icon: m.avatarIcon || "controller" };
+  renderPf();
   const h = m.handles || {}; for (const k of ["steam", "epic", "psn", "xbox", "discord"]) f[k].value = h[k] || "";
   renderPlatChecks($("mePlats"), m.platforms || []);
   const cur = accentOf(m);
@@ -1371,7 +1470,10 @@ function renderPlatChecks(el, sel) {
 const readPlats = el => JSON.parse(el.dataset.order || "[]");
 async function saveMe(e) {
   e.preventDefault(); const f = $("meForm");
+  const pf = S._pf || {};
   const data = { name: f.name.value.trim().slice(0, 40), platforms: readPlats($("mePlats")), accent: accentOf({ accent: f.accent?.value }),
+    statusLine: f.statusLine.value.trim().slice(0, 60), tz: validTz(f.tz.value) ? f.tz.value : DEVICE_TZ,
+    avatarType: pf.type || "google", avatarIcon: pf.icon || "controller", avatarData: pf.type === "upload" ? (pf.data || "") : "",
     handles: Object.fromEntries(["steam", "epic", "psn", "xbox", "discord"].map(k => [k, f[k].value.trim()]).filter(([, v]) => v)) };
   if (!data.name) return;
   try {
@@ -1380,6 +1482,38 @@ async function saveMe(e) {
     S._accentSaved = true; applyAccent(data.accent);
     $("meDlg").close(); toast("Profile saved");
   } catch (er) { $("meErr").textContent = er.message; $("meErr").classList.remove("hidden"); }
+}
+
+/* ---------- profile picture picker ---------- */
+function renderPf() {
+  const pf = S._pf; const m = me() || {};
+  const preview = { ...m, name: $("meForm").name.value || m.name || "?", accent: $("meForm").accent?.value || m.accent, avatarType: pf.type, avatarData: pf.data, avatarIcon: pf.icon, photo: S.user.photoURL || m.photo || "" };
+  $("pfPreview").innerHTML = avatar(preview, "lg");
+  const types = [["google", "Google photo"], ["upload", "Upload"], ["icon", "Icon"], ["initials", "Initials"]].filter(([k]) => k !== "google" || S.user.photoURL || m.photo);
+  $("pfType").innerHTML = types.map(([k, l]) => `<button type="button" data-pf="${k}" aria-pressed="${pf.type === k}">${l}</button>`).join("");
+  $("pfType").querySelectorAll("[data-pf]").forEach(b => b.onclick = () => {
+    pf.type = b.dataset.pf;
+    if (pf.type === "upload" && !pf.data) $("pfFile").click();
+    renderPf();
+  });
+  $("pfUpload").classList.toggle("hidden", pf.type !== "upload");
+  $("pfPick").textContent = pf.data ? "Choose a different picture…" : "Choose a picture…";
+  $("pfIcons").classList.toggle("hidden", pf.type !== "icon");
+  const a = ACCENTS[accentOf({ accent: preview.accent })].d;
+  $("pfIcons").innerHTML = Object.keys(AV_ICONS).map(k => `<button type="button" data-icon="${k}" aria-pressed="${pf.icon === k}" aria-label="${k}" style="background:${a[0]}">${iconSvg(k, a[1])}</button>`).join("");
+  $("pfIcons").querySelectorAll("[data-icon]").forEach(b => b.onclick = () => { pf.icon = b.dataset.icon; renderPf(); });
+}
+// Shrink an image file to a 192×192 JPEG data URL (stored on the profile, so it must stay small).
+async function shrinkImage(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("That file isn't an image we can read.")); i.src = url; });
+    const size = 192, c = document.createElement("canvas"); c.width = c.height = size;
+    const side = Math.min(img.naturalWidth, img.naturalHeight);
+    c.getContext("2d").drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+    for (const q of [0.86, 0.75, 0.6, 0.45]) { const d = c.toDataURL("image/jpeg", q); if (d.length < 120000) return d; }
+    throw new Error("That picture is too detailed to save. Try another.");
+  } finally { URL.revokeObjectURL(url); }
 }
 
 /* ---------- gate (sign in / create / join) ---------- */
@@ -1407,7 +1541,7 @@ function showJoin(groupExists) {
   $("gateOut").onclick = () => B.signOut();
   $("joinForm").onsubmit = async e => {
     e.preventDefault(); const f = e.target;
-    const meData = { uid: S.user.uid, name: f.name.value.trim(), photo: S.user.photoURL || "", platforms: readPlats($("joinPlats")), handles: {} };
+    const meData = { uid: S.user.uid, name: f.name.value.trim(), photo: S.user.photoURL || "", platforms: readPlats($("joinPlats")), handles: {}, tz: DEVICE_TZ };
     try {
       if (groupExists) await B.join(meData, f.code.value.trim());
       else await B.createGroup({ name: f.gname.value.trim(), leaderUid: S.user.uid }, meData, f.code.value.trim());
@@ -1428,6 +1562,7 @@ function enterApp() {
     members: m => {
       S.members = m || {}; if (S.user && !S.members[S.user.uid] && S.ready) { toast("You're no longer in this group"); }
       const mine = me(); if (mine?.accent && !$("meDlg").open) applyAccent(mine.accent);
+      if (mine && !mine.tz && !enterApp.tzSet) { enterApp.tzSet = true; B.saveMember(S.user.uid, { tz: DEVICE_TZ }).catch(() => {}); }
       updateMe(); render();
     },
     games: g => { S.games = g || {}; S.ready = true; backfillCovers(); render(); const d = $("gameDlg"); if (d.open && d.dataset.id && S.games[d.dataset.id] && !d.contains(document.activeElement?.closest?.("input,textarea,select") || null)) refreshDialogVotes(d.dataset.id); },
@@ -1485,6 +1620,15 @@ $("addBack").onclick = () => { $("addForm").classList.add("hidden"); $("addStep1
 $("addForm").onsubmit = saveSuggestion;
 $("meBtn").onclick = openMe;
 $("meForm").onsubmit = saveMe;
+$("pfPick").onclick = () => $("pfFile").click();
+$("pfFile").onchange = async e => {
+  const file = e.target.files?.[0]; e.target.value = ""; if (!file) return;
+  $("pfNote").textContent = "Resizing…";
+  try { S._pf.data = await shrinkImage(file); S._pf.type = "upload"; $("pfNote").textContent = ""; renderPf(); }
+  catch (er) { $("pfNote").textContent = er.message; }
+};
+$("meForm").addEventListener("input", e => { if (e.target.name === "name" && S._pf) renderPf(); });
+$("meForm").addEventListener("change", e => { if (e.target.name === "accent" && S._pf) renderPf(); });
 $("signOutBtn").onclick = () => { $("meDlg").close(); B.signOut(); };
 $("meDlg").addEventListener("close", () => { if (!S._accentSaved) applyAccent(accentOf(me()) , !!me()); });
 $("nightForm").onsubmit = saveNight;
@@ -1517,7 +1661,7 @@ document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed"
 })();
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck };
+window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput };
 </script>
 </body>
 </html>
