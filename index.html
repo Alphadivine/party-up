@@ -285,6 +285,18 @@ label.fld textarea{min-height:70px;resize:vertical}
 .avatar .ic{width:62%;height:62%}
 .avatar.lg{width:72px;height:72px;font-size:24px;border-width:3px}
 .pfrow{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.pfgame{display:flex;flex-direction:column;gap:8px}
+.pfgame .search{flex:none}
+.pfgames{display:flex;flex-direction:column;gap:4px;max-height:210px;overflow:auto}
+.pfg{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:5px 8px;cursor:pointer;text-align:left;color:var(--ink);font-weight:600;font-size:13.5px}
+.pfg[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pfg .th{width:64px;height:30px;border-radius:5px;background:var(--panel2) center/cover no-repeat;flex:none}
+.pfpics{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px}
+.pfpic{border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:11.5px;font-weight:600;min-width:0}
+.pfpic .c{width:72px;height:72px;border-radius:50%;background:var(--panel2) center/cover no-repeat;border:3px solid transparent;box-shadow:0 0 0 1px var(--line)}
+.pfpic[aria-pressed="true"] .c{border-color:var(--accent)}
+.pfpic[aria-pressed="true"] .l{color:var(--ink)}
+.pfpic .l{max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
 .seg button{border:1px solid var(--line);background:var(--bg);border-radius:9px;min-height:40px;padding:0 12px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink)}
 .seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -483,6 +495,12 @@ nav.bottom{display:none}
       <div class="pfrow"><span id="pfPreview"></span><div class="seg" id="pfType" role="group" aria-label="Picture type"></div></div>
       <div id="pfUpload" class="hidden"><input type="file" id="pfFile" accept="image/*" class="hidden"><button type="button" class="ibtn" id="pfPick">Choose a picture…</button> <span class="muted" style="font-weight:400" id="pfNote"></span></div>
       <div id="pfIcons" class="icongrid hidden" role="group" aria-label="Pick an icon"></div>
+      <div id="pfGame" class="pfgame hidden">
+        <div class="search"><span aria-hidden="true">⌕</span><input id="pfGameQ" placeholder="Search any game…" autocomplete="off" aria-label="Search for a game"></div>
+        <div class="muted" id="pfGameNote" style="font-weight:400;font-size:12.5px"></div>
+        <div class="pfgames" id="pfGames" role="list"></div>
+        <div class="pfpics" id="pfPics" role="group" aria-label="Pick a picture"></div>
+      </div>
     </div>
     <label class="fld">Your timezone (game night times are shown in it)<select name="tz" id="meTz"></select></label>
     <div class="fld" style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)">Your color (changes how the app looks for you, and your ring on the Crew tab)
@@ -568,7 +586,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "2.0.2";
+const VERSION = "2.1.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -724,6 +742,7 @@ function initials(n) { return String(n || "?").split(/\s+/).map(w => w[0]).join(
 function avatarType(m) {
   const t = m?.avatarType;
   if (t === "upload" && m.avatarData) return "upload";
+  if (t === "game" && /^https:\/\//.test(m.avatarImg || "")) return "game";
   if (t === "icon") return "icon";
   if (t === "initials") return "initials";
   return m?.photo ? "google" : "initials";
@@ -731,11 +750,12 @@ function avatarType(m) {
 function avatar(m, cls = "") {
   if (!m) return `<span class="avatar ${cls}">?</span>`;
   const a = ACCENTS[accentOf(m)].d;
-  const title = esc(m.name + (m.statusLine ? " — " + m.statusLine : ""));
+  const title = esc(m.name + (m.statusLine ? " — " + m.statusLine : "") + (avatarType(m) === "game" && m.avatarGame ? ` (picture: ${m.avatarGame})` : ""));
   const t = avatarType(m);
   const base = `class="avatar ring ${cls}" title="${title}"`;
   if (t === "upload") return `<span ${base} style="--ring:${a[0]}"><img src="${esc(m.avatarData)}" alt=""></span>`;
   if (t === "icon") return `<span ${base} style="--ring:${a[0]};background:${a[0]}">${iconSvg(m.avatarIcon, a[1])}</span>`;
+  if (t === "game") return `<span ${base} style="--ring:${a[0]};background:${a[0]}"><img src="${esc(m.avatarImg)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"></span>`;
   if (t === "initials") return `<span ${base} style="--ring:${a[0]};background:${a[0]};color:${a[1]}">${esc(initials(m.name))}</span>`;
   return `<span ${base} style="--ring:${a[0]}"><img src="${esc(m.photo)}" alt="" referrerpolicy="no-referrer"></span>`;
 }
@@ -1974,7 +1994,7 @@ function openGuide() {
   $("guideBody").innerHTML = `<h2 id="guideTitle">How to use Party Up</h2>
    <p class="tip">Party Up is the crew's game inventory: what everyone owns, what we want, and what we can actually play together across PC, PlayStation and Xbox.</p>
    <h3>1. Set up</h3>
-   <ul><li>Tap your avatar (top right) and tick the platforms you play on. Add your Steam / PSN / Xbox / Discord names so friends can add you.</li><li>The <b>Get started</b> box on the Library walks you through the rest.</li></ul>
+   <ul><li>Tap your avatar (top right) and tick the platforms you play on. For your picture, <b>Game art</b> lets you search any game and pick its cover, artwork, a screenshot or a character. Add your Steam / PSN / Xbox / Discord names so friends can add you.</li><li>The <b>Get started</b> box on the Library walks you through the rest.</li></ul>
    <h3>2. Mark the games you own</h3>
    <ul><li>Tap <b>＋ Add</b> → <b>Tick several games I own</b> and tick everything you have, with every platform you own it on.</li><li>See a game a friend has? Tap <b>＋ I have this too</b> on it.</li><li>PC can be Steam / Epic, <b>PC·GP</b> (Game Pass / Xbox app) or <b>PC·L</b> (the game's own launcher, like Path of Titans).</li></ul>
    <h3>3. See what you can play</h3>
@@ -2175,7 +2195,8 @@ async function openMe() {
   const opt = tz => `<option value="${esc(tz)}" ${tz === tzNow ? "selected" : ""}>${esc(tzCity(tz))} (${esc(tzAbbr(tz))})</option>`;
   const commons = [...new Set([tzNow, DEVICE_TZ, ...COMMON_TZ])].filter(validTz);
   $("meTz").innerHTML = `<optgroup label="Common">${commons.map(opt).join("")}</optgroup><optgroup label="All timezones">${all.filter(t => !commons.includes(t)).map(opt).join("")}</optgroup>`;
-  S._pf = { type: avatarType(m), data: m.avatarData || "", icon: m.avatarIcon || "controller" };
+  S._pf = { type: avatarType(m), data: m.avatarData || "", icon: m.avatarIcon || "controller", img: m.avatarImg || "", game: m.avatarGame || "" };
+  $("pfGameQ").value = ""; $("pfGames").innerHTML = ""; $("pfPics").innerHTML = "";
   renderPf();
   const h = m.handles || {}; for (const k of ["steam", "epic", "psn", "xbox", "discord"]) f[k].value = h[k] || "";
   renderPlatChecks($("mePlats"), m.platforms || []);
@@ -2202,7 +2223,8 @@ async function saveMe(e) {
   const pf = S._pf || {};
   const data = { name: f.name.value.trim().slice(0, 40), platforms: readPlats($("mePlats")), accent: accentOf({ accent: f.accent?.value }),
     statusLine: f.statusLine.value.trim().slice(0, 60), tz: validTz(f.tz.value) ? f.tz.value : DEVICE_TZ,
-    avatarType: pf.type || "google", avatarIcon: pf.icon || "controller", avatarData: pf.type === "upload" ? (pf.data || "") : "",
+    avatarType: pf.type === "game" && !pf.img ? (S.user.photoURL ? "google" : "initials") : (pf.type || "google"), avatarIcon: pf.icon || "controller", avatarData: pf.type === "upload" ? (pf.data || "") : "",
+    avatarImg: pf.type === "game" ? (pf.img || "").slice(0, 400) : "", avatarGame: pf.type === "game" ? (pf.game || "").slice(0, 120) : "",
     handles: Object.fromEntries(["steam", "epic", "psn", "xbox", "discord"].map(k => [k, f[k].value.trim()]).filter(([, v]) => v)) };
   if (!data.name) return;
   try {
@@ -2216,22 +2238,78 @@ async function saveMe(e) {
 /* ---------- profile picture picker ---------- */
 function renderPf() {
   const pf = S._pf; const m = me() || {};
-  const preview = { ...m, name: $("meForm").name.value || m.name || "?", accent: $("meForm").accent?.value || m.accent, avatarType: pf.type, avatarData: pf.data, avatarIcon: pf.icon, photo: S.user.photoURL || m.photo || "" };
+  const preview = { ...m, name: $("meForm").name.value || m.name || "?", accent: $("meForm").accent?.value || m.accent, avatarType: pf.type, avatarData: pf.data, avatarIcon: pf.icon, avatarImg: pf.img, avatarGame: pf.game, photo: S.user.photoURL || m.photo || "" };
   $("pfPreview").innerHTML = avatar(preview, "lg");
-  const types = [["google", "Google photo"], ["upload", "Upload"], ["icon", "Icon"], ["initials", "Initials"]].filter(([k]) => k !== "google" || S.user.photoURL || m.photo);
+  const types = [["google", "Google photo"], ["game", "Game art"], ["upload", "Upload"], ["icon", "Icon"], ["initials", "Initials"]].filter(([k]) => k !== "google" || S.user.photoURL || m.photo);
   $("pfType").innerHTML = types.map(([k, l]) => `<button type="button" data-pf="${k}" aria-pressed="${pf.type === k}">${l}</button>`).join("");
   $("pfType").querySelectorAll("[data-pf]").forEach(b => b.onclick = () => {
     pf.type = b.dataset.pf;
     if (pf.type === "upload" && !pf.data) $("pfFile").click();
     renderPf();
+    if (pf.type === "game" && !$("pfGames").innerHTML) pfLibraryGames();
   });
   $("pfUpload").classList.toggle("hidden", pf.type !== "upload");
   $("pfPick").textContent = pf.data ? "Choose a different picture…" : "Choose a picture…";
   $("pfIcons").classList.toggle("hidden", pf.type !== "icon");
+  $("pfGame").classList.toggle("hidden", pf.type !== "game");
   const a = ACCENTS[accentOf({ accent: preview.accent })].d;
   $("pfIcons").innerHTML = Object.keys(AV_ICONS).map(k => `<button type="button" data-icon="${k}" aria-pressed="${pf.icon === k}" aria-label="${k}" style="background:${a[0]}">${iconSvg(k, a[1])}</button>`).join("");
   $("pfIcons").querySelectorAll("[data-icon]").forEach(b => b.onclick = () => { pf.icon = b.dataset.icon; renderPf(); });
 }
+/* Game art: search any game (IGDB through the Worker) and pick a picture. The circle shows the
+   middle of the picture (automatic center crop); only the picture's address is saved. */
+let pfTimer, pfTok = 0;
+function pfRenderGames(list) {
+  $("pfGames").innerHTML = list.map((g, i) => `<button type="button" class="pfg" role="listitem" data-pfg="${i}"><span class="th" style="${g.thumb ? `background-image:url('${esc(g.thumb).replace(/'/g, "%27")}')` : ""}"></span><span>${esc(g.title)}${g.year ? ` <span class="muted">(${esc(String(g.year))})</span>` : ""}</span></button>`).join("");
+  $("pfGames").querySelectorAll("[data-pfg]").forEach(b => b.onclick = () => pfPickGame(list[+b.dataset.pfg]));
+}
+function pfLibraryGames() {
+  const games = Object.values(S.games).filter(g => coverOf(g).src).sort((a, b) => a.title.localeCompare(b.title)).slice(0, 30)
+    .map(g => ({ title: g.title, thumb: coverOf(g).src, lib: g }));
+  $("pfGameNote").textContent = games.length ? "Your crew's games are below, or search for any game." : "Search for any game.";
+  $("pfPics").innerHTML = "";
+  pfRenderGames(games);
+}
+async function pfSearch() {
+  const q = $("pfGameQ").value.trim(); const tok = ++pfTok;
+  if (q.length < 2) return pfLibraryGames();
+  if (!CONFIG.GAME_API) { $("pfGameNote").textContent = "Searching every game needs the IGDB Worker (see the setup guide). Here are your crew's games."; return pfRenderGames(Object.values(S.games).filter(g => coverOf(g).src && norm(g.title).includes(norm(q))).map(g => ({ title: g.title, thumb: coverOf(g).src, lib: g }))); }
+  $("pfGameNote").innerHTML = `<span class="spin"></span> Searching…`; $("pfPics").innerHTML = "";
+  try {
+    const d = await gameApi(`/search?q=${encodeURIComponent(q)}`); if (tok !== pfTok) return;
+    const res = (d.results || []).map(r => ({ id: r.id, title: r.title, thumb: r.thumb || r.cover || "", year: r.year || "" }));
+    $("pfGameNote").textContent = res.length ? "Pick the game:" : "No games found. Try a different spelling.";
+    pfRenderGames(res);
+  } catch (e) { if (tok === pfTok) { $("pfGames").innerHTML = ""; $("pfGameNote").textContent = "Couldn't search right now. Try again in a moment."; } }
+}
+async function pfPickGame(g) {
+  const tok = ++pfTok;
+  $("pfGames").querySelectorAll(".pfg").forEach(b => b.setAttribute("aria-pressed", b.textContent.startsWith(g.title)));
+  $("pfPics").innerHTML = `<div class="muted" style="grid-column:1/-1;font-weight:400"><span class="spin"></span> Getting pictures from ${esc(g.title)}…</div>`;
+  let pics = [];
+  let id = g.id;
+  if (CONFIG.GAME_API) {
+    try {
+      if (!id) { const d = await gameApi(`/search?q=${encodeURIComponent(g.title)}`); id = (d.results || []).find(r => norm(r.title) === norm(g.title))?.id; }
+      if (id) pics = (await gameApi(`/images?id=${encodeURIComponent(id)}`)).pictures || [];
+    } catch (e) { console.warn("game pictures", e); }
+  }
+  const own = g.lib ? coverOf(g.lib).src : g.thumb;
+  if (own && (g.lib || !pics.length) && !pics.some(p => p.url === own)) pics.push({ kind: "cover", label: g.lib ? "Library art" : "Cover", thumb: own, url: own });
+  if (tok !== pfTok) return;
+  const pf = S._pf;
+  const sel = () => $("pfPics").querySelectorAll("[data-pic]").forEach(b => b.setAttribute("aria-pressed", pics[+b.dataset.pic].url === pf.img));
+  $("pfPics").innerHTML = pics.length ? pics.map((p, i) => `<button type="button" class="pfpic" data-pic="${i}" aria-pressed="false" aria-label="${esc(g.title)}: ${esc(p.label || p.kind)}"><span class="c" style="background-image:url('${esc(p.thumb || p.url).replace(/'/g, "%27")}')"></span><span class="l">${esc(p.kind === "character" ? p.label : p.kind === "cover" ? (p.label || "Cover") : p.kind === "artwork" ? "Artwork" : "Screenshot")}</span></button>`).join("")
+    : `<div class="muted" style="grid-column:1/-1;font-weight:400">No pictures found for ${esc(g.title)}. Try another game.</div>`;
+  $("pfPics").querySelectorAll("[data-pic]").forEach(b => b.onclick = () => {
+    const p = pics[+b.dataset.pic]; pf.type = "game"; pf.img = p.url; pf.game = p.kind === "character" ? `${p.label}, ${g.title}` : g.title;
+    renderPf(); sel();
+  });
+  sel();
+}
+$("pfGameQ").addEventListener("input", () => { clearTimeout(pfTimer); pfTimer = setTimeout(pfSearch, 350); });
+$("pfGameQ").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); clearTimeout(pfTimer); pfSearch(); } });
+
 // Shrink an image file to a 192×192 JPEG data URL (stored on the profile, so it must stay small).
 async function shrinkImage(file) {
   const url = URL.createObjectURL(file);

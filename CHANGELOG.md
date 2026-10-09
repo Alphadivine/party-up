@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10 — Game art profile pictures (v2.1.0)
+
+- New **Game art** option for your profile picture: search any game and pick its cover, official artwork, a screenshot, or a character portrait when IGDB has one (like Master Chief). The crew's own games are listed first.
+- Pictures are centered and cropped into the circle automatically. Only the picture's web address is saved, so profiles stay small.
+- Hovering someone's picture shows which game it's from.
+- Needs the updated Worker (new `/images` lookup) and updated Firestore rules (new `avatarImg` / `avatarGame` profile fields).
+
 ## 2026-10 — Better List thumbnails (v2.0.2)
 
 - Game art in List and Compare views is bigger and shaped like the store art, so the whole picture (logo included) shows instead of a cropped slice.
