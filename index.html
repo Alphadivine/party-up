@@ -241,6 +241,46 @@ label.fld textarea{min-height:70px;resize:vertical}
 .statusline{font-size:13px;color:var(--muted);font-style:italic;overflow-wrap:anywhere}
 .localtimes{font-size:12.5px;color:var(--muted)}
 
+/* library */
+.owners{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.ready{font-size:13px;color:var(--full);display:flex;gap:6px;align-items:flex-start}
+.salebadge{position:absolute;bottom:10px;left:10px;background:var(--full);color:#0d1a05;font-weight:800;border-radius:7px;padding:2px 8px;font-size:12.5px;z-index:1}
+.cover .salebadge{z-index:1}
+.viewtoggle{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;height:40px}
+.viewtoggle button{border:0;background:var(--panel);padding:0 12px;cursor:pointer;font-weight:600;color:var(--muted)}
+.viewtoggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.gridwrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);margin-bottom:110px}
+table.own{border-collapse:collapse;width:100%;font-size:13.5px}
+table.own th,table.own td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+table.own th:first-child,table.own td:first-child{text-align:left;position:sticky;left:0;background:var(--panel);z-index:1;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+table.own thead th{font-size:12px;color:var(--muted);font-weight:600}
+table.own td button.cell{border:1px dashed var(--line);background:none;border-radius:6px;min-width:44px;min-height:32px;cursor:pointer;color:var(--muted);font-weight:700}
+table.own td .have{font-weight:700;font-size:12px}
+table.own tr.isready td:first-child::before{content:"● ";color:var(--full)}
+.bulklist{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.bulkrow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--bg)}
+.bulkrow label{flex:1;display:flex;align-items:center;gap:8px;min-width:0;cursor:pointer}
+.bulkrow select{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:4px 6px}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding-bottom:110px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px}
+.stat h3{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.big{font-family:"Chakra Petch",sans-serif;font-size:34px;font-weight:700;line-height:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.bar{display:grid;grid-template-columns:110px 1fr 34px;gap:8px;align-items:center;font-size:13px}
+.bar .t{height:10px;border-radius:5px;background:var(--panel2);overflow:hidden}
+.bar .t span{display:block;height:100%;background:var(--accent);border-radius:5px}
+.bar .n{text-align:right;font-weight:700}
+.award{display:flex;gap:10px;align-items:center}
+.award .w{font-size:12.5px;color:var(--muted)}
+/* guide */
+.guide h3{margin:14px 0 4px;font-size:16px}
+.guide p,.guide li{color:var(--ink);font-size:14.5px;line-height:1.5}
+.guide ul{margin:4px 0;padding-left:20px}
+.guide .tip{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:14px}
+
 /* phone */
 nav.bottom{display:none}
 @media (max-width:760px){
@@ -267,6 +307,7 @@ nav.bottom{display:none}
     <div class="tabs desk" role="tablist" id="tabsDesk"></div>
     <div class="spacer"></div>
     <button class="ibtn ghost bell hidden" id="actBtn" aria-label="Activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="dot hidden" id="actDot"></span></button>
+    <button class="ibtn ghost" id="guideBtn" title="How to use Party Up" aria-label="How to use Party Up">?</button>
     <button class="ibtn ghost" id="themeBtn" title="Theme" aria-label="Switch theme">◐</button>
     <button class="ibtn ghost hidden" id="meBtn" aria-label="Your profile"></button>
   </div>
@@ -278,8 +319,11 @@ nav.bottom{display:none}
   <div id="demoBanner" class="banner hidden">Demo mode: everything is saved in this browser only. Add your Firebase config to <code>index.html</code> to share it with the crew (see the setup guide).</div>
   <div class="toolbar" id="toolbar">
     <div class="search"><span aria-hidden="true">⌕</span><input id="q" placeholder="Search the list…" aria-label="Search games"></div>
+    <select class="sel" id="ownerSel" aria-label="Owned by"></select>
+    <div class="viewtoggle" id="viewToggle" role="group" aria-label="View"><button data-view="cards" aria-pressed="true">Cards</button><button data-view="grid" aria-pressed="false">Who owns what</button></div>
     <select class="sel" id="sortSel" aria-label="Sort">
       <option value="score">Most wanted</option>
+      <option value="owned">Most owned</option>
       <option value="new">Newest</option>
       <option value="price">Cheapest</option>
       <option value="az">A–Z</option>
@@ -291,6 +335,8 @@ nav.bottom{display:none}
       <option value="mmo">MMO</option><option value="split-screen">Split-screen</option>
     </select>
     <div class="chiprow">
+      <button class="chip" data-f="ready" aria-pressed="false">Ready tonight</button>
+      <button class="chip" data-f="sale" aria-pressed="false">On sale</button>
       <button class="chip" data-f="cross" aria-pressed="false">Crossplay</button>
       <button class="chip" data-f="fits" aria-pressed="false">Whole crew fits</button>
       <button class="chip" data-f="free" aria-pressed="false">Free</button>
@@ -298,7 +344,8 @@ nav.bottom{display:none}
     </div>
     <div class="spacer hide-sm"></div>
     <button class="ibtn" id="pickBtn" title="Pick a game for tonight">🎲 <span>Pick tonight</span></button>
-    <button class="ibtn primary" id="addBtn">＋ <span>Suggest a game</span></button>
+    <button class="ibtn" id="bulkBtn">✓ <span>I own…</span></button>
+    <button class="ibtn primary" id="addBtn">＋ <span>Add a game</span></button>
   </div>
   <div id="view"></div>
 </main>
@@ -311,9 +358,9 @@ nav.bottom{display:none}
 <dialog id="addDlg" aria-labelledby="addTitle">
   <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
   <div class="dbody">
-    <h2 id="addTitle">Suggest a game</h2>
+    <h2 id="addTitle">Add a game</h2>
     <div id="addStep1" class="box" style="border:0;padding:0">
-      <div class="search"><span aria-hidden="true">⌕</span><input id="lookupQ" placeholder="Type a game name, e.g. Helldivers 2" autocomplete="off"></div>
+      <div class="search"><span aria-hidden="true">⌕</span><input id="lookupQ" placeholder="Game name or a Steam / Xbox / Epic store link" autocomplete="off"></div>
       <div class="muted" id="lookupNote" style="font-size:12.5px"></div>
       <div class="results" id="lookupRes"></div>
       <button class="ibtn ghost" id="manualBtn" style="align-self:flex-start">Can't find it? Enter it by hand</button>
@@ -335,6 +382,7 @@ nav.bottom{display:none}
       <label class="fld">Crossplay note<input name="crossplayNote" placeholder="e.g. PC and Xbox only" maxlength="120"></label>
       <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">Type
         <div class="checks" id="addModes"></div></div>
+      <label class="checks" style="font-weight:600"><input type="checkbox" name="iown"> I own it on <select name="iownPlat" id="iownPlat" style="border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:4px 6px"></select></label>
       <div class="checks">
         <label><input type="checkbox" name="freeToPlay"> Free to play</label>
         <label><input type="checkbox" name="gamepass"> On Game Pass</label>
@@ -400,6 +448,22 @@ nav.bottom{display:none}
   <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
   <div class="dbody"><h2 id="actTitle">Activity</h2><div class="feed" id="feed"></div></div>
 </dialog>
+<!-- bulk own -->
+<dialog id="bulkDlg" aria-labelledby="bulkTitle">
+  <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
+  <div class="dbody">
+    <h2 id="bulkTitle">Games I own</h2>
+    <p class="muted" style="margin:0">Tick everything you own and pick the platform. Games not on the crew's list yet get added to it.</p>
+    <div class="search"><span aria-hidden="true">⌕</span><input id="bulkQ" placeholder="Filter…" autocomplete="off"></div>
+    <div class="bulklist" id="bulkList"></div>
+    <div class="foot"><span class="muted" id="bulkCount" style="margin-right:auto;align-self:center"></span><button class="ibtn ghost" data-close>Cancel</button><button class="ibtn primary" id="bulkSave">Save</button></div>
+  </div>
+</dialog>
+<!-- guide -->
+<dialog id="guideDlg" aria-labelledby="guideTitle">
+  <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
+  <div class="dbody guide" id="guideBody"></div>
+</dialog>
 <!-- pick -->
 <dialog id="pickDlg"><div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div><div class="pick" id="pickBody"></div></dialog>
 
@@ -421,7 +485,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.3.2";
+const VERSION = "1.4.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -435,20 +499,20 @@ const baseOf = p => p === "pcms" ? "pc" : p;
 const MODES = ["co-op","pvp","pve","survival","party","battle-royale","mmo","split-screen"];
 const MODE_LABEL = {"co-op":"Co-op","pvp":"PvP","pve":"PvE","survival":"Survival","party":"Party","battle-royale":"Battle royale","mmo":"MMO","split-screen":"Split-screen"};
 const STATUS = {
-  suggested: { label: "Suggested", tab: "queue" },
-  next:      { label: "Up next",   tab: "queue" },
-  playing:   { label: "Playing",   tab: "playing" },
-  finished:  { label: "Finished",  tab: "played" },
-  dropped:   { label: "Dropped",   tab: "played" },
+  suggested: { label: "Not played yet" },
+  next:      { label: "Up next" },
+  playing:   { label: "Playing" },
+  finished:  { label: "Finished" },
+  dropped:   { label: "Dropped" },
 };
 const XP_LABEL = { full: "Full crossplay", partial: "Partial crossplay", none: "No crossplay", unknown: "Crossplay ?" };
 const TABS = [
-  { id: "queue",   label: "Queue",   ic: "☰" },
-  { id: "nights",  label: "Nights",  ic: "◷" },
-  { id: "playing", label: "Playing", ic: "▶" },
-  { id: "played",  label: "Played",  ic: "✓" },
-  { id: "ideas",   label: "Ideas",   ic: "✦" },
-  { id: "crew",    label: "Crew",    ic: "☺" },
+  { id: "library",  label: "Library",  ic: "▤" },
+  { id: "wishlist", label: "Wishlist", ic: "♡" },
+  { id: "nights",   label: "Nights",   ic: "◷" },
+  { id: "ideas",    label: "Ideas",    ic: "✦" },
+  { id: "crew",     label: "Crew",     ic: "☺" },
+  { id: "stats",    label: "Stats",    ic: "▥" },
 ];
 const CS_STORES = {1:"Steam",2:"GamersGate",3:"Green Man Gaming",7:"GOG",8:"EA app",11:"Humble",13:"Ubisoft Store",15:"Fanatical",21:"WinGameStore",23:"GameBillet",24:"Voidu",25:"Epic Games Store",27:"Gamesplanet",28:"Gamesload",29:"2Game",30:"IndieGala",31:"Blizzard",33:"DLGamer",34:"Noctre",35:"DreamGame"};
 
@@ -692,7 +756,7 @@ function score(g) { let s = 0; for (const v of Object.values(g.votes || {})) s +
    DATA LAYER — Firebase (shared) or Local (demo)
    ============================================================ */
 const GROUP = (new URLSearchParams(location.search).get("group") || CONFIG.DEFAULT_GROUP).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) || "squad";
-const S = { user: null, group: null, members: {}, games: {}, nights: {}, activity: [], tab: store.get("sq_tab", "queue"), filters: store.get("sq_filters", {}), ready: false };
+const S = { user: null, group: null, members: {}, games: {}, nights: {}, activity: [], tab: (t => ["queue", "playing", "played"].includes(t) ? "library" : t)(store.get("sq_tab", "library")), owner: "", view: store.get("sq_view", "cards"), filters: store.get("sq_filters", {}), ready: false };
 
 function LocalBackend() {
   const KEY = "sq_demo_" + GROUP;
@@ -866,7 +930,7 @@ async function detailsFor(hit) {
         if (key) out.storeUrls[key] = r.url;
       }
     } else if (hit.src === "wiki" && hit.id) {
-      const d = await fetchJSON(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&pageids=${hit.id}&prop=extracts|pageimages|info&exintro=1&explaintext=1&exsentences=4&piprop=thumbnail&pithumbsize=900&pilicense=any&inprop=url`);
+      const d = await fetchJSON(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&pageids=${hit.id}&prop=extracts|pageimages|info|pageprops&ppprop=wikibase_item&exintro=1&explaintext=1&exsentences=4&piprop=thumbnail&pithumbsize=900&pilicense=any&inprop=url`);
       const p = Object.values(d.query?.pages || {})[0] || {};
       out.description = (p.extract || "").trim().slice(0, 1200);
       out.cover = p.thumbnail?.source || out.cover;
@@ -879,6 +943,13 @@ async function detailsFor(hit) {
       if (/survival/.test(t)) out.modes.push("survival");
       if (/battle royale/.test(t)) out.modes.push("battle-royale");
       if (/free-to-play/.test(t)) out.freeToPlay = true;
+      const wd = await wikidataFacts(p.pageprops?.wikibase_item).catch(() => null);
+      if (wd) {
+        if (wd.platforms.length) out.platforms = wd.platforms;
+        if (wd.genres.length) out.genres = wd.genres.slice(0, 3);
+        if (wd.released) out.released = wd.released;
+        if (wd.modes.length) out.modes = [...new Set([...out.modes, ...wd.modes])];
+      }
     }
   } catch (e) { console.warn("details failed", e); }
   const b = builtinFor(out.title) || builtinFor(hit.title);
@@ -899,6 +970,42 @@ async function detailsFor(hit) {
   return out;
 }
 
+/* Wikidata (keyless): real platform list, genres, modes and release date for a Wikipedia article. */
+async function wikidataFacts(qid) {
+  if (!/^Q\d+$/.test(qid || "")) return null;
+  const api = "https://www.wikidata.org/w/api.php?format=json&origin=*&action=wbgetentities";
+  const e = (await fetchJSON(`${api}&ids=${qid}&props=claims`)).entities?.[qid];
+  if (!e) return null;
+  const ids = prop => (e.claims?.[prop] || []).map(c => c.mainsnak?.datavalue?.value?.id).filter(Boolean);
+  const plat = ids("P400"), genre = ids("P136"), mode = ids("P404");
+  const all = [...new Set([...plat, ...genre, ...mode])].slice(0, 50);
+  const labels = {};
+  if (all.length) {
+    const L = await fetchJSON(`${api}&ids=${all.join("|")}&props=labels&languages=en`);
+    for (const [id, x] of Object.entries(L.entities || {})) labels[id] = x.labels?.en?.value || "";
+  }
+  const platforms = new Set();
+  for (const id of plat) {
+    const l = (labels[id] || "").toLowerCase();
+    if (/windows|steam|linux|steamos/.test(l)) platforms.add("pc");
+    else if (/playstation/.test(l)) platforms.add("playstation");
+    else if (/xbox/.test(l)) platforms.add("xbox");
+  }
+  const modes = [];
+  for (const id of mode) {
+    const l = (labels[id] || "").toLowerCase();
+    if (/co-?op|cooperative/.test(l)) modes.push("co-op");
+    if (/split.?screen/.test(l)) modes.push("split-screen");
+    if (/massively/.test(l)) modes.push("mmo");
+  }
+  const dates = (e.claims?.P577 || []).map(c => c.mainsnak?.datavalue?.value?.time).filter(Boolean).map(t => t.replace(/^\+/, "").slice(0, 10)).sort();
+  return {
+    platforms: BASE_PLATS.filter(p => platforms.has(p)),
+    genres: genre.map(id => labels[id]).filter(Boolean).map(x => x.replace(/ video game$/i, "").replace(/^\w/, c => c.toUpperCase())),
+    modes, released: dates[0] && !dates[0].startsWith("0") ? dates[0].replace(/-00/g, "-01") : "",
+  };
+}
+
 /* PC prices from CheapShark (keyless). */
 async function pcPrice(title, steamAppID) {
   let list;
@@ -916,12 +1023,13 @@ async function pcPrice(title, steamAppID) {
     price: Number(top.price), retail: Number(top.retailPrice), savings: Math.round(Number(top.savings) || 0),
     store: CS_STORES[top.storeID] || "PC store", dealUrl: `https://www.cheapshark.com/redirect?dealID=${top.dealID}`,
     steamAppID: best.steamAppID || d.info?.steamAppID || null,
+    lowest: d.cheapestPriceEver?.price != null ? Number(d.cheapestPriceEver.price) : null,
   };
 }
 async function refreshPrice(id, force) {
   const g = S.games[id]; if (!g) return;
   if (!(g.platforms || []).includes("pc") && !g.steamAppID) return;
-  if (!force && g.priceAt && Date.now() - g.priceAt < 3 * 86400e3) return;
+  if (!force && g.priceAt && Date.now() - g.priceAt < (inLibrary(g) ? 3 : 1) * 86400e3) return;
   if (refreshPrice.busy?.has(id)) return; (refreshPrice.busy ??= new Set()).add(id);
   try {
     const p = await pcPrice(g.title, g.steamAppID);
@@ -951,22 +1059,42 @@ function storeLinks(g) {
   return L;
 }
 
+/* ---------- library helpers ---------- */
+// A game is in the crew Library once anyone owns it (free-to-play counts as owned by everyone).
+const ownersOf = g => Object.entries(g.owns || {}).filter(([u, pl]) => pl && S.members[u]).map(([u]) => u);
+const inLibrary = g => !!g.freeToPlay || ownersOf(g).length > 0;
+const gameTab = g => inLibrary(g) ? "library" : "wishlist";
+const onSale = g => !g.freeToPlay && (g.pcPrice?.savings || 0) >= 10;
+function readyInfo(g) {
+  const owners = g.freeToPlay ? Object.keys(S.members) : ownersOf(g);
+  if (owners.length < 2) return null;
+  const people = owners.map(u => ({ uid: u, plats: platsFor(g, u) })).filter(p => p.plats.length);
+  const f = fitCheck(g, people);
+  if (!f || f.state !== "ok") return null;
+  const max = maxPartyOf(g);
+  return { n: owners.length, text: g.freeToPlay ? `Free · all ${owners.length} can play together` : `${owners.length} own it and can play together${max && owners.length > max ? ` (${max} at a time)` : ""}` };
+}
+
 /* ============================================================
    RENDER
    ============================================================ */
 function renderTabs() {
-  const counts = { queue: 0, playing: 0, played: 0, nights: upcomingNights().length };
-  for (const g of Object.values(S.games)) counts[STATUS[g.status || "suggested"]?.tab || "queue"]++;
+  const counts = { library: 0, wishlist: 0, nights: upcomingNights().length };
+  for (const g of Object.values(S.games)) counts[gameTab(g)]++;
   const html = TABS.map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${S.tab === t.id}"><span class="ic" aria-hidden="true">${t.ic}</span><span>${t.label}</span>${counts[t.id] ? `<span class="n">${counts[t.id]}</span>` : ""}</button>`).join("");
   $("tabsDesk").innerHTML = html; $("tabsMob").innerHTML = html;
 }
-function setTab(t) { S.tab = t; store.set("sq_tab", t); render(); window.scrollTo({ top: 0 }); }
+function setTab(t) { if (!TABS.some(x => x.id === t)) t = "library"; if (t !== "library") S.owner = S.owner; S.tab = t; store.set("sq_tab", t); render(); window.scrollTo({ top: 0 }); }
 
 function matches(g) {
   const f = S.filters; const q = norm($("q").value);
   if (q && !norm(g.title + " " + (g.genres || []).join(" ")).includes(q)) return false;
   if (f.cross && !(g.crossplay === "full" || g.crossplay === "partial")) return false;
   if (f.free && !g.freeToPlay) return false;
+  if (S.tab === "library" && f.ready && !readyInfo(g)) return false;
+  if (f.sale && !onSale(g)) return false;
+  if (S.tab === "library" && S.owner && !(g.owns || {})[S.owner] && !g.freeToPlay) return false;
+  if (S.tab === "library" && S.libStatus && (g.status || "suggested") !== S.libStatus) return false;
   if (f.sub && !(g.gamepass || g.psplus)) return false;
   if (f.mode && !(g.modes || []).includes(f.mode)) return false;
   if (f.fits) { const r = fitCheck(g, crewPeople(g)); if (!r || r.state !== "ok") return false; if (partyCheck(g, Object.keys(S.members).length)) return false; }
@@ -979,6 +1107,7 @@ function sortGames(list) {
     by === "new" ? tsMs(b.suggestedAt) - tsMs(a.suggestedAt) :
     by === "price" ? priceOf(a) - priceOf(b) :
     by === "az" ? a.title.localeCompare(b.title) :
+    by === "owned" ? (ownersOf(b).length - ownersOf(a).length) || a.title.localeCompare(b.title) :
     (score(b) - score(a)) || (tsMs(b.suggestedAt) - tsMs(a.suggestedAt)));
 }
 
@@ -1000,6 +1129,7 @@ function voteButtons(id, g, small) {
 function card(id, g, rank) {
   const fit = fitCheck(g, interestedPeople(g));
   const party = partyCheck(g, interestedCount(g));
+  const lib = inLibrary(g); const ready = lib ? readyInfo(g) : null; const owners = ownersOf(g);
   const xp = g.crossplay || "unknown";
   const st = g.status || "suggested";
   return `<article class="card" tabindex="0" data-open="${esc(id)}" aria-label="${esc(g.title)}">
@@ -1007,6 +1137,7 @@ function card(id, g, rank) {
       ${coverImg(g)}
       ${rank ? `<span class="rank">#${rank}</span>` : ""}
       ${st !== "suggested" ? `<span class="stat">${STATUS[st].label}</span>` : ""}
+      ${onSale(g) ? `<span class="salebadge">−${g.pcPrice.savings}% · ${fmtPrice(g.pcPrice.price)}</span>` : ""}
     </div>
     <div class="cbody">
       <h3 class="ctitle">${esc(g.title)}</h3>
@@ -1014,7 +1145,9 @@ function card(id, g, rank) {
         ${maxPartyOf(g) ? `<span class="tag">Up to ${maxPartyOf(g)}</span>` : g.players ? `<span class="tag">${esc(g.players)}</span>` : ""}
         ${g.gamepass ? `<span class="tag">Game Pass</span>` : ""}${g.psplus ? `<span class="tag">PS Plus</span>` : ""}</div>
       ${g.description ? `<p class="desc">${esc(g.description)}</p>` : ""}
-      ${fit ? `<div class="fit ${fit.state === "unknown" ? "warn" : fit.state}"><span aria-hidden="true">${fit.state === "ok" ? "✔" : fit.state === "bad" ? "✖" : "⚠"}</span><span>${esc(fit.text)}</span></div>` : ""}
+      ${lib ? `<div class="owners">${g.freeToPlay ? "Free to play" : `<span class="stack">${owners.slice(0, 6).map(u => avatar(S.members[u], "sm")).join("")}</span><span>${owners.length} of ${Object.keys(S.members).length} own it</span>`}</div>` : ""}
+      ${ready ? `<div class="ready"><span aria-hidden="true">✔</span><span>Ready: ${esc(ready.text)}</span></div>` : ""}
+      ${!ready && fit ? `<div class="fit ${fit.state === "unknown" ? "warn" : fit.state}"><span aria-hidden="true">${fit.state === "ok" ? "✔" : fit.state === "bad" ? "✖" : "⚠"}</span><span>${esc(fit.text)}</span></div>` : ""}
       ${party ? `<div class="fit warn"><span aria-hidden="true">⚠</span><span>${esc(party)}</span></div>` : ""}
       <div class="cfoot">${priceLine(g)}${voteButtons(id, g)}</div>
     </div></article>`;
@@ -1023,32 +1156,44 @@ function card(id, g, rank) {
 function render() {
   if (!S.ready) return;
   renderTabs();
-  $("toolbar").classList.toggle("hidden", ["crew", "ideas", "nights"].includes(S.tab));
+  $("toolbar").classList.toggle("hidden", !["library", "wishlist"].includes(S.tab));
+  const lib = S.tab === "library";
+  $("ownerSel").classList.toggle("hidden", !lib); $("viewToggle").classList.toggle("hidden", !lib);
+  document.querySelector('[data-f="ready"]').classList.toggle("hidden", !lib);
+  $("ownerSel").innerHTML = `<option value="">Everyone's games</option>` + Object.entries(S.members).sort((a, b) => a[1].name.localeCompare(b[1].name)).map(([u, m]) => `<option value="${esc(u)}" ${S.owner === u ? "selected" : ""}>${u === S.user.uid ? "My games" : esc(m.name.split(" ")[0]) + "'s games"}</option>`).join("");
+  $("viewToggle").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", S.view === b.dataset.view));
   const v = $("view");
   updateBell();
+  if (S.tab === "stats") return renderStats(v);
   if (S.tab === "nights") return renderNights(v);
   if (S.tab === "ideas") return renderIdeas(v);
   if (S.tab === "crew") return renderCrew(v);
-  const entries = Object.entries(S.games).filter(([, g]) => (STATUS[g.status || "suggested"]?.tab || "queue") === S.tab);
+  const entries = Object.entries(S.games).filter(([, g]) => gameTab(g) === S.tab);
   const shown = sortGames(entries.filter(([, g]) => matches(g)).map(([id, g]) => ({ ...g, _id: id })));
-  const heads = { queue: ["The queue", "Vote 👍 on what you'd play. Most-wanted rises to the top."], playing: ["Now playing", "Games the crew is in right now."], played: ["Played", "Finished and dropped."] };
+  const heads = { library: ["Library", "Games the crew owns. Mark yours with “I own…”."], wishlist: ["Wishlist", "Games nobody owns yet. Vote 👍 on what you'd buy and play."] };
   let html = "";
   const next = upcomingNights()[0];
-  if (S.tab === "queue" && next) {
+  if (["library", "wishlist"].includes(S.tab) && next) {
     const [nid, n] = next; const ng = n.gameId && S.games[n.gameId];
     const ins = Object.values(n.rsvps || {}).filter(x => x === "in").length;
     html += `<button class="nextnight" data-tab="nights"><span aria-hidden="true">◷</span><span>Next game night: <b>${esc(fmtNight(n.when))}</b>${ng ? ` · ${esc(ng.title)}` : ""} · ${ins} in</span></button>`;
   }
-  html += `<div class="sectionhead"><h2>${heads[S.tab][0]}</h2><span class="muted">${heads[S.tab][1]}</span></div><div class="grid">`;
+  html += `<div class="sectionhead"><h2>${heads[S.tab][0]}</h2><span class="muted">${heads[S.tab][1]}</span></div>`;
+  if (lib) {
+    const sc = {}; for (const [, g] of entries) sc[g.status || "suggested"] = (sc[g.status || "suggested"] || 0) + 1;
+    html += `<div class="chiprow" style="margin:-2px 0 12px">${[["", "All"], ...Object.entries(STATUS).map(([k, x]) => [k, x.label])].filter(([k]) => !k || sc[k]).map(([k, l]) => `<button class="chip" data-libstatus="${k}" aria-pressed="${(S.libStatus || "") === k}">${l}${k ? ` · ${sc[k]}` : ""}</button>`).join("")}</div>`;
+  }
+  if (lib && S.view === "grid" && entries.length) { v.innerHTML = html + ownershipGrid(shown); return; }
+  html += `<div class="grid">`;
   if (!entries.length) {
-    html += S.tab === "queue"
-      ? `<div class="empty"><h3>Nothing in the queue yet</h3><p>Hit <b>Suggest a game</b>, or grab one from <b>Ideas</b>, a list of ${BUILTIN.length} multiplayer games with crossplay already checked.</p></div>`
-      : `<div class="empty"><h3>Nothing here yet</h3><p>Open a game and change its status to move it here.</p></div>`;
+    html += lib
+      ? `<div class="empty"><h3>The library is empty</h3><p>Hit <b>I own…</b> to tick the games you already have. Everyone's games show up here, with who owns what.</p></div>`
+      : `<div class="empty"><h3>Nothing on the wishlist</h3><p>Hit <b>Add a game</b>, or grab one from <b>Ideas</b>: ${BUILTIN.length} multiplayer games with crossplay already checked.</p></div>`;
   } else if (!shown.length) html += `<div class="empty"><h3>No matches</h3><p>Try clearing the search or filters.</p></div>`;
-  else shown.forEach((g, i) => { html += card(g._id, g, S.tab === "queue" && (S.filters.sort || "score") === "score" && score(g) > 0 ? i + 1 : 0); });
+  else shown.forEach((g, i) => { html += card(g._id, g, !lib && (S.filters.sort || "score") === "score" && score(g) > 0 ? i + 1 : 0); });
   v.innerHTML = html + "</div>";
   // lazy price refresh for visible PC games
-  shown.slice(0, 24).forEach(g => refreshPrice(g._id, false));
+  shown.slice(0, 30).forEach(g => refreshPrice(g._id, false));
 }
 
 function renderIdeas(v) {
@@ -1088,7 +1233,7 @@ function renderCrew(v) {
       ${tz ? `<div class="localtimes">Local time ${esc(fmtTime(Date.now(), tz))} ${esc(tzAbbr(tz))} · ${esc(tzCity(tz))}</div>` : ""}
       <div class="tags" style="margin-top:3px">${(m.platforms || []).map(p => `<span class="plat ${p}">${PLATS[p].short}</span>`).join("") || `<span class="muted" style="font-size:12px">No platforms set</span>`}</div></div></div>
       ${handle("Steam", h.steam)}${handle("Epic", h.epic)}${handle("PSN", h.psn)}${handle("Xbox", h.xbox)}${handle("Discord", h.discord)}
-      <div class="muted" style="font-size:12.5px">${sugg} suggestion${sugg === 1 ? "" : "s"}</div>
+      <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12.5px">${Object.values(S.games).filter(g => (g.owns || {})[uid]).length} games owned · ${sugg} added</span><button class="ibtn ghost" data-ownerlib="${esc(uid)}" style="height:34px">View library</button></div>
       ${isLeader() && uid !== S.user.uid ? `<button class="ibtn danger" data-kick="${esc(uid)}" style="align-self:flex-start">Remove from group</button>` : ""}
     </div>`; }).join("")}</div>
 `;
@@ -1132,7 +1277,7 @@ function openGame(id) {
        </div>
        <div class="box"><h3>Price</h3>
          ${g.freeToPlay ? `<div class="price">Free to play</div>` : ""}
-         ${g.pcPrice ? `<div><span class="price">${fmtPrice(g.pcPrice.price)}</span> on ${esc(g.pcPrice.store)}${g.pcPrice.savings > 0 ? ` <span class="xp full">−${g.pcPrice.savings}%</span> <s class="muted">${fmtPrice(g.pcPrice.retail)}</s>` : ""}</div>` : (g.platforms || []).includes("pc") && !g.freeToPlay ? `<div class="muted" style="font-size:13px">No PC price found yet</div>` : ""}
+         ${g.pcPrice ? `<div><span class="price">${fmtPrice(g.pcPrice.price)}</span> on ${esc(g.pcPrice.store)}${g.pcPrice.savings > 0 ? ` <span class="xp full">−${g.pcPrice.savings}%</span> <s class="muted">${fmtPrice(g.pcPrice.retail)}</s>` : ""}</div>${g.pcPrice.lowest != null ? `<div class="muted" style="font-size:12.5px">${g.pcPrice.lowest >= g.pcPrice.price ? "Lowest price ever right now" : `Lowest ever: ${fmtPrice(g.pcPrice.lowest)}`}</div>` : ""}` : (g.platforms || []).includes("pc") && !g.freeToPlay ? `<div class="muted" style="font-size:13px">No PC price found yet</div>` : ""}
          ${g.consolePrice ? `<div>Console: ${esc(g.consolePrice)}</div>` : ""}
          <div class="tags">${g.gamepass ? `<span class="tag">On Game Pass</span>` : ""}${g.psplus ? `<span class="tag">In PS Plus</span>` : ""}</div>
          ${g.players ? `<div class="muted" style="font-size:13px">Players: ${esc(g.players)}</div>` : ""}
@@ -1200,13 +1345,14 @@ function openAdd(prefill) {
   pending = null;
   $("addStep1").classList.remove("hidden"); $("addForm").classList.add("hidden"); $("addErr").classList.add("hidden");
   $("lookupQ").value = prefill || ""; $("lookupRes").innerHTML = "";
-  $("lookupNote").textContent = CONFIG.RAWG_KEY ? "Details from RAWG · crossplay from the built-in list" : "Details from Wikipedia · crossplay from the built-in list";
+  $("lookupNote").textContent = CONFIG.RAWG_KEY ? "Details from RAWG · crossplay from the built-in list · or paste a store link" : "Details from Wikipedia + Wikidata · crossplay from the built-in list · or paste a store link";
   $("addDlg").showModal(); $("lookupQ").focus();
   if (prefill) runLookup();
 }
 async function runLookup() {
   const q = $("lookupQ").value.trim(); const tok = ++lookupToken;
   if (q.length < 2) { $("lookupRes").innerHTML = ""; return; }
+  if (/^https?:\/\//i.test(q)) return runLinkLookup(q, tok);
   $("lookupRes").innerHTML = `<div class="row muted"><span class="spin"></span> Searching…</div>`;
   const local = BUILTIN.filter(b => norm(b.title).includes(norm(q)) || (b.aliases || []).some(a => norm(a).includes(norm(q)))).slice(0, 3);
   let hits = [];
@@ -1219,6 +1365,54 @@ async function runLookup() {
     : `<div class="muted">No results. Try a different spelling, or enter it by hand.</div>`;
   $("lookupRes").querySelectorAll("[data-hit]").forEach(b => b.onclick = () => pickHit(all[+b.dataset.hit]));
 }
+/* Paste a store link: work out the game from the URL. */
+function parseStoreLink(url) {
+  let u; try { u = new URL(url); } catch { return null; }
+  const h = u.hostname.replace(/^www\./, ""); const parts = u.pathname.split("/").filter(Boolean);
+  const titleFromSlug = sl => decodeURIComponent(sl || "").replace(/[-_]+/g, " ").replace(/\b\w/g, c => c.toUpperCase()).trim();
+  if (h.endsWith("steampowered.com") || h === "steamcommunity.com") { const i = parts.indexOf("app"); if (i >= 0 && /^\d+$/.test(parts[i + 1] || "")) return { store: "Steam", steamAppID: parts[i + 1], title: parts[i + 2] ? titleFromSlug(parts[i + 2]) : "" }; }
+  if (h.endsWith("xbox.com")) { const i = parts.indexOf("store"); if (i >= 0 && parts[i + 1]) return { store: "Xbox", title: titleFromSlug(parts[i + 1]), url }; }
+  if (h.endsWith("epicgames.com")) { const i = parts.indexOf("p"); if (i >= 0 && parts[i + 1]) return { store: "Epic", title: titleFromSlug(parts[i + 1].replace(/-[0-9a-f]{4,}$/i, "")), url }; }
+  if (h.endsWith("gog.com")) { const i = parts.indexOf("game"); if (i >= 0 && parts[i + 1]) return { store: "GOG", title: titleFromSlug(parts[i + 1]), url }; }
+  if (h.endsWith("playstation.com")) return { store: "PlayStation", title: "", url };
+  return { store: h, title: "" };
+}
+async function runLinkLookup(url, tok) {
+  const L = parseStoreLink(url);
+  const res = $("lookupRes");
+  if (!L) { res.innerHTML = `<div class="muted">That doesn't look like a link.</div>`; return; }
+  let title = L.title;
+  if (L.steamAppID) {
+    res.innerHTML = `<div class="row muted"><span class="spin"></span> Reading the Steam link…</div>`;
+    const b = BUILTIN.find(x => String(x.steamAppId) === L.steamAppID);
+    if (b) title = b.title;
+    else { try { const list = await fetchJSON(`https://www.cheapshark.com/api/1.0/games?steamAppID=${encodeURIComponent(L.steamAppID)}`); if (list?.[0]?.external) title = list[0].external; } catch {} }
+  }
+  if (tok !== lookupToken) return;
+  if (!title) { res.innerHTML = `<div class="muted">Couldn't read the game's name from this ${esc(L.store)} link. Type the name instead.</div>`; return; }
+  res.innerHTML = `<div class="row muted"><span class="spin"></span> Found “${esc(title)}” · getting details…</div>`;
+  let hits = []; try { hits = await searchGames(title); } catch {}
+  if (tok !== lookupToken) return;
+  const b = builtinFor(title);
+  const m = hits.find(h => norm(h.title) === norm(title) || (b && builtinFor(h.title)?.title === b.title)) || hits[0];
+  let d;
+  if (b) { d = await detailsFor({ src: "none", title: b.title }); if (m) { const wd = await detailsFor(m); for (const k of ["description", "storeUrls", "genres", "released", "rawgId"]) if (wd[k] && (!Array.isArray(wd[k]) || wd[k].length)) d[k] = wd[k]; if (!d.cover) d.cover = wd.cover; } }
+  else if (m) d = await detailsFor(m);
+  else d = { title, platforms: [], modes: [] };
+  if (L.steamAppID) { d.steamAppID = L.steamAppID; if (!d.cover) d.cover = steamHeader(L.steamAppID); if (!d.platforms.includes("pc")) d.platforms.push("pc"); d.storeUrls = { ...(d.storeUrls || {}), steam: `https://store.steampowered.com/app/${L.steamAppID}/` }; }
+  if (L.store === "Xbox") { if (!d.platforms.includes("xbox")) d.platforms.push("xbox"); d.storeUrls = { ...(d.storeUrls || {}), xbox: L.url }; }
+  if (L.store === "Epic") { if (!d.platforms.includes("pc")) d.platforms.push("pc"); d.storeUrls = { ...(d.storeUrls || {}), epic: L.url }; }
+  if (L.store === "GOG") { if (!d.platforms.includes("pc")) d.platforms.push("pc"); d.storeUrls = { ...(d.storeUrls || {}), gog: L.url }; }
+  if (tok !== lookupToken) return;
+  showForm(d);
+}
+function renderIownPlat(gamePlats) {
+  const mine = me()?.platforms || [];
+  const opts = Object.keys(PLATS).filter(k => !gamePlats.length || gamePlats.includes(baseOf(k)));
+  const def = mine.find(k => opts.includes(k)) || opts[0] || "pc";
+  $("iownPlat").innerHTML = (opts.length ? opts : Object.keys(PLATS)).map(k => `<option value="${k}" ${k === def ? "selected" : ""}>${PLATS[k].label}</option>`).join("");
+}
+
 async function pickHit(hit) {
   $("lookupRes").innerHTML = `<div class="row muted"><span class="spin"></span> Getting details for ${esc(hit.title)}…</div>`;
   let d;
@@ -1237,6 +1431,8 @@ function showForm(d) {
   f.crossplay.value = pending.crossplay || (pending.crossHint ? "full" : "unknown");
   f.crossplayNote.value = pending.crossplayNote || (pending.crossHint && !pending.crossplay ? "RAWG lists cross-platform multiplayer; double-check" : "");
   f.players.value = pending.players || ""; f.freeToPlay.checked = !!pending.freeToPlay;
+  f.iown.checked = false;
+  renderIownPlat(pending.platforms || []);
   f.maxParty.value = pending.builtin ? (pending.maxParty || "") : (parseMaxParty(pending.players) || "");
   f.gamepass.checked = !!pending.gamepass; f.psplus.checked = !!pending.psplus; f.consolePrice.value = ""; f.pitch.value = "";
   $("addPlats").innerHTML = BASE_PLATS.map(p => `<label><input type="checkbox" value="${p}" ${(pending.platforms || []).includes(p) ? "checked" : ""}> ${PLATS[p].label.replace(" (Steam / Epic)", "")}</label>`).join("");
@@ -1266,8 +1462,10 @@ async function saveSuggestion(e) {
     status: "suggested", suggestedBy: S.user.uid, votes: { [S.user.uid]: "yes" }, owns: {}, notes: "",
     maxParty: parseInt(f.maxParty.value, 10) > 0 ? Math.min(parseInt(f.maxParty.value, 10), 100) : null,
   };
+  if (f.iown.checked && f.iownPlat.value) data.owns = { [S.user.uid]: f.iownPlat.value };
+  if (pending?.steamAppID) data.steamAppID = String(pending.steamAppID);
   $("addSave").disabled = true;
-  try { await B.addGame(id, data); $("addDlg").close(); toast(`Suggested ${title}`); logAct("suggest", { gameId: id, title }); refreshPrice(id, false); if (S.tab !== "queue") setTab("queue"); }
+  try { await B.addGame(id, data); $("addDlg").close(); toast(data.owns[S.user.uid] ? `Added ${title} to the library` : `Added ${title} to the wishlist`); logAct("suggest", { gameId: id, title }); refreshPrice(id, false); setTab(inLibrary(data) ? "library" : "wishlist"); }
   catch (er) { err.textContent = er.message === "exists" ? `${title} is already on the list.` : (er.code === "permission-denied" ? "You don't have permission to add games." : er.message); err.classList.remove("hidden"); }
   finally { $("addSave").disabled = false; }
 }
@@ -1291,6 +1489,137 @@ function pickTonight() {
     <div class="row"><button class="ibtn" id="reroll">🎲 Reroll</button><button class="ibtn primary" id="pickOpen">Open it</button></div>`;
   if (!$("pickDlg").open) $("pickDlg").showModal();
   $("reroll").onclick = pickTonight; $("pickOpen").onclick = () => { $("pickDlg").close(); openGame(id); };
+}
+
+/* ---------- ownership grid ---------- */
+function ownershipGrid(list) {
+  const ms = Object.entries(S.members).sort((a, b) => (a[0] === S.user.uid ? -1 : b[0] === S.user.uid ? 1 : a[1].name.localeCompare(b[1].name)));
+  if (!list.length) return `<div class="empty"><h3>No matches</h3><p>Try clearing the search or filters.</p></div>`;
+  return `<div class="gridwrap"><table class="own"><thead><tr><th scope="col">Game</th>${ms.map(([u, m]) => `<th scope="col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px">${avatar(m, "sm")}<span>${u === S.user.uid ? "You" : esc(m.name.split(" ")[0])}</span></div></th>`).join("")}<th scope="col">Ready</th></tr></thead><tbody>
+    ${list.map(g => { const r = readyInfo(g); return `<tr class="${r ? "isready" : ""}"><td><button class="linkbtn" data-open="${esc(g._id)}" style="border:0;background:none;padding:0;cursor:pointer;font-weight:600;color:var(--ink);text-align:left">${esc(g.title)}</button></td>
+      ${ms.map(([u]) => { const pl = (g.owns || {})[u];
+        if (u === S.user.uid) return `<td><button class="cell" data-cellown="${esc(g._id)}" aria-label="${pl ? "You own it on " + PLATS[pl]?.label : "Mark as owned"}" ${pl ? `style="border-style:solid;border-color:var(--accent);color:var(--ink)"` : ""}>${pl ? PLATS[pl]?.short || pl : g.freeToPlay ? "Free" : "＋"}</button></td>`;
+        return `<td>${pl ? `<span class="have plat ${pl}">${PLATS[pl]?.short || pl}</span>` : g.freeToPlay ? `<span class="muted">Free</span>` : `<span class="muted" aria-label="Doesn't own it">·</span>`}</td>`; }).join("")}
+      <td>${r ? `<span class="xp full">${r.n}</span>` : `<span class="muted">·</span>`}</td></tr>`; }).join("")}
+  </tbody></table></div>`;
+}
+async function cycleOwn(id) {
+  const g = S.games[id]; if (!g) return;
+  const opts = Object.keys(PLATS).filter(k => !(g.platforms || []).length || g.platforms.includes(baseOf(k)));
+  const mine = me()?.platforms || [];
+  const order = mine.filter(k => opts.includes(k)).length ? mine.filter(k => opts.includes(k)) : opts;
+  const cur = (g.owns || {})[S.user.uid];
+  const i = cur ? order.indexOf(cur) : -1;
+  const next = i + 1 < order.length ? order[i + 1] : undefined;
+  try { await B.patchGame(id, { [`owns.${S.user.uid}`]: next || B.DEL }); } catch (e) { fail(e); }
+}
+
+/* ---------- bulk "I own these" ---------- */
+function openBulk() {
+  const mine = me()?.platforms || [];
+  const rows = [];
+  const inList = new Set();
+  for (const [id, g] of Object.entries(S.games)) { inList.add(norm(g.title)); if (!(g.owns || {})[S.user.uid] && !g.freeToPlay) rows.push({ key: "g:" + id, title: g.title, plats: g.platforms || [], listed: true }); }
+  for (const b of BUILTIN) if (!inList.has(norm(b.title)) && !b.freeToPlay) rows.push({ key: "b:" + b.title, title: b.title, plats: b.platforms || [], listed: false });
+  rows.sort((a, b) => (b.listed - a.listed) || a.title.localeCompare(b.title));
+  $("bulkList").innerHTML = rows.map(r => {
+    const opts = Object.keys(PLATS).filter(k => !r.plats.length || r.plats.includes(baseOf(k)));
+    const def = mine.find(k => opts.includes(k)) || opts[0];
+    return `<div class="bulkrow" data-t="${esc(norm(r.title))}"><label><input type="checkbox" value="${esc(r.key)}"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.title)}</span>${r.listed ? `<span class="tag">On list</span>` : ""}</label>
+      <select aria-label="Platform for ${esc(r.title)}">${opts.map(k => `<option value="${k}" ${k === def ? "selected" : ""}>${PLATS[k].short}</option>`).join("")}</select></div>`;
+  }).join("") || `<div class="muted">You've marked everything already.</div>`;
+  $("bulkQ").value = ""; updBulkCount();
+  $("bulkList").onchange = updBulkCount;
+  $("bulkDlg").showModal(); $("bulkQ").focus();
+}
+function updBulkCount() { const n = $("bulkList").querySelectorAll("input:checked").length; $("bulkCount").textContent = n ? `${n} selected` : ""; }
+async function saveBulk() {
+  const picks = [...$("bulkList").querySelectorAll(".bulkrow")].filter(r => r.querySelector("input").checked).map(r => ({ key: r.querySelector("input").value, plat: r.querySelector("select").value }));
+  if (!picks.length) { $("bulkDlg").close(); return; }
+  $("bulkSave").disabled = true; let added = 0, marked = 0;
+  try {
+    for (const p of picks) {
+      if (p.key.startsWith("g:")) { await B.patchGame(p.key.slice(2), { [`owns.${S.user.uid}`]: p.plat }); marked++; continue; }
+      const b = BUILTIN.find(x => x.title === p.key.slice(2)); if (!b) continue;
+      const id = slug(b.title); if (S.games[id]) { await B.patchGame(id, { [`owns.${S.user.uid}`]: p.plat }); marked++; continue; }
+      await B.addGame(id, {
+        title: b.title, description: "", cover: b.cover || "", platforms: b.platforms, crossplay: b.crossplay, crossplayNote: b.crossplayNote,
+        groups: encG(b.groups), crossProgression: b.crossProgression ?? null, players: b.players, modes: b.mode || [], genres: [], released: "", storeUrls: {},
+        stores: b.stores || {}, freeToPlay: !!b.freeToPlay, gamepass: !!b.stores?.gamepass, psplus: !!b.stores?.psplus, consolePrice: "", pitch: "",
+        xpSource: b.source || "", rawgId: null, steamAppID: b.steamAppId ? String(b.steamAppId) : null, maxParty: b.maxParty || null,
+        status: "suggested", suggestedBy: S.user.uid, votes: {}, owns: { [S.user.uid]: p.plat }, notes: "",
+      });
+      added++;
+    }
+    $("bulkDlg").close();
+    toast(`Library updated: ${marked + added} game${marked + added === 1 ? "" : "s"}`);
+    logAct("owned", { count: marked + added });
+    setTab("library");
+  } catch (e) { fail(e); } finally { $("bulkSave").disabled = false; }
+}
+
+/* ---------- crew stats ---------- */
+function renderStats(v) {
+  const games = Object.entries(S.games); const ms = Object.entries(S.members);
+  const lib = games.filter(([, g]) => inLibrary(g)); const wish = games.filter(([, g]) => !inLibrary(g));
+  const past = Object.values(S.nights).filter(n => n.when < Date.now());
+  const ready = lib.filter(([, g]) => readyInfo(g));
+  const per = ms.map(([u, m]) => ({ u, m,
+    owned: games.filter(([, g]) => (g.owns || {})[u]).length,
+    added: games.filter(([, g]) => g.suggestedBy === u).length,
+    nights: past.filter(n => (n.rsvps || {})[u] === "in").length,
+    votes: games.filter(([, g]) => (g.votes || {})[u] === "yes").length }));
+  const top = k => [...per].sort((a, b) => b[k] - a[k])[0];
+  const award = (title, k, unit) => { const t = top(k); return t && t[k] > 0 ? `<div class="award">${avatar(t.m)}<div><b>${esc(title)}</b><div class="w">${esc(t.m.name)} · ${t[k]} ${unit}${t[k] === 1 ? "" : "s"}</div></div></div>` : ""; };
+  const bars = (rows, max) => rows.map(([l, n]) => `<div class="bar"><span>${esc(l)}</span><span class="t"><span style="width:${max ? Math.round(n / max * 100) : 0}%"></span></span><span class="n">${n}</span></div>`).join("");
+  const count = f => { const c = {}; for (const [, g] of lib) for (const x of f(g)) c[x] = (c[x] || 0) + 1; return Object.entries(c).sort((a, b) => b[1] - a[1]); };
+  const modes = count(g => (g.modes || []).map(x => MODE_LABEL[x] || x)).slice(0, 6);
+  const plats = (() => { const c = {}; for (const [, g] of games) for (const pl of Object.values(g.owns || {})) if (pl) c[PLATS[pl]?.label || pl] = (c[PLATS[pl]?.label || pl] || 0) + 1; return Object.entries(c).sort((a, b) => b[1] - a[1]); })();
+  const xp = { full: 0, partial: 0, none: 0, unknown: 0 }; for (const [, g] of lib) xp[g.crossplay || "unknown"]++;
+  const nightGames = {}; for (const n of past) if (n.gameId && S.games[n.gameId]) nightGames[S.games[n.gameId].title] = (nightGames[S.games[n.gameId].title] || 0) + 1;
+  const mostPlayed = Object.entries(nightGames).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const wanted = [...wish].sort((a, b) => score(b[1]) - score(a[1])).slice(0, 5).filter(([, g]) => score(g) > 0);
+  const value = lib.reduce((t, [, g]) => t + (g.pcPrice?.retail || 0) * ownersOf(g).length, 0);
+  v.innerHTML = `<div class="sectionhead"><h2>Crew stats</h2><span class="muted">How the crew plays.</span></div>
+   <div class="kpis">
+     <div class="kpi"><div class="big">${lib.length}</div><div class="l">games in the library</div></div>
+     <div class="kpi"><div class="big">${ready.length}</div><div class="l">ready to play tonight</div></div>
+     <div class="kpi"><div class="big">${wish.length}</div><div class="l">on the wishlist</div></div>
+     <div class="kpi"><div class="big">${past.length}</div><div class="l">game nights played</div></div>
+     ${value ? `<div class="kpi"><div class="big">$${Math.round(value).toLocaleString()}</div><div class="l">library value (PC list prices)</div></div>` : ""}
+   </div>
+   <div class="stats">
+     <div class="stat"><h3>Awards</h3>${award("Biggest collection", "owned", "game") + award("Most games added", "added", "game") + award("Never misses a night", "nights", "night") + award("Most 👍 votes", "votes", "vote") || `<div class="muted">Awards appear once people start adding and owning games.</div>`}</div>
+     <div class="stat"><h3>Games owned per person</h3>${bars(per.sort((a, b) => b.owned - a.owned).map(p => [p.m.name.split(" ")[0], p.owned]), Math.max(1, ...per.map(p => p.owned)))}</div>
+     <div class="stat"><h3>What the crew plays</h3>${modes.length ? bars(modes, modes[0][1]) : `<div class="muted">No library games yet.</div>`}</div>
+     <div class="stat"><h3>Platforms</h3>${plats.length ? bars(plats, plats[0][1]) : `<div class="muted">Nobody's marked games as owned yet.</div>`}</div>
+     <div class="stat"><h3>Crossplay in the library</h3>${bars([["Full", xp.full], ["Partial", xp.partial], ["None", xp.none], ["Unknown", xp.unknown]].filter(([, n]) => n), Math.max(1, lib.length))}</div>
+     <div class="stat"><h3>Most played on game nights</h3>${mostPlayed.length ? bars(mostPlayed, mostPlayed[0][1]) : `<div class="muted">Plan a game night with a game picked and it'll count here.</div>`}</div>
+     <div class="stat"><h3>Most wanted on the wishlist</h3>${wanted.length ? wanted.map(([id, g]) => `<button class="gm" data-open="${esc(id)}"><span class="th">${coverOf(g).src ? coverImg(g) : ""}</span><span><b>${esc(g.title)}</b><div class="muted" style="font-size:12.5px">${Object.values(g.votes || {}).filter(x => x === "yes").length} 👍${onSale(g) ? ` · on sale −${g.pcPrice.savings}%` : ""}</div></span></button>`).join("") : `<div class="muted">Vote 👍 on wishlist games to rank them.</div>`}</div>
+   </div>`;
+}
+
+/* ---------- in-app guide ---------- */
+function openGuide() {
+  $("guideBody").innerHTML = `<h2 id="guideTitle">How to use Party Up</h2>
+   <p class="tip">Party Up is the crew's game inventory: what everyone owns, what we want, and what we can actually play together across PC, PlayStation and Xbox.</p>
+   <h3>1. Set up your profile</h3>
+   <ul><li>Tap your avatar (top right). Tick the platforms you play on; the first one is your main.</li><li>Pick your color, picture, timezone and a status line, and add your Steam / PSN / Xbox / Discord names so friends can add you.</li></ul>
+   <h3>2. Fill in your library</h3>
+   <ul><li>On <b>Library</b>, tap <b>I own…</b> and tick every game you have, with the platform. Games that aren't on the list yet get added.</li><li>Or open any game and set <b>I have it on</b>.</li><li>Switch to <b>Who owns what</b> for a table of every game and every person. Tap your column to mark a game (tap again to change platform or clear it).</li><li>Use the <b>Everyone's games</b> menu to see one person's library.</li></ul>
+   <h3>3. Find something to play</h3>
+   <ul><li><b>Ready tonight</b> shows games that at least two people own and can play together.</li><li>Each card checks crossplay for you: <i>“All 3 can play together”</i> or who'd be split up.</li><li><b>🎲 Pick tonight</b> chooses one for you.</li></ul>
+   <h3>4. The wishlist</h3>
+   <ul><li>Games nobody owns yet live on <b>Wishlist</b>. Vote 👍 / 🤷 / 👎 and the most-wanted rise to the top.</li><li>PC prices update daily; <b>On sale</b> shows deals, and each game shows its lowest price ever.</li><li>When someone buys it and marks it owned, it moves to the Library.</li></ul>
+   <h3>5. Adding a game</h3>
+   <ul><li><b>Add a game</b>: type a name, or paste a Steam, Xbox, Epic or GOG store link.</li><li><b>Ideas</b> has ${BUILTIN.length} multiplayer games with crossplay already checked.</li><li>Tick <b>I own it</b> while adding to put it straight in the library.</li></ul>
+   <h3>6. Game nights</h3>
+   <ul><li>On <b>Nights</b>, plan a time and a game. Everyone taps In / Maybe / Out, and times show in each person's own timezone.</li><li><b>Add to calendar</b> puts it on your phone or PC calendar.</li></ul>
+   <h3>Also</h3>
+   <ul><li>The 🔔 shows what's new. <b>Stats</b> has awards and what the crew plays most.</li><li>Install it: in Chrome, use “Install app”; on iPhone, Share → Add to Home Screen.</li></ul>
+   <div class="foot"><button class="ibtn primary" data-close>Got it</button></div>`;
+  $("guideDlg").showModal();
+  store.set("sq_guide_seen", true);
 }
 
 /* ---------- cover backfill ---------- */
@@ -1445,6 +1774,7 @@ function actText(e) {
     case "night": return `${who} planned a game night for ${esc(fmtNight(e.when))}${e.title ? ` · ${t}` : ""}`;
     case "rsvp": return `${who} is in for game night on ${esc(fmtNight(e.when))}`;
     case "join": return `${who} joined the crew`;
+    case "owned": return `${who} added ${e.count} game${e.count === 1 ? "" : "s"} to their library`;
     default: return `${who} updated the list`;
   }
 }
@@ -1461,6 +1791,7 @@ function openActItem(id) {
   if (e.gameId && S.games[e.gameId]) { $("actDlg").close(); return openGame(e.gameId); }
   if (e.nightId || e.type === "night" || e.type === "rsvp") { $("actDlg").close(); return setTab("nights"); }
   if (e.type === "join") { $("actDlg").close(); return setTab("crew"); }
+  if (e.type === "owned") { $("actDlg").close(); S.owner = e.by; return setTab("library"); }
 }
 $("actDlg").addEventListener("close", () => { S._seenBefore = undefined; });
 
@@ -1584,6 +1915,7 @@ function enterApp() {
   $("demoBanner").classList.toggle("hidden", B.mode !== "local");
   if (unwatch) unwatch();
   $("actBtn").classList.remove("hidden");
+  if (!store.get("sq_guide_seen", false)) setTimeout(() => { if (!document.querySelector("dialog[open]")) openGuide(); }, 600);
   if (store.get("sq_seen_" + GROUP, null) == null) store.set("sq_seen_" + GROUP, Date.now());
   unwatch = B.watch({
     group: g => { S.group = g; $("groupName").textContent = g?.name ? "· " + g.name : ""; render(); },
@@ -1616,8 +1948,12 @@ applyTheme();
 
 /* ---------- events ---------- */
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f],[data-rsvp],[data-ics],[data-plan],[data-editnight],[data-delnight],[data-act]");
+  const t = e.target.closest("[data-ownerlib],[data-cellown],[data-libstatus],[data-view],[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f],[data-rsvp],[data-ics],[data-plan],[data-editnight],[data-delnight],[data-act]");
   if (!t) return;
+  if (t.dataset.ownerlib) { S.owner = t.dataset.ownerlib; S.view = "cards"; return setTab("library"); }
+  if (t.dataset.cellown) return cycleOwn(t.dataset.cellown);
+  if (t.dataset.libstatus !== undefined) { S.libStatus = t.dataset.libstatus; return render(); }
+  if (t.dataset.view) { S.view = t.dataset.view; store.set("sq_view", S.view); return render(); }
   if (t.dataset.rsvp) return rsvp(t.dataset.night, t.dataset.rsvp);
   if (t.dataset.ics) return downloadIcs(t.dataset.ics);
   if ("plan" in t.dataset) { if ($("gameDlg").open) $("gameDlg").close(); return openPlan(t.dataset.plan || null); }
@@ -1660,6 +1996,11 @@ $("meForm").addEventListener("change", e => { if (e.target.name === "accent" && 
 $("signOutBtn").onclick = () => { $("meDlg").close(); B.signOut(); };
 $("meDlg").addEventListener("close", () => { if (!S._accentSaved) applyAccent(accentOf(me()) , !!me()); });
 $("nightForm").onsubmit = saveNight;
+$("ownerSel").onchange = e => { S.owner = e.target.value; render(); };
+$("bulkBtn").onclick = openBulk;
+$("bulkSave").onclick = saveBulk;
+$("bulkQ").oninput = () => { const q = norm($("bulkQ").value); $("bulkList").querySelectorAll(".bulkrow").forEach(r => r.classList.toggle("hidden", !!q && !r.dataset.t.includes(q))); };
+$("guideBtn").onclick = openGuide;
 $("actBtn").onclick = openActivity;
 // restore filter UI
 $("sortSel").value = S.filters.sort || "score"; $("modeSel").value = S.filters.mode || "";
@@ -1689,7 +2030,7 @@ document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed"
 })();
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput };
+window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput, parseStoreLink, readyInfo, wikidataFacts };
 </script>
 </body>
 </html>

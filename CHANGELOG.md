@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10 — Library + Wishlist, store links, sales, stats, guide (v1.4.0)
+
+- Party Up is now the crew's game inventory. **Library** holds every game someone owns (free-to-play counts as everyone's); **Wishlist** holds games nobody owns yet, with votes and prices. The old Queue / Playing / Played tabs became status chips inside the Library.
+- **I own…**: tick every game you own in one go, with the platform for each. Games not on the list (from the 110 built-in) get added automatically.
+- **Who owns what**: a grid of every library game × every person. Tap your own column to mark a game, tap again to change platform or clear it.
+- **Ready tonight**: games at least two people own and can play together; shown on cards, in the grid and as a filter.
+- **Per-person library**: "Everyone's games" menu, plus "View library" on each Crew card.
+- **Paste a store link** to add a game: Steam, Xbox, Epic and GOG links fill in the title, art and platforms. "I own it" while adding puts it straight in the Library.
+- **Sale alerts**: sale badge with % off and price on cards, an "On sale" filter, lowest-price-ever in each game's details; wishlist prices refresh daily.
+- **Stats** tab: library size, games ready tonight, awards (biggest collection, most games added, never misses a night, most 👍), games per person, what the crew plays, platforms, crossplay mix, most-played on game nights, most wanted on the wishlist.
+- **How-to guide** in the app: opens on first visit and from the ? button.
+- **Wikidata**: games looked up through Wikipedia now get their real platform list, genres, multiplayer modes and release date (RAWG signup is down).
+
 ## 2026-10 — Fix "Not on anyone's platform" (v1.3.2)
 
 - Fixed: the "can we play together" check only looked at each person's main platform, so a game on Xbox showed "Not on anyone's platform" for people whose main platform was PC even though they also own an Xbox. It now considers every platform in each person's profile (or the one they marked as owning) and picks whichever lets the most people play together.
