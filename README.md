@@ -11,11 +11,12 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 ## ✨ Features
 
 - **Library + Wishlist**: the Library is everything the crew owns, with who owns it and on what; the Wishlist is games nobody owns yet, with votes and prices. Mark many games at once with **I own…**, see a **Who owns what** grid, filter to **Ready tonight** (2+ owners who can play together) or to one person's games.
+- **Who can play what**: every card shows each person and the platform they'd play on, with ✔ / ✖ and the reason when someone can't join.
 - **Paste a store link**: Steam, Xbox, Epic and GOG links fill in the game for you.
 - **Sale alerts**: % off badges, an On sale filter and lowest-price-ever notes.
 - **Stats**: awards and what the crew plays most.
 - **Built-in guide**: shows on first visit and from the ? button.
-- **Suggest a game by name**: type a title and pick it from the results. A description is pulled in automatically (from [RAWG](https://rawg.io) if a key is set, otherwise Wikipedia plus Wikidata for platforms, genres and release dates). Add a pitch for why the crew should play it.
+- **Suggest a game by name**: type a title and pick it from the results. A description is pulled in automatically (from [RAWG](https://rawg.io) if a key is set, or from [IGDB](https://www.igdb.com) through the optional Party Up Worker; otherwise Wikipedia plus Wikidata for platforms, genres and release dates). Add a pitch for why the crew should play it.
 - **Cover art for every game**: all 110 built-in games carry official store art (Steam, or the PlayStation / Epic store for games not on Steam). Other games use RAWG or Wikipedia art, then fall back to Steam art; games saved without art fill it in automatically.
 - **Crossplay you can trust**: a built-in list of **110 popular multiplayer games** with crossplay checked in October 2026 and re-checked monthly by a scheduled task (full / partial / none, cross-progression, player counts, free-to-play), each with a link to where it was verified. Anything not on the list can be filled in by whoever suggests it.
 - **"Can we all play together?" check**: every card looks at who voted 👍 or 🤷 and what they play on, then says *"All 4 can play together"* or *"3 of 4 together · split: Sam (PS)"*. It understands awkward cases like Deep Rock Galactic, where Xbox and Game Pass PC play together but Steam and PlayStation don't.
@@ -88,4 +89,4 @@ Game data from **[RAWG](https://rawg.io)** and **[Wikipedia](https://www.wikiped
 
 ---
 
-_Last updated: October 2026 (v1.4.0). Full change history in `CHANGELOG.md`._
+_Last updated: October 2026 (v1.5.0). Full change history in `CHANGELOG.md`._

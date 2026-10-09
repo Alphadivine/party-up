@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10 — Who can play what, IGDB game data (v1.5.0)
+
+- Every card now shows who can play and on what: ✔ Quentin · XB, ✔ Sam · PC·GP, ✖ Mia · PS (plays separately). Library cards show it for everyone who owns the game, Wishlist cards for everyone interested, and game nights for everyone who's in. Game details show it for the interested players and the whole crew, with the reason when someone can't join.
+- IGDB is connected (Worker: partyup-games.quentinclayton643.workers.dev). IGDB support comes through a small Cloudflare Worker (`Worker/worker.js`): accurate platforms, landscape art, genres, and online co-op player limits that fill in party size automatically. Falls back to Wikipedia + Wikidata if it's not set up or down. See `Docs/Setup guide (IGDB).md`.
+- Steam store links read the official title, description and art through the Worker.
+- Fixed: a pasted store link could pick up a different game if search didn't find an exact match; it now only accepts a matching title.
+- A store's "cross-platform multiplayer" tag no longer auto-marks a game as full crossplay (it can mean PC + Mac only); it's added as a note to check.
+
 ## 2026-10 — Library + Wishlist, store links, sales, stats, guide (v1.4.0)
 
 - Party Up is now the crew's game inventory. **Library** holds every game someone owns (free-to-play counts as everyone's); **Wishlist** holds games nobody owns yet, with votes and prices. The old Queue / Playing / Played tabs became status chips inside the Library.

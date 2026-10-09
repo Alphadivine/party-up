@@ -281,6 +281,12 @@ table.own tr.isready td:first-child::before{content:"● ";color:var(--full)}
 .guide ul{margin:4px 0;padding-left:20px}
 .guide .tip{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:14px}
 
+.whofit .p{font-size:12.5px;padding:2px 9px;border:1px solid transparent}
+.whofit .p.yes{background:var(--full-bg);color:var(--full)}
+.whofit .p.no{background:var(--none-bg);color:var(--none)}
+.whofit .p.maybe{background:var(--part-bg);color:var(--part)}
+.whofit .p .muted{color:inherit;opacity:.8}
+.whofit .avatar{border-width:1px}
 /* phone */
 nav.bottom{display:none}
 @media (max-width:760px){
@@ -482,10 +488,11 @@ const CONFIG = {
     messagingSenderId: "922628506214",
     appId: "1:922628506214:web:9707a99e1faeea1d1b63a7"
   },
+  GAME_API: "https://partyup-games.quentinclayton643.workers.dev",          // your Party Up Worker address (IGDB + Steam), e.g. "https://partyup-games.<you>.workers.dev". Optional.
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.4.0";
+const VERSION = "1.5.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -686,16 +693,21 @@ function fitCheck(game, people) {
   const notOn = people.filter(p => !on(p).length);
   const able = people.filter(p => on(p).length);
   const onList = () => [...avail].map(short).join("/");
-  if (!able.length) return { state: "bad", text: people.length === 1 ? `Not on your platforms (${onList()} only)` : `Not on anyone's platforms (${onList()} only)` };
+  // who: per-person breakdown → [{uid, plat, ok, why}]
+  const missingWho = notOn.map(p => ({ uid: p.uid, plat: p.plats[0], ok: false, why: `not on ${p.plats.map(short).join("/")}` }));
+  if (!able.length) return { state: "bad", text: people.length === 1 ? `Not on your platforms (${onList()} only)` : `Not on anyone's platforms (${onList()} only)`, who: missingWho };
   const missing = notOn.length ? ` · ${notOn.map(p => name(p.uid)).join(", ")} ${notOn.length === 1 ? "doesn't have" : "don't have"} ${onList()}` : "";
   const groups = decG(game.groups) || defaultGroups(game.crossplay);
   const total = people.length;
   if (!groups) {
-    // crossplay unknown/partial without detail: fine only if everyone shares one platform
     const common = on(able[0]).filter(x => able.every(p => on(p).includes(x)));
-    if (common.length && !notOn.length) return { state: "ok", text: total === 1 ? "You can play it" : `All ${total} can play on ${short(common[0])}` };
-    if (common.length) return { state: "warn", text: `${able.length} of ${total} can play on ${short(common[0])}${missing}` };
-    return { state: "unknown", text: game.crossplayNote ? `Check: ${game.crossplayNote}` : "Crossplay not confirmed yet" };
+    if (common.length) {
+      const who = [...able.map(p => ({ uid: p.uid, plat: common[0], ok: true })), ...missingWho];
+      if (!notOn.length) return { state: "ok", text: total === 1 ? "You can play it" : `All ${total} can play on ${short(common[0])}`, who };
+      return { state: "warn", text: `${able.length} of ${total} can play on ${short(common[0])}${missing}`, who };
+    }
+    return { state: "unknown", text: game.crossplayNote ? `Check: ${game.crossplayNote}` : "Crossplay not confirmed yet",
+      who: [...able.map(p => ({ uid: p.uid, plat: on(p)[0], ok: null, why: "crossplay unknown" })), ...missingWho] };
   }
   const inGroup = (x, g) => g.includes(x) || (x === "pcms" && g.includes("pc") && !groups.some(h => h.includes("pcms")));
   let best = [], bestG = null;
@@ -703,11 +715,27 @@ function fitCheck(game, people) {
     const fit = able.filter(p => on(p).some(x => inGroup(x, g)));
     if (fit.length > best.length) { best = fit; bestG = g; }
   }
-  if (best.length === total) return { state: "ok", text: total === 1 ? "You can play it" : `All ${total} can play together` };
-  if (best.length === able.length && notOn.length) return { state: best.length >= 2 ? "warn" : "bad", text: `${best.length} of ${total} can play together${missing}` };
-  if (best.length < 2) return { state: "bad", text: "Separate versions: " + able.map(p => `${name(p.uid)} (${on(p).map(short).join("/")})`).join(" · ") + missing };
+  const who = [
+    ...best.map(p => ({ uid: p.uid, plat: on(p).find(x => inGroup(x, bestG)), ok: true })),
+    ...able.filter(p => !best.includes(p)).map(p => ({ uid: p.uid, plat: on(p)[0], ok: false, why: best.length ? `${on(p).map(short).join("/")} plays separately` : "" })),
+    ...missingWho,
+  ];
+  if (best.length === total) return { state: "ok", text: total === 1 ? "You can play it" : `All ${total} can play together`, who };
+  if (best.length === able.length && notOn.length) return { state: best.length >= 2 ? "warn" : "bad", text: `${best.length} of ${total} can play together${missing}`, who };
+  if (best.length < 2) return { state: "bad", text: "Separate versions: " + able.map(p => `${name(p.uid)} (${on(p).map(short).join("/")})`).join(" · ") + missing,
+    who: who.map(w => ({ ...w, ok: notOn.some(p => p.uid === w.uid) ? false : null, why: w.why || "no crossplay with the others" })) };
   const split = able.filter(p => !best.includes(p)).map(p => `${name(p.uid)} (${on(p).map(short).join("/")})`).join(", ");
-  return { state: "warn", text: `${best.length} of ${total} together · split: ${split}${missing}` };
+  return { state: "warn", text: `${best.length} of ${total} together · split: ${split}${missing}`, who };
+}
+// Per-person chips: ✔ Quentin · XB   ✖ Mia · PS (not on PlayStation)
+function whoChips(fit, compact) {
+  if (!fit?.who?.length) return "";
+  const nm = uid => uid === S.user?.uid ? "You" : (S.members[uid]?.name || "?").split(" ")[0];
+  return `<div class="who whofit" aria-label="Who can play">${fit.who.map(w => {
+    const cls = w.ok === true ? "yes" : w.ok === false ? "no" : "maybe";
+    const ic = w.ok === true ? "✔" : w.ok === false ? "✖" : "?";
+    return `<span class="p ${cls}" title="${esc(nm(w.uid) + (w.why ? " — " + w.why : ""))}">${compact ? "" : avatar(S.members[w.uid], "sm")}<span aria-hidden="true">${ic}</span> ${esc(nm(w.uid))} · ${esc(PLATS[w.plat]?.short || w.plat || "?")}${!compact && w.why ? ` <span class="muted">(${esc(w.why)})</span>` : ""}</span>`;
+  }).join("")}</div>`;
 }
 // Platforms a person can play this game on: what they marked as owned, else everything in their profile.
 const platsFor = (game, uid) => { const o = (game?.owns || {})[uid]; return o ? [o] : (S.members[uid]?.platforms || []); };
@@ -883,7 +911,16 @@ const me = () => S.user && S.members[S.user.uid];
 /* ============================================================
    GAME LOOKUP — RAWG (with key) or Wikipedia, + built-in crossplay
    ============================================================ */
+const gameApi = path => fetchJSON(CONFIG.GAME_API.replace(/\/+$/, "") + path, 12000);
 async function searchGames(q) {
+  if (CONFIG.GAME_API) {
+    try {
+      const d = await gameApi(`/search?q=${encodeURIComponent(q)}`);
+      const res = (d.results || []).map(r => ({ src: "igdb", id: r.id, title: r.title, cover: r.thumb || r.cover || "", year: r.year ? String(r.year) : "",
+        sub: [r.platforms.map(k => PLATS[k]?.short || k).join(" · "), r.maxParty ? `up to ${r.maxParty} co-op` : ""].filter(Boolean).join(" · "), igdb: r }));
+      if (res.length) return res;
+    } catch (e) { console.warn("Game API search failed, falling back", e); }
+  }
   if (CONFIG.RAWG_KEY) {
     try {
       const d = await fetchJSON(`https://api.rawg.io/api/games?key=${encodeURIComponent(CONFIG.RAWG_KEY)}&search=${encodeURIComponent(q)}&search_precise=true&page_size=8`);
@@ -901,7 +938,16 @@ async function searchGames(q) {
 async function detailsFor(hit) {
   const out = { title: hit.title, cover: hit.cover || "", description: "", platforms: [], modes: [], storeUrls: {}, genres: [], released: "", rawgId: null };
   try {
-    if (hit.src === "rawg") {
+    if (hit.src === "igdb") {
+      let gd = hit.igdb;
+      try { gd = (await gameApi(`/game?id=${encodeURIComponent(hit.id)}`)).game || gd; } catch (e) { console.warn("game details", e); }
+      Object.assign(out, {
+        title: gd.title, description: gd.description || "", cover: gd.cover || out.cover, platforms: gd.platforms || [],
+        modes: gd.modes || [], genres: gd.genres || [], released: gd.released || "", storeUrls: gd.storeUrls || {},
+        maxParty: gd.maxParty || null, igdbId: gd.id || null,
+      });
+      if (gd.steamAppID) out.steamAppID = gd.steamAppID;
+    } else if (hit.src === "rawg") {
       const k = encodeURIComponent(CONFIG.RAWG_KEY);
       const [d, st] = await Promise.all([
         fetchJSON(`https://api.rawg.io/api/games/${hit.id}?key=${k}`),
@@ -960,7 +1006,7 @@ async function detailsFor(hit) {
     out.crossProgression = b.crossProgression; out.players = b.players;
     out.modes = [...new Set([...(b.mode || []), ...out.modes])];
     out.freeToPlay = b.freeToPlay;
-    out.maxParty = b.maxParty || null;
+    out.maxParty = b.maxParty || out.maxParty || null;
     if (b.cover) out.cover = b.cover;
     if (b.steamAppId) out.steamAppID = String(b.steamAppId);
     if (b.stores?.gamepass) out.gamepass = true;
@@ -1149,6 +1195,7 @@ function card(id, g, rank) {
       ${ready ? `<div class="ready"><span aria-hidden="true">✔</span><span>Ready: ${esc(ready.text)}</span></div>` : ""}
       ${!ready && fit ? `<div class="fit ${fit.state === "unknown" ? "warn" : fit.state}"><span aria-hidden="true">${fit.state === "ok" ? "✔" : fit.state === "bad" ? "✖" : "⚠"}</span><span>${esc(fit.text)}</span></div>` : ""}
       ${party ? `<div class="fit warn"><span aria-hidden="true">⚠</span><span>${esc(party)}</span></div>` : ""}
+      ${whoChips(lib ? fitCheck(g, (g.freeToPlay ? Object.keys(S.members) : ownersOf(g)).map(u => ({ uid: u, plats: platsFor(g, u) }))) || fit : fit, true)}
       <div class="cfoot">${priceLine(g)}${voteButtons(id, g)}</div>
     </div></article>`;
 }
@@ -1270,8 +1317,8 @@ function openGame(id) {
          <div><span class="xp ${xp}">${XP_LABEL[xp]}</span></div>
          ${g.crossplayNote ? `<div>${esc(g.crossplayNote)}</div>` : ""}
          ${g.crossProgression === true ? `<div class="muted" style="font-size:13px">Cross-progression: yes</div>` : g.crossProgression === false ? `<div class="muted" style="font-size:13px">Cross-progression: no</div>` : ""}
-         ${fitI ? `<div class="fit ${fitI.state === "unknown" ? "warn" : fitI.state}"><b>Interested:</b>&nbsp;${esc(fitI.text)}</div>` : ""}
-         ${fitC ? `<div class="fit ${fitC.state === "unknown" ? "warn" : fitC.state}"><b>Whole crew:</b>&nbsp;${esc(fitC.text)}</div>` : ""}
+         ${fitI ? `<div class="fit ${fitI.state === "unknown" ? "warn" : fitI.state}"><b>Interested:</b>&nbsp;${esc(fitI.text)}</div>${whoChips(fitI)}` : ""}
+         ${fitC ? `<div class="fit ${fitC.state === "unknown" ? "warn" : fitC.state}"><b>Whole crew:</b>&nbsp;${esc(fitC.text)}</div>${whoChips(fitC)}` : ""}
          ${maxPartyOf(g) ? `<div class="${partyCheck(g, Object.keys(S.members).length) ? "fit warn" : "muted"}" style="font-size:13px">Party size: up to ${maxPartyOf(g)}${partyCheck(g, interestedCount(g)) ? ` · ${interestedCount(g)} want in` : ""} · crew of ${Object.keys(S.members).length}</div>` : ""}
          ${g.xpSource ? `<a href="${esc(g.xpSource)}" target="_blank" rel="noopener" class="muted" style="font-size:12px">Where this was checked ↗</a>` : ""}
        </div>
@@ -1345,7 +1392,7 @@ function openAdd(prefill) {
   pending = null;
   $("addStep1").classList.remove("hidden"); $("addForm").classList.add("hidden"); $("addErr").classList.add("hidden");
   $("lookupQ").value = prefill || ""; $("lookupRes").innerHTML = "";
-  $("lookupNote").textContent = CONFIG.RAWG_KEY ? "Details from RAWG · crossplay from the built-in list · or paste a store link" : "Details from Wikipedia + Wikidata · crossplay from the built-in list · or paste a store link";
+  $("lookupNote").textContent = CONFIG.GAME_API ? "Details from IGDB · crossplay from the built-in list · or paste a store link" : CONFIG.RAWG_KEY ? "Details from RAWG · crossplay from the built-in list · or paste a store link" : "Details from Wikipedia + Wikidata · crossplay from the built-in list · or paste a store link";
   $("addDlg").showModal(); $("lookupQ").focus();
   if (prefill) runLookup();
 }
@@ -1386,7 +1433,12 @@ async function runLinkLookup(url, tok) {
     res.innerHTML = `<div class="row muted"><span class="spin"></span> Reading the Steam link…</div>`;
     const b = BUILTIN.find(x => String(x.steamAppId) === L.steamAppID);
     if (b) title = b.title;
-    else { try { const list = await fetchJSON(`https://www.cheapshark.com/api/1.0/games?steamAppID=${encodeURIComponent(L.steamAppID)}`); if (list?.[0]?.external) title = list[0].external; } catch {} }
+    else {
+      let official = "";
+      if (CONFIG.GAME_API) { try { const sg = (await gameApi(`/steam?appid=${encodeURIComponent(L.steamAppID)}`)).game; if (sg?.title) { official = sg.title.replace(/[™®]/g, "").trim(); L.steam = sg; } } catch {} }
+      if (!official) { try { const list = await fetchJSON(`https://www.cheapshark.com/api/1.0/games?steamAppID=${encodeURIComponent(L.steamAppID)}`); if (list?.[0]?.external) official = list[0].external; } catch {} }
+      if (official) title = official; // the link's own text is only a fallback
+    }
   }
   if (tok !== lookupToken) return;
   if (!title) { res.innerHTML = `<div class="muted">Couldn't read the game's name from this ${esc(L.store)} link. Type the name instead.</div>`; return; }
@@ -1394,11 +1446,19 @@ async function runLinkLookup(url, tok) {
   let hits = []; try { hits = await searchGames(title); } catch {}
   if (tok !== lookupToken) return;
   const b = builtinFor(title);
-  const m = hits.find(h => norm(h.title) === norm(title) || (b && builtinFor(h.title)?.title === b.title)) || hits[0];
+  const m = hits.find(h => norm(h.title) === norm(title) || (b && builtinFor(h.title)?.title === b.title));
   let d;
   if (b) { d = await detailsFor({ src: "none", title: b.title }); if (m) { const wd = await detailsFor(m); for (const k of ["description", "storeUrls", "genres", "released", "rawgId"]) if (wd[k] && (!Array.isArray(wd[k]) || wd[k].length)) d[k] = wd[k]; if (!d.cover) d.cover = wd.cover; } }
   else if (m) d = await detailsFor(m);
-  else d = { title, platforms: [], modes: [] };
+  else d = { title, platforms: [], modes: [], genres: [], storeUrls: {} };
+  if (L.steam) {
+    if (!d.description) d.description = L.steam.description;
+    if (!d.genres?.length) d.genres = L.steam.genres;
+    d.modes = [...new Set([...(d.modes || []), ...(L.steam.modes || [])])];
+    if (L.steam.freeToPlay) d.freeToPlay = true;
+    if (L.steam.crossPlatform && !d.crossplay) { d.crossHint = true; }
+    if (L.steam.cover && !builtinFor(d.title)) d.cover = L.steam.cover;
+  }
   if (L.steamAppID) { d.steamAppID = L.steamAppID; if (!d.cover) d.cover = steamHeader(L.steamAppID); if (!d.platforms.includes("pc")) d.platforms.push("pc"); d.storeUrls = { ...(d.storeUrls || {}), steam: `https://store.steampowered.com/app/${L.steamAppID}/` }; }
   if (L.store === "Xbox") { if (!d.platforms.includes("xbox")) d.platforms.push("xbox"); d.storeUrls = { ...(d.storeUrls || {}), xbox: L.url }; }
   if (L.store === "Epic") { if (!d.platforms.includes("pc")) d.platforms.push("pc"); d.storeUrls = { ...(d.storeUrls || {}), epic: L.url }; }
@@ -1428,12 +1488,12 @@ function showForm(d) {
   $("addStep1").classList.add("hidden"); f.classList.remove("hidden");
   f.title.value = pending.title || $("lookupQ").value.trim();
   f.description.value = pending.description || ""; f.cover.value = pending.cover || "";
-  f.crossplay.value = pending.crossplay || (pending.crossHint ? "full" : "unknown");
-  f.crossplayNote.value = pending.crossplayNote || (pending.crossHint && !pending.crossplay ? "RAWG lists cross-platform multiplayer; double-check" : "");
+  f.crossplay.value = pending.crossplay || "unknown";
+  f.crossplayNote.value = pending.crossplayNote || (pending.crossHint && !pending.crossplay ? "Store lists cross-platform multiplayer; check which platforms" : "");
   f.players.value = pending.players || ""; f.freeToPlay.checked = !!pending.freeToPlay;
   f.iown.checked = false;
   renderIownPlat(pending.platforms || []);
-  f.maxParty.value = pending.builtin ? (pending.maxParty || "") : (parseMaxParty(pending.players) || "");
+  f.maxParty.value = pending.maxParty || (pending.builtin ? "" : parseMaxParty(pending.players)) || "";
   f.gamepass.checked = !!pending.gamepass; f.psplus.checked = !!pending.psplus; f.consolePrice.value = ""; f.pitch.value = "";
   $("addPlats").innerHTML = BASE_PLATS.map(p => `<label><input type="checkbox" value="${p}" ${(pending.platforms || []).includes(p) ? "checked" : ""}> ${PLATS[p].label.replace(" (Steam / Epic)", "")}</label>`).join("");
   $("addModes").innerHTML = MODES.map(m => `<label><input type="checkbox" value="${m}" ${(pending.modes || []).includes(m) ? "checked" : ""}> ${MODE_LABEL[m]}</label>`).join("");
@@ -1680,6 +1740,7 @@ function nightCard(id, n, past) {
       : `<div class="muted" style="font-size:14px">Game: to be decided. Vote in the queue.</div>`}
     ${n.note ? `<div style="font-size:14px;white-space:pre-line">${esc(n.note)}</div>` : ""}
     ${fit ? `<div class="fit ${fit.state === "unknown" ? "warn" : fit.state}"><span aria-hidden="true">${fit.state === "ok" ? "✔" : fit.state === "bad" ? "✖" : "⚠"}</span><span>${esc(fit.text.replace("can play together", "who are in can play together"))}</span></div>` : ""}
+    ${whoChips(fit, true)}
     ${party ? `<div class="fit warn"><span aria-hidden="true">⚠</span><span>${esc(party)}</span></div>` : ""}
     ${past ? "" : `<div class="rsvp" role="group" aria-label="Are you in?">
       <button class="in" data-rsvp="in" data-night="${esc(id)}" aria-pressed="${mine === "in"}">In${cnt("in") ? " · " + cnt("in") : ""}</button>
