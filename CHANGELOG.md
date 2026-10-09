@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10 — Easier to use (v2.0.0)
+
+- **Slimmer toolbar**: just Search, **Filters** and **＋ Add**. The view switch (Cards / List / Who owns what / Compare) sits next to the Library heading. Sorting and "whose games" moved into the Filters panel, and a bar shows when you're looking at one person's games.
+- **One Add button**: ＋ Add searches for a game, and also offers **Tick several games I own** (the old "I own…") and **Browse ideas** (the old Ideas tab, now with a Back button).
+- **Four tabs**: Library, Wishlist, Nights, Crew. Stats is now a section of Crew (Members / Stats).
+- **🎲 Pick a game** moved to Nights, and now picks from games the crew owns and can play together (falling back to the most-wanted wishlist games).
+- **Library cards** drop voting and get a one-tap **＋ I have this too** (or **✔ You · PS** to change your platforms). The Library sorts by most owned.
+- **List view**: compact rows with small art, crossplay, party size, who owns it and a Ready mark. Phones start in List view.
+- **Tap any tag** (Full crossplay, PC·GP, PC·L, Up to 4, Ready, sale %) to see what it means.
+- **Shorter game details**: for owned games, "Who owns it" comes first; votes, group notes and editing fold away under **More**. Wishlist games keep the vote up top.
+- **Get started** checklist for new members: pick platforms, tick your games, try Compare. It goes away once done (or tap ×).
+- **Undo**: changing what you own, or ticking several games at once, shows an Undo button.
+- How-to guide rewritten for the new layout. Fixed the phone search box squeezing the toolbar onto two rows.
+
 ## 2026-10 — Filters panel (v1.8.0)
 
 - New **Filters** button on the Library and Wishlist opens a panel with every filter in one place. A badge shows how many are on, and **Clear all** resets them. Filters are remembered on your device.

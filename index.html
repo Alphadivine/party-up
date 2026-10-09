@@ -122,6 +122,52 @@ select.sel{height:40px;border:1px solid var(--line);background:var(--panel);bord
 .fit{font-size:13px;display:flex;gap:6px;align-items:flex-start}
 .fit.ok{color:var(--full)} .fit.warn{color:var(--part)} .fit.bad{color:var(--none)}
 .cfoot{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:6px;border-top:1px dashed var(--line)}
+.ownbtn{height:32px;font-size:13px;margin-left:auto;white-space:nowrap}
+.ownbtn.mine{color:var(--full);border-color:var(--full-bg)}
+.swrap{flex-wrap:wrap;align-items:center}
+.vsw{margin-left:auto;height:36px}
+.vsw button{display:inline-flex;align-items:center;gap:6px;padding:0 11px}
+.vsw .vs{display:none}
+.subsw{display:inline-flex;height:38px;margin:14px 0 0}
+.subsw button{padding:0 16px}
+.backbtn{margin:14px 0 -6px;height:34px}
+.ownerbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;margin:-4px 0 12px}
+.lrows{display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
+.lrow{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:7px 10px 7px 7px;cursor:pointer}
+.lrow:hover{border-color:var(--accent)}
+.lrow:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lrow.isready{border-left:4px solid var(--full)}
+.lrow .th{width:72px;height:40px;border-radius:7px;background:var(--chip) center/cover no-repeat;flex:none}
+.lrow .lmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lrow .lt{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow .lmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px}
+.lrow .lmeta .xp,.lrow .lmeta .tag{font-size:11px;padding:1px 7px}
+.lrow .rdy{color:var(--full);font-weight:700}
+.lrow .lact{flex:none;display:flex;gap:4px}
+.lrow .lact .ownbtn{margin-left:0}
+.onboard{border:1px solid var(--accent);background:var(--accent-soft);border-radius:14px;padding:12px 14px;margin:14px 0 4px}
+.onboard .ohead{display:flex;align-items:center;gap:10px}
+.onboard .ohead .muted{font-size:12.5px}
+.onboard .ox{margin-left:auto;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:var(--muted)}
+.onboard ol{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.onboard li{display:flex;align-items:center;gap:10px;font-size:14px}
+.onboard li .t{flex:1;min-width:0}
+.onboard li .num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--panel);font-weight:800;font-size:12.5px;flex:none}
+.onboard li.done{color:var(--muted)}
+.onboard li.done .num{background:var(--full);color:#fff}
+.onboard li .ibtn{height:32px;font-size:13px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.addalt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+details.more{border:1px solid var(--line);border-radius:12px;padding:0 14px}
+details.more>summary{cursor:pointer;font-weight:700;padding:12px 0;list-style:none;display:flex;align-items:center;gap:8px}
+details.more>summary::before{content:"▸";transition:transform .15s}
+details.more[open]>summary::before{transform:rotate(90deg)}
+details.more>summary::-webkit-details-marker{display:none}
+details.more .morebody{display:flex;flex-direction:column;gap:14px;padding-bottom:14px}
+.gdesc{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.card .tags .xp,.card .tags .plat,.lrow .xp,[data-tip],#gameDlg .tags .xp,#gameDlg .tags .plat,.salebadge{cursor:help}
+.toast{display:flex;align-items:center;gap:14px}
+.toast .undo{border:0;background:none;color:inherit;font-weight:800;text-decoration:underline;cursor:pointer;font-size:14px;padding:4px}
 .price{font-weight:700;font-size:14px}
 .price s{color:var(--muted);font-weight:400;font-size:12px;margin-left:4px}
 .votes{display:flex;gap:4px;margin-left:auto}
@@ -336,6 +382,15 @@ nav.bottom{display:none}
   .dbody{padding:4px 16px 18px}
   .dbody h2{font-size:22px}
   .toolbar .sel{flex:1 1 40%}
+  .toolbar .search{flex:1 1 120px;min-width:0}
+  .toolbar .search input{width:100%}
+  .vsw .vl,.vsw .vic{display:none}
+  .vsw .vs{display:inline}
+  .vsw{margin-left:0;width:100%}
+  .vsw button{flex:1;justify-content:center;padding:0 6px}
+  .lrow .th{width:52px;height:34px}
+  .lrow .lact .vote{padding:0 7px}
+  .cfoot .ownbtn{font-size:12.5px}
   .hide-sm{display:none}
 }
 </style>
@@ -359,20 +414,8 @@ nav.bottom{display:none}
   <div id="demoBanner" class="banner hidden">Demo mode: everything is saved in this browser only. Add your Firebase config to <code>index.html</code> to share it with the crew (see the setup guide).</div>
   <div class="toolbar" id="toolbar">
     <div class="search"><span aria-hidden="true">⌕</span><input id="q" placeholder="Search the list…" aria-label="Search games"></div>
-    <select class="sel" id="ownerSel" aria-label="Owned by"></select>
-    <div class="viewtoggle" id="viewToggle" role="group" aria-label="View"><button data-view="cards" aria-pressed="true">Cards</button><button data-view="grid" aria-pressed="false">Who owns what</button><button data-view="compare" aria-pressed="false">Compare</button></div>
-    <select class="sel" id="sortSel" aria-label="Sort">
-      <option value="score">Most wanted</option>
-      <option value="owned">Most owned</option>
-      <option value="new">Newest</option>
-      <option value="price">Cheapest</option>
-      <option value="az">A–Z</option>
-    </select>
     <button class="ibtn fbtn" id="filterBtn" aria-expanded="false" aria-controls="filterPanel"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg> <span>Filters</span><span class="n hidden" id="filterN"></span></button>
-    <div class="spacer hide-sm"></div>
-    <button class="ibtn" id="pickBtn" title="Pick a game for tonight">🎲 <span>Pick tonight</span></button>
-    <button class="ibtn" id="bulkBtn">✓ <span>I own…</span></button>
-    <button class="ibtn primary" id="addBtn">＋ <span>Add a game</span></button>
+    <button class="ibtn primary" id="addBtn">＋ <span>Add</span></button>
   </div>
   <div id="filterPanel" class="fpanel hidden" role="region" aria-label="Filters"></div>
   <div id="view"></div>
@@ -393,6 +436,7 @@ nav.bottom{display:none}
       <div class="muted" id="lookupNote" style="font-size:12.5px"></div>
       <div class="results" id="lookupRes"></div>
       <button class="ibtn ghost" id="manualBtn" style="align-self:flex-start">Can't find it? Enter it by hand</button>
+      <div class="addalt"><span class="muted">Or</span><button type="button" class="ibtn" id="bulkBtn">✓ Tick several games I own</button><button type="button" class="ibtn" id="ideasBtn">✦ Browse ideas</button></div>
     </div>
     <form id="addForm" class="hidden" style="display:flex;flex-direction:column;gap:12px">
       <div class="row" id="addPreview"></div>
@@ -520,7 +564,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.8.0";
+const VERSION = "2.0.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -548,9 +592,9 @@ const TABS = [
   { id: "library",  label: "Library",  ic: "▤" },
   { id: "wishlist", label: "Wishlist", ic: "♡" },
   { id: "nights",   label: "Nights",   ic: "◷" },
-  { id: "ideas",    label: "Ideas",    ic: "✦" },
   { id: "crew",     label: "Crew",     ic: "☺" },
-  { id: "stats",    label: "Stats",    ic: "▥" },
+  { id: "ideas",    label: "Ideas",    ic: "✦", hidden: true }, // opened from Add
+  { id: "stats",    label: "Stats",    ic: "▥", hidden: true }, // a section of Crew
 ];
 const CS_STORES = {1:"Steam",2:"GamersGate",3:"Green Man Gaming",7:"GOG",8:"EA app",11:"Humble",13:"Ubisoft Store",15:"Fanatical",21:"WinGameStore",23:"GameBillet",24:"Voidu",25:"Epic Games Store",27:"Gamesplanet",28:"Gamesload",29:"2Game",30:"IndieGala",31:"Blizzard",33:"DLGamer",34:"Noctre",35:"DreamGame"};
 
@@ -652,9 +696,11 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
-function toast(msg, ms = 2600) {
+function toast(msg, ms = 2600, undo) {
   document.querySelectorAll(".toast").forEach(x => x.remove());
-  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status");
+  const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status");
+  const sp = document.createElement("span"); sp.textContent = msg; t.appendChild(sp);
+  if (undo) { const b = document.createElement("button"); b.className = "undo"; b.type = "button"; b.textContent = "Undo"; b.onclick = () => { t.remove(); undo(); }; t.appendChild(b); }
   document.body.appendChild(t); setTimeout(() => t.remove(), ms);
 }
 function timeAgo(ms) {
@@ -765,7 +811,7 @@ function whoChips(fit, compact) {
   return `<div class="who whofit" aria-label="Who can play">${fit.who.map(w => {
     const cls = w.ok === true ? "yes" : w.ok === false ? "no" : "maybe";
     const ic = w.ok === true ? "✔" : w.ok === false ? "✖" : "?";
-    return `<span class="p ${cls}" title="${esc(nm(w.uid) + (w.why ? " — " + w.why : ""))}">${compact ? "" : avatar(S.members[w.uid], "sm")}<span aria-hidden="true">${ic}</span> ${esc(nm(w.uid))} · ${esc(PLATS[w.plat]?.short || w.plat || "?")}${!compact && w.why ? ` <span class="muted">(${esc(w.why)})</span>` : ""}</span>`;
+    return `<span class="p ${cls}" data-tip="plat:${esc(w.plat || "")}" title="${esc(nm(w.uid) + (w.why ? " — " + w.why : ""))}">${compact ? "" : avatar(S.members[w.uid], "sm")}<span aria-hidden="true">${ic}</span> ${esc(nm(w.uid))} · ${esc(PLATS[w.plat]?.short || w.plat || "?")}${!compact && w.why ? ` <span class="muted">(${esc(w.why)})</span>` : ""}</span>`;
   }).join("")}</div>`;
 }
 // Platforms a person can play this game on: what they marked as owned, else everything in their profile.
@@ -775,8 +821,11 @@ const platsFor = (game, uid) => { const o = ownOf(game, uid); return o.length ? 
 const platShort = list => list.map(x => PLATS[x]?.short || x).join(" · ");
 // Platforms a game can be owned on (all four if the game's platforms aren't known)
 const ownOptions = g => Object.keys(PLATS).filter(k => !(g?.platforms || []).length || g.platforms.includes(baseOf(k)));
-async function setOwn(id, list) {
-  try { await B.patchGame(id, { [`owns.${S.user.uid}`]: list.length ? list : B.DEL }); } catch (e) { fail(e); }
+async function setOwn(id, list, quiet) {
+  const prev = ownOf(S.games[id], S.user.uid); const title = S.games[id]?.title || "it";
+  try { await B.patchGame(id, { [`owns.${S.user.uid}`]: list.length ? list : B.DEL }); } catch (e) { fail(e); return; }
+  if (quiet) return;
+  toast(list.length ? `You own ${title} on ${platShort(list)}` : `${title} removed from your games`, 6000, async () => { await setOwn(id, prev, true); toast("Undone"); });
 }
 function interestedPeople(game) {
   const v = game.votes || {};
@@ -823,7 +872,7 @@ function score(g) { let s = 0; for (const v of Object.values(g.votes || {})) s +
    DATA LAYER — Firebase (shared) or Local (demo)
    ============================================================ */
 const GROUP = (new URLSearchParams(location.search).get("group") || CONFIG.DEFAULT_GROUP).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) || "squad";
-const S = { user: null, group: null, members: {}, games: {}, nights: {}, activity: [], tab: (t => ["queue", "playing", "played"].includes(t) ? "library" : t)(store.get("sq_tab", "library")), owner: "", view: store.get("sq_view", "cards"), filters: store.get("sq_filters", {}), ready: false };
+const S = { user: null, group: null, members: {}, games: {}, nights: {}, activity: [], tab: (t => ["queue", "playing", "played"].includes(t) ? "library" : t)(store.get("sq_tab", "library")), owner: "", view: store.get("sq_view", window.matchMedia?.("(max-width: 760px)").matches ? "list" : "cards"), filters: store.get("sq_filters", {}), ready: false };
 
 function LocalBackend() {
   const KEY = "sq_demo_" + GROUP;
@@ -1166,10 +1215,10 @@ function readyInfo(g) {
 function renderTabs() {
   const counts = { library: 0, wishlist: 0, nights: upcomingNights().length };
   for (const g of Object.values(S.games)) counts[gameTab(g)]++;
-  const html = TABS.map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${S.tab === t.id}"><span class="ic" aria-hidden="true">${t.ic}</span><span>${t.label}</span>${counts[t.id] ? `<span class="n">${counts[t.id]}</span>` : ""}</button>`).join("");
+  const html = TABS.filter(t => !t.hidden).map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${S.tab === t.id || (t.id === "crew" && S.tab === "stats")}"><span class="ic" aria-hidden="true">${t.ic}</span><span>${t.label}</span>${counts[t.id] ? `<span class="n">${counts[t.id]}</span>` : ""}</button>`).join("");
   $("tabsDesk").innerHTML = html; $("tabsMob").innerHTML = html;
 }
-function setTab(t) { if (!TABS.some(x => x.id === t)) t = "library"; if (t !== "library") S.owner = S.owner; S.tab = t; store.set("sq_tab", t); render(); window.scrollTo({ top: 0 }); }
+function setTab(t) { if (!TABS.some(x => x.id === t)) t = "library"; if (t === "ideas" && S.tab !== "ideas") S.prevTab = S.tab; S.tab = t; store.set("sq_tab", t); render(); window.scrollTo({ top: 0 }); }
 
 function matches(g) {
   const f = S.filters; const q = norm($("q").value);
@@ -1203,6 +1252,7 @@ function matches(g) {
 /* ---------- Filters panel ---------- */
 const QUICK_F = [["ready", "Ready tonight", true], ["sale", "On sale"], ["cross", "Crossplay"], ["fits", "Whole crew fits"], ["free", "Free"], ["sub", "Game Pass / PS Plus"]];
 const OWN_F = [["", "Anyone"], ["mine", "I own it"], ["missing", "I don't have it"], ["all", "Everyone owns it"], ["one", "Only one person owns it"]];
+const SORT_F = [["owned", "Most owned"], ["score", "Most wanted"], ["new", "Newest"], ["price", "Cheapest"], ["az", "A–Z"]];
 const PARTY_F = [[0, "Any"], [2, "2+"], [3, "3+"], [4, "4+"], [5, "5+"], [6, "6+"], [8, "8+"]];
 function activeFilters(lib) {
   const f = S.filters; let n = 0;
@@ -1210,6 +1260,7 @@ function activeFilters(lib) {
   if (f.mode) n++; if (f.party) n++;
   n += (f.genres || []).length + (f.plats || []).length;
   if (lib && f.own) n++;
+  if (lib && S.owner) n++;
   return n;
 }
 function renderFilters(lib, total, shown) {
@@ -1226,6 +1277,8 @@ function renderFilters(lib, total, shown) {
   const platCount = k => games.filter(g => lib ? Object.keys(S.members).some(u => ownOf(g, u).includes(k)) || (g.freeToPlay && (g.platforms || []).includes(k)) : (g.platforms || []).includes(k)).length;
   const chip = (attr, val, label, on, count) => `<button class="chip" ${attr}="${esc(String(val))}" aria-pressed="${!!on}">${label}${count != null ? `<span class="c">${count}</span>` : ""}</button>`;
   panel.innerHTML = `
+    <div class="fgroup"><h4>Sort by</h4><div class="chiprow">${SORT_F.filter(([k]) => lib || k !== "owned").map(([k, l]) => chip("data-fsort", k, lib && k === "score" ? "Most 👍" : l, (f.sort || (lib ? "owned" : "score")) === k)).join("")}</div></div>
+    ${lib ? `<div class="fgroup"><h4>Whose games</h4><div class="chiprow">${chip("data-fowner", "", "Everyone's", !S.owner)}${Object.entries(S.members).sort((a, b) => (a[0] === S.user.uid ? -1 : b[0] === S.user.uid ? 1 : a[1].name.localeCompare(b[1].name))).map(([u, m]) => chip("data-fowner", u, u === S.user.uid ? "Mine" : esc(m.name.split(" ")[0]) + "'s", S.owner === u)).join("")}</div></div>` : ""}
     <div class="fgroup"><h4>Quick</h4><div class="chiprow">${QUICK_F.filter(([, , libOnly]) => lib || !libOnly).map(([k, l]) => chip("data-f", k, l, f[k])).join("")}</div></div>
     ${lib ? `<div class="fgroup"><h4>Ownership</h4><div class="chiprow">${OWN_F.map(([k, l]) => chip("data-fown", k || "any", l, (f.own || "") === k)).join("")}</div></div>` : ""}
     <div class="fgroup"><h4>${lib ? "Owned on" : "Available on"}</h4><div class="chiprow">${platKeys.map(k => chip("data-fplat", k, lib ? PLATS[k].label : PLATS[k].label.replace(" (Steam / Epic)", ""), (f.plats || []).includes(k), platCount(k))).join("")}</div>
@@ -1237,9 +1290,9 @@ function renderFilters(lib, total, shown) {
       <button class="ibtn ghost" data-fclear="1" ${n ? "" : "disabled"}>Clear all</button><button class="ibtn" data-fclose="1">Done</button></div>`;
 }
 function setFilter(patch) { Object.assign(S.filters, patch); store.set("sq_filters", S.filters); render(); }
-function clearFilters() { const sort = S.filters.sort; S.filters = sort ? { sort } : {}; store.set("sq_filters", S.filters); render(); }
+function clearFilters() { const sort = S.filters.sort; S.filters = sort ? { sort } : {}; S.owner = ""; store.set("sq_filters", S.filters); render(); }
 function sortGames(list) {
-  const by = S.filters.sort || "score";
+  const by = S.filters.sort || (S.tab === "library" ? "owned" : "score");
   const priceOf = g => g.freeToPlay ? 0 : g.pcPrice?.price ?? 9999;
   return list.sort((a, b) =>
     by === "new" ? tsMs(b.suggestedAt) - tsMs(a.suggestedAt) :
@@ -1280,16 +1333,75 @@ function card(id, g, rank) {
     <div class="cbody">
       <h3 class="ctitle">${esc(g.title)}</h3>
       <div class="tags"><span class="xp ${xp}">${XP_LABEL[xp]}</span>${platTags(g.platforms)}
-        ${maxPartyOf(g) ? `<span class="tag">Up to ${maxPartyOf(g)}</span>` : g.players ? `<span class="tag">${esc(g.players)}</span>` : ""}
+        ${maxPartyOf(g) ? `<span class="tag" data-tip="party">Up to ${maxPartyOf(g)}</span>` : g.players ? `<span class="tag">${esc(g.players)}</span>` : ""}
         ${g.gamepass ? `<span class="tag">Game Pass</span>` : ""}${g.psplus ? `<span class="tag">PS Plus</span>` : ""}</div>
       ${g.description ? `<p class="desc">${esc(g.description)}</p>` : ""}
       ${lib ? `<div class="owners">${g.freeToPlay ? "Free to play" : `<span class="stack">${owners.slice(0, 6).map(u => avatar(S.members[u], "sm")).join("")}</span><span>${owners.length} of ${Object.keys(S.members).length} own it</span>`}</div>` : ""}
-      ${ready ? `<div class="ready"><span aria-hidden="true">✔</span><span>Ready: ${esc(ready.text)}</span></div>` : ""}
+      ${ready ? `<div class="ready" data-tip="ready"><span aria-hidden="true">✔</span><span>Ready: ${esc(ready.text)}</span></div>` : ""}
       ${!ready && fit ? `<div class="fit ${fit.state === "unknown" ? "warn" : fit.state}"><span aria-hidden="true">${fit.state === "ok" ? "✔" : fit.state === "bad" ? "✖" : "⚠"}</span><span>${esc(fit.text)}</span></div>` : ""}
       ${party ? `<div class="fit warn"><span aria-hidden="true">⚠</span><span>${esc(party)}</span></div>` : ""}
       ${whoChips(lib ? fitCheck(g, (g.freeToPlay ? Object.keys(S.members) : ownersOf(g)).map(u => ({ uid: u, plats: platsFor(g, u) }))) || fit : fit, true)}
-      <div class="cfoot">${priceLine(g)}${voteButtons(id, g)}</div>
+      <div class="cfoot">${priceLine(g)}${lib ? ownButton(id, g) : voteButtons(id, g)}</div>
     </div></article>`;
+}
+
+function viewSwitch(lib, cur) {
+  const opts = lib ? [["cards", "Cards", "▦"], ["list", "List", "☰"], ["grid", "Who owns what", "▤", "Owners"], ["compare", "Compare", "⇄"]] : [["cards", "Cards", "▦"], ["list", "List", "☰"]];
+  return `<div class="viewtoggle vsw" id="viewToggle" role="group" aria-label="View">${opts.map(([k, l, ic, sh]) => `<button data-view="${k}" aria-pressed="${cur === k}" title="${l}" aria-label="${l}"><span class="vic" aria-hidden="true">${ic}</span><span class="vl">${l}</span><span class="vs" aria-hidden="true">${sh || l}</span></button>`).join("")}</div>`;
+}
+// Library cards: mark that you own it in one tap (instead of voting)
+function ownButton(id, g) {
+  const mine = ownOf(g, S.user.uid);
+  if (mine.length) return `<button class="ibtn ghost ownbtn mine" data-cellown="${esc(id)}" title="Change your platforms">✔ You · ${esc(platShort(mine))}</button>`;
+  return `<button class="ibtn ownbtn" data-cellown="${esc(id)}">＋ ${g.freeToPlay ? "I play it" : "I have this too"}</button>`;
+}
+// Compact one-line row (List view)
+function lrow(id, g, lib) {
+  const owners = ownersOf(g); const ready = lib ? readyInfo(g) : null; const xp = g.crossplay || "unknown";
+  const yes = Object.values(g.votes || {}).filter(v => v === "yes").length; const c = coverOf(g);
+  return `<div class="lrow ${ready ? "isready" : ""}" data-open="${esc(id)}" tabindex="0" role="button" aria-label="${esc(g.title)}">
+    <span class="th" aria-hidden="true" style="${c.src ? `background-image:url('${esc(c.src).replace(/'/g, "%27")}')` : ""}"></span>
+    <div class="lmain"><div class="lt">${esc(g.title)}</div>
+      <div class="lmeta"><span class="xp ${xp}">${XP_LABEL[xp]}</span>${maxPartyOf(g) ? `<span class="tag" data-tip="party">Up to ${maxPartyOf(g)}</span>` : ""}${onSale(g) ? `<span class="tag" data-tip="sale">−${g.pcPrice.savings}%</span>` : ""}
+        ${lib ? (g.freeToPlay && !owners.length ? `<span class="muted">Free</span>` : `<span class="stack">${owners.slice(0, 5).map(u => avatar(S.members[u], "sm")).join("")}</span><span class="muted">${owners.length} own</span>`) : `<span class="muted">${yes} 👍${g.pcPrice ? " · " + fmtPrice(g.pcPrice.price) : g.freeToPlay ? " · Free" : ""}</span>`}
+        ${ready ? `<span class="rdy" data-tip="ready">✔ Ready</span>` : ""}</div></div>
+    <div class="lact">${lib ? ownButton(id, g) : voteButtons(id, g)}</div>
+  </div>`;
+}
+// First-run checklist on the Library
+function onboardCard() {
+  if (store.get("sq_onboard_done_" + S.user?.uid, false)) return "";
+  const m = me(); const myN = Object.values(S.games).filter(g => ownOf(g, S.user.uid).length).length;
+  const steps = [
+    [!!(m?.platforms || []).length, "Pick the platforms you play on", `<button class="ibtn ghost" data-editme="1">Profile</button>`],
+    [myN > 0, "Tick the games you own", `<button class="ibtn primary" data-bulkopen="1">Tick games</button>`],
+    [!!store.get("sq_cmp_seen_" + S.user?.uid, false), "See what you can play together", `<button class="ibtn ghost" data-view="compare">Compare</button>`],
+  ];
+  if (steps.every(x => x[0])) { store.set("sq_onboard_done_" + S.user?.uid, true); return ""; }
+  return `<div class="onboard" role="region" aria-label="Getting started"><div class="ohead"><b>Get started</b><span class="muted">${steps.filter(x => x[0]).length} of 3 done</span><button class="ox" data-onboarddone="1" aria-label="Hide getting started">×</button></div>
+   <ol>${steps.map(([done, t, btn], i) => `<li class="${done ? "done" : ""}"><span class="num" aria-hidden="true">${done ? "✔" : i + 1}</span><span class="t">${t}${done ? `<span class="sr"> (done)</span>` : ""}</span>${done ? "" : btn}</li>`).join("")}</ol></div>`;
+}
+// Tap a tag to see what it means
+const TIPS = {
+  "xp:full": "Full crossplay: PC, PlayStation and Xbox players can all play together.",
+  "xp:partial": "Partial crossplay: only some platforms play together. Open the game to see who's split up.",
+  "xp:none": "No crossplay: you all need the same platform to play together.",
+  "xp:unknown": "Crossplay isn't confirmed yet. Anyone can set it in the game's details.",
+  "plat:pc": "PC: Steam, Epic or another PC store.",
+  "plat:pcms": "PC·GP: PC through Game Pass or the Xbox app. Some games pair it with Xbox, not Steam.",
+  "plat:pcown": "PC·L: PC through the game's own launcher (like Path of Titans). Counts as PC for crossplay.",
+  "plat:playstation": "PS: PlayStation 4 / 5.",
+  "plat:xbox": "XB: Xbox One / Series X|S.",
+  "party": "Up to N: the most players who can be in one group together.",
+  "ready": "Ready: at least two of you own it and can play together right now.",
+  "sale": "On sale on PC right now (price from CheapShark).",
+};
+function tipFor(el) {
+  if (el.dataset.tip) return el.dataset.tip;
+  if (el.classList.contains("xp")) return "xp:" + (["full", "partial", "none", "unknown"].find(c => el.classList.contains(c)) || "unknown");
+  if (el.classList.contains("plat")) return "plat:" + Object.keys(PLATS).find(c => el.classList.contains(c));
+  if (el.classList.contains("salebadge")) return "sale";
+  return "";
 }
 
 function render() {
@@ -1297,9 +1409,6 @@ function render() {
   renderTabs();
   $("toolbar").classList.toggle("hidden", !["library", "wishlist"].includes(S.tab));
   const lib = S.tab === "library";
-  $("ownerSel").classList.toggle("hidden", !lib || S.view === "compare"); $("viewToggle").classList.toggle("hidden", !lib);
-  $("ownerSel").innerHTML = `<option value="">Everyone's games</option>` + Object.entries(S.members).sort((a, b) => a[1].name.localeCompare(b[1].name)).map(([u, m]) => `<option value="${esc(u)}" ${S.owner === u ? "selected" : ""}>${u === S.user.uid ? "My games" : esc(m.name.split(" ")[0]) + "'s games"}</option>`).join("");
-  $("viewToggle").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", S.view === b.dataset.view));
   const v = $("view");
   updateBell();
   if (!["library", "wishlist"].includes(S.tab)) $("filterPanel").classList.add("hidden");
@@ -1310,7 +1419,8 @@ function render() {
   const entries = Object.entries(S.games).filter(([, g]) => gameTab(g) === S.tab);
   const shown = sortGames(entries.filter(([, g]) => matches(g)).map(([id, g]) => ({ ...g, _id: id })));
   renderFilters(lib, entries.length, shown.length);
-  const heads = { library: ["Library", "Games the crew owns. Mark yours with “I own…”."], wishlist: ["Wishlist", "Games nobody owns yet. Vote 👍 on what you'd buy and play."] };
+  const heads = { library: ["Library", "Games the crew owns. Tap ＋ Add to mark yours."], wishlist: ["Wishlist", "Games nobody owns yet. Vote 👍 on what you'd buy."] };
+  const view = lib ? S.view : (S.view === "list" ? "list" : "cards");
   let html = "";
   const next = upcomingNights()[0];
   if (["library", "wishlist"].includes(S.tab) && next) {
@@ -1318,20 +1428,22 @@ function render() {
     const ins = Object.values(n.rsvps || {}).filter(x => x === "in").length;
     html += `<button class="nextnight" data-tab="nights"><span aria-hidden="true">◷</span><span>Next game night: <b>${esc(fmtNight(n.when))}</b>${ng ? ` · ${esc(ng.title)}` : ""} · ${ins} in</span></button>`;
   }
-  html += `<div class="sectionhead"><h2>${heads[S.tab][0]}</h2><span class="muted">${heads[S.tab][1]}</span></div>`;
+  if (lib) html += onboardCard();
+  html += `<div class="sectionhead swrap"><h2>${heads[S.tab][0]}</h2><span class="muted hide-sm">${heads[S.tab][1]}</span>${viewSwitch(lib, view)}</div>`;
+  if (lib && S.owner && S.members[S.owner]) html += `<div class="ownerbar">Showing <b>${S.owner === S.user.uid ? "your" : esc(S.members[S.owner].name.split(" ")[0]) + "'s"}</b> games <button class="chip" data-fowner="">Show everyone's</button></div>`;
   if (lib) {
     const sc = {}; for (const [, g] of entries) sc[g.status || "suggested"] = (sc[g.status || "suggested"] || 0) + 1;
     html += `<div class="chiprow" style="margin:-2px 0 12px">${[["", "All"], ...Object.entries(STATUS).map(([k, x]) => [k, x.label])].filter(([k]) => !k || sc[k]).map(([k, l]) => `<button class="chip" data-libstatus="${k}" aria-pressed="${(S.libStatus || "") === k}">${l}${k ? ` · ${sc[k]}` : ""}</button>`).join("")}</div>`;
   }
   if (lib && S.view === "grid" && entries.length) { v.innerHTML = html + ownershipGrid(shown); return; }
   if (lib && S.view === "compare") { const keep = S.owner; S.owner = ""; const all = sortGames(entries.filter(([, g]) => matches(g)).map(([id, g]) => ({ ...g, _id: id }))); S.owner = keep; v.innerHTML = html + compareView(all); return; }
-  html += `<div class="grid">`;
+  html += view === "list" ? `<div class="lrows">` : `<div class="grid">`;
   if (!entries.length) {
     html += lib
-      ? `<div class="empty"><h3>The library is empty</h3><p>Hit <b>I own…</b> to tick the games you already have. Everyone's games show up here, with who owns what.</p></div>`
-      : `<div class="empty"><h3>Nothing on the wishlist</h3><p>Hit <b>Add a game</b>, or grab one from <b>Ideas</b>: ${BUILTIN.length} multiplayer games with crossplay already checked.</p></div>`;
+      ? `<div class="empty"><h3>The library is empty</h3><p>Tap <b>＋ Add</b>, then <b>Tick several games I own</b>. Everyone's games show up here, with who owns what.</p></div>`
+      : `<div class="empty"><h3>Nothing on the wishlist</h3><p>Tap <b>＋ Add</b> and choose <b>Wishlist</b>, or browse ${BUILTIN.length} <b>Ideas</b> from the Add window.</p></div>`;
   } else if (!shown.length) html += `<div class="empty"><h3>No matches</h3><p>Try clearing the search or filters.</p></div>`;
-  else shown.forEach((g, i) => { html += card(g._id, g, !lib && (S.filters.sort || "score") === "score" && score(g) > 0 ? i + 1 : 0); });
+  else shown.forEach((g, i) => { html += view === "list" ? lrow(g._id, g, lib) : card(g._id, g, !lib && (S.filters.sort || "score") === "score" && score(g) > 0 ? i + 1 : 0); });
   v.innerHTML = html + "</div>";
   // lazy price refresh for visible PC games
   shown.slice(0, 30).forEach(g => refreshPrice(g._id, false));
@@ -1344,7 +1456,7 @@ function renderIdeas(v) {
     (!f.q || norm(b.title).includes(norm(f.q))) &&
     (!f.xp || b.crossplay === f.xp) &&
     (!f.mode || (b.mode || []).includes(f.mode)));
-  v.innerHTML = `<div class="sectionhead"><h2>Ideas</h2><span class="muted">${BUILTIN.length} multiplayer games, crossplay last checked ${esc(fmtDate(window.BUILTIN_CHECKED))}. Tap Add to put it in your library or on the wishlist.</span></div>
+  v.innerHTML = `<button class="ibtn ghost backbtn" data-tab="${esc(S.prevTab || "library")}">← Back</button><div class="sectionhead"><h2>Ideas</h2><span class="muted">${BUILTIN.length} multiplayer games, crossplay last checked ${esc(fmtDate(window.BUILTIN_CHECKED))}. Tap Add to put it in your library or on the wishlist.</span></div>
    <div class="toolbar" style="padding-top:0">
      <div class="search"><span aria-hidden="true">⌕</span><input id="ideaQ" placeholder="Search ideas…" value="${esc(f.q)}"></div>
      <select class="sel" id="ideaXp"><option value="">Any crossplay</option><option value="full" ${f.xp === "full" ? "selected" : ""}>Full crossplay</option><option value="partial" ${f.xp === "partial" ? "selected" : ""}>Partial</option><option value="none" ${f.xp === "none" ? "selected" : ""}>None</option></select>
@@ -1360,10 +1472,11 @@ function renderIdeas(v) {
   $("ideaQ").oninput = () => { S._ideaTyping = true; upd(); }; $("ideaXp").onchange = () => { S._ideaTyping = false; upd(); }; $("ideaMode").onchange = () => { S._ideaTyping = false; upd(); };
 }
 
+const crewSwitch = () => `<div class="viewtoggle subsw" role="group" aria-label="Crew"><button data-tab="crew" aria-pressed="${S.tab === "crew"}">Members</button><button data-tab="stats" aria-pressed="${S.tab === "stats"}">Stats</button></div>`;
 function renderCrew(v) {
   const ms = Object.entries(S.members).sort((a, b) => (a[0] === S.group?.leaderUid ? -1 : 0) - (b[0] === S.group?.leaderUid ? -1 : 0) || a[1].name.localeCompare(b[1].name));
   const handle = (lab, val) => val ? `<div class="handle"><span><span class="muted">${lab}</span> ${esc(val)}</span><button data-copy="${esc(val)}">Copy</button></div>` : "";
-  v.innerHTML = `<div class="sectionhead"><h2>Crew</h2><span class="muted">${ms.length} member${ms.length === 1 ? "" : "s"} · tap Copy to grab a friend's tag</span></div>
+  v.innerHTML = crewSwitch() + `<div class="sectionhead"><h2>Crew</h2><span class="muted">${ms.length} member${ms.length === 1 ? "" : "s"} · tap Copy to grab a friend's tag</span></div>
   <p class="muted" style="font-size:13px;margin:-4px 0 12px">${isLeader() ? "Invite friends: send them this page's link and the join code (set it in your profile)." : "Want someone else in? Ask the leader for the join code."}</p>
   <div class="crew">${ms.map(([uid, m]) => {
     const h = m.handles || {};
@@ -1393,20 +1506,15 @@ function openGame(id) {
   const fitC = fitCheck(g, crewPeople(g));
   const xp = g.crossplay || "unknown";
   const notOwn = Object.keys(S.members).filter(u => !ownOf(g, u).length).length;
-  d.innerHTML = `
-   <div class="dhead ${coverOf(g).src ? "" : "noimg"}">${coverOf(g).src ? coverImg(g) : ""}<button class="dclose" data-close aria-label="Close">×</button></div>
-   <div class="dbody">
-     <div><h2 id="gTitle">${esc(g.title)}</h2>
-       <div class="tags" style="margin-top:8px"><span class="xp ${xp}">${XP_LABEL[xp]}</span>${platTags(g.platforms)}
-       ${(g.modes || []).map(m => `<span class="tag">${MODE_LABEL[m] || esc(m)}</span>`).join("")}
-       ${(g.genres || []).map(x => `<span class="tag">${esc(x)}</span>`).join("")}</div>
-       <div class="muted" style="font-size:13px;margin-top:8px">${sugg ? `Added by ${esc(sugg.name)}` : "Added"} ${timeAgo(tsMs(g.suggestedAt))}${g.released ? ` · Released ${esc(g.released.slice(0, 4))}` : ""}</div>
-       <div class="row" style="margin-top:10px"><a class="tlink" href="${esc(trailerUrl(g.title))}" target="_blank" rel="noopener">▶ Watch trailer</a><button class="ibtn" data-plan="${esc(id)}" style="height:32px">◷ Plan a game night</button></div></div>
-     ${g.pitch ? `<div class="box" style="background:var(--accent-soft);border-color:transparent"><h3>The pitch</h3><div>“${esc(g.pitch)}”</div></div>` : ""}
-     ${g.description ? `<div style="white-space:pre-line;color:var(--muted)">${esc(g.description)}</div>` : ""}
-     <div class="box"><h3>Your vote</h3><div class="row">${voteButtons(id, g)}</div>
+  const libG = inLibrary(g);
+  const bPitch = `     ${g.pitch ? `<div class="box" style="background:var(--accent-soft);border-color:transparent"><h3>The pitch</h3><div>“${esc(g.pitch)}”</div></div>` : ""}
+`;
+  const bDesc = `     ${g.description ? `<div class="gdesc" style="white-space:pre-line;color:var(--muted)">${esc(g.description)}</div>` : ""}
+`;
+  const bVote = `     <div class="box"><h3>Your vote</h3><div class="row">${voteButtons(id, g)}</div>
        <div class="who">${["yes", "maybe", "no"].map(k => votesBy(k).map(m => `<span class="p">${avatar(m, "sm")}${esc(m.name.split(" ")[0])} ${k === "yes" ? "👍" : k === "maybe" ? "🤷" : "👎"}</span>`).join("")).join("") || `<span class="muted" style="font-size:13px">No votes yet</span>`}</div></div>
-     <div class="two">
+`;
+  const bTwo = `     <div class="two">
        <div class="box"><h3>Crossplay</h3>
          <div><span class="xp ${xp}">${XP_LABEL[xp]}</span></div>
          ${g.crossplayNote ? `<div>${esc(g.crossplayNote)}</div>` : ""}
@@ -1426,12 +1534,15 @@ function openGame(id) {
          ${g.priceAt ? `<div class="muted" style="font-size:11.5px">PC price checked ${timeAgo(g.priceAt)} via CheapShark</div>` : ""}
        </div>
      </div>
-     <div class="box"><h3>Where to get it</h3><div class="links">${storeLinks(g).map(([l, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join("") || `<span class="muted">No store links</span>`}</div></div>
-     <div class="box"><h3>Who owns it</h3>
+`;
+  const bWhere = `     <div class="box"><h3>Where to get it</h3><div class="links">${storeLinks(g).map(([l, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join("") || `<span class="muted">No store links</span>`}</div></div>
+`;
+  const bOwn = `     <div class="box"><h3>Who owns it</h3>
        <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">I have it on (tick every platform you own it on)<div class="checks" id="ownChecks">${ownOptions(g).map(k => `<label><input type="checkbox" value="${k}" ${mine.includes(k) ? "checked" : ""}> ${PLATS[k].label}</label>`).join("")}</div></div>
        <div class="who">${owners.map(([u, list]) => `<span class="p">${avatar(S.members[u], "sm")}${esc(S.members[u].name.split(" ")[0])} · ${esc(platShort(list))}</span>`).join("") || `<span class="muted" style="font-size:13px">Nobody's marked it yet</span>`}</div>
        ${notOwn ? `<div class="muted" style="font-size:13px">${notOwn} of ${Object.keys(S.members).length} would need to get it${g.freeToPlay ? " (it's free)" : g.gamepass ? " (or play via Game Pass)" : ""}.</div>` : ""}</div>
-     <div class="box"><h3>Group notes</h3>
+`;
+  const bNotes = `     <div class="box"><h3>Group notes</h3>
        <div class="two">
          <label class="fld">Status<select id="statSel">${Object.entries(STATUS).map(([k, s]) => `<option value="${k}" ${(g.status || "suggested") === k ? "selected" : ""}>${s.label}</option>`).join("")}</select></label>
          <label class="fld">Console price<input id="cpIn" value="${esc(g.consolePrice || "")}" placeholder="e.g. $39.99 PS Store" maxlength="60"></label>
@@ -1449,13 +1560,26 @@ function openGame(id) {
          <div class="spacer"></div>
          <button class="ibtn primary" id="saveGame">Save changes</button>
        </div></div>
+`;
+  d.innerHTML = `
+   <div class="dhead ${coverOf(g).src ? "" : "noimg"}">${coverOf(g).src ? coverImg(g) : ""}<button class="dclose" data-close aria-label="Close">×</button></div>
+   <div class="dbody">
+     <div><h2 id="gTitle">${esc(g.title)}</h2>
+       <div class="tags" style="margin-top:8px"><span class="xp ${xp}">${XP_LABEL[xp]}</span>${platTags(g.platforms)}
+       ${(g.modes || []).map(m => `<span class="tag">${MODE_LABEL[m] || esc(m)}</span>`).join("")}
+       ${(g.genres || []).map(x => `<span class="tag">${esc(x)}</span>`).join("")}</div>
+       <div class="muted" style="font-size:13px;margin-top:8px">${sugg ? `Added by ${esc(sugg.name)}` : "Added"} ${timeAgo(tsMs(g.suggestedAt))}${g.released ? ` · Released ${esc(g.released.slice(0, 4))}` : ""}</div>
+       <div class="row" style="margin-top:10px"><a class="tlink" href="${esc(trailerUrl(g.title))}" target="_blank" rel="noopener">▶ Watch trailer</a><button class="ibtn" data-plan="${esc(id)}" style="height:32px">◷ Plan a game night</button></div></div>
+     ${libG ? bOwn + bTwo + bDesc + bWhere : bPitch + bVote + bTwo + bDesc + bWhere + bOwn}
+     <details class="more" id="moreDetails" ${S.moreOpen ? "open" : ""}><summary>${libG ? "Votes, notes &amp; edit game" : "Notes &amp; edit game"}</summary><div class="morebody">${libG ? bPitch + bVote : ""}${bNotes}</div></details>
    </div>`;
   if (!d.open) d.showModal();
   d.dataset.id = id;
   $("ownChecks").onchange = async () => {
     const list = [...$("ownChecks").querySelectorAll("input:checked")].map(i => i.value);
-    await setOwn(id, list); toast(list.length ? `You own it on ${platShort(list)}` : "Ownership cleared");
+    await setOwn(id, list);
   };
+  $("moreDetails").ontoggle = e => { S.moreOpen = e.target.open; };
   $("saveGame").onclick = async () => {
     const xpv = $("xpSel").value;
     const patch = { status: $("statSel").value, consolePrice: $("cpIn").value.trim(), gamepass: $("gpIn").checked, psplus: $("psIn").checked,
@@ -1656,13 +1780,17 @@ async function suggestIdea(title) {
 
 /* ---------- pick tonight ---------- */
 function pickTonight() {
-  const pool = Object.entries(S.games).filter(([, g]) => ["suggested", "next", "playing"].includes(g.status || "suggested") && score(g) > 0);
+  // Pick from games the crew already has (ready ones first); fall back to the most-wanted wishlist games.
+  const active = g => !["finished", "dropped"].includes(g.status || "suggested");
+  let pool = Object.entries(S.games).filter(([, g]) => inLibrary(g) && active(g) && readyInfo(g));
+  if (!pool.length) pool = Object.entries(S.games).filter(([, g]) => active(g) && (inLibrary(g) || score(g) > 0));
   const body = $("pickBody");
-  if (!pool.length) { body.innerHTML = `<div class="big">Nothing to pick yet</div><p class="muted">Vote 👍 on a few games first.</p>`; $("pickDlg").showModal(); return; }
-  // weight by score, bonus if everyone interested can play together
-  const w = pool.map(([id, g]) => { const f = fitCheck(g, interestedPeople(g)); return Math.max(1, score(g)) * (f?.state === "ok" ? 2 : f?.state === "bad" ? 0.3 : 1) * (partyCheck(g, interestedCount(g)) ? 0.4 : 1); });
+  if (!pool.length) { body.innerHTML = `<div class="big">Nothing to pick yet</div><p class="muted">Mark the games you own (＋ Add → Tick several games I own), or vote 👍 on the wishlist.</p>`; $("pickDlg").showModal(); return; }
+  const people = g => inLibrary(g) ? (g.freeToPlay ? Object.keys(S.members) : ownersOf(g)).map(u => ({ uid: u, plats: platsFor(g, u) })) : interestedPeople(g);
+  // weight by how many can play + 👍 votes, bonus if they can all play together
+  const w = pool.map(([, g]) => { const f = fitCheck(g, people(g)); return Math.max(1, people(g).length + Math.max(0, score(g))) * (f?.state === "ok" ? 2 : f?.state === "bad" ? 0.3 : 1) * (g.status === "playing" || g.status === "next" ? 1.5 : 1); });
   let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0; for (; i < w.length - 1; i++) { r -= w[i]; if (r <= 0) break; }
-  const [id, g] = pool[i]; const f = fitCheck(g, interestedPeople(g));
+  const [id, g] = pool[i]; const f = fitCheck(g, people(g));
   body.innerHTML = `<div class="muted disp" style="letter-spacing:.12em;text-transform:uppercase;font-size:13px">Tonight you're playing</div><div class="big">${esc(g.title)}</div>
     ${f ? `<div class="fit ${f.state === "unknown" ? "warn" : f.state}">${esc(f.text)}</div>` : ""}
     <div class="row"><button class="ibtn" id="reroll">🎲 Reroll</button><button class="ibtn primary" id="pickOpen">Open it</button></div>`;
@@ -1692,6 +1820,7 @@ function cmpPeople() {
 }
 function setCmp(list) { S.cmp = [...new Set(list)]; store.set("sq_cmp", S.cmp); render(); }
 function compareView(list) {
+  store.set("sq_cmp_seen_" + S.user?.uid, true);
   const pick = cmpPeople();
   const nm = u => u === S.user.uid ? "You" : esc((S.members[u]?.name || "?").split(" ")[0]);
   const ms = Object.entries(S.members).sort((a, b) => (a[0] === S.user.uid ? -1 : b[0] === S.user.uid ? 1 : a[1].name.localeCompare(b[1].name)));
@@ -1767,12 +1896,12 @@ async function saveBulk() {
     .map(r => ({ key: r.querySelector("input.pick").value, plats: [...r.querySelectorAll(".bplats input:checked")].map(i => i.value) }))
     .filter(p => p.plats.length);
   if (!picks.length) { $("bulkDlg").close(); return; }
-  $("bulkSave").disabled = true; let added = 0, marked = 0;
+  $("bulkSave").disabled = true; let added = 0, marked = 0; const changes = [];
   try {
     for (const p of picks) {
-      if (p.key.startsWith("g:")) { await B.patchGame(p.key.slice(2), { [`owns.${S.user.uid}`]: p.plats }); marked++; continue; }
+      if (p.key.startsWith("g:")) { const gid = p.key.slice(2); changes.push({ id: gid, prev: ownOf(S.games[gid], S.user.uid) }); await B.patchGame(gid, { [`owns.${S.user.uid}`]: p.plats }); marked++; continue; }
       const b = BUILTIN.find(x => x.title === p.key.slice(2)); if (!b) continue;
-      const id = slug(b.title); if (S.games[id]) { await B.patchGame(id, { [`owns.${S.user.uid}`]: p.plats }); marked++; continue; }
+      const id = slug(b.title); if (S.games[id]) { changes.push({ id, prev: ownOf(S.games[id], S.user.uid) }); await B.patchGame(id, { [`owns.${S.user.uid}`]: p.plats }); marked++; continue; }
       await B.addGame(id, {
         title: b.title, description: "", cover: b.cover || "", platforms: b.platforms, crossplay: b.crossplay, crossplayNote: b.crossplayNote,
         groups: encG(b.groups), crossProgression: b.crossProgression ?? null, players: b.players, modes: b.mode || [], genres: [], released: "", storeUrls: {},
@@ -1780,10 +1909,16 @@ async function saveBulk() {
         xpSource: b.source || "", rawgId: null, steamAppID: b.steamAppId ? String(b.steamAppId) : null, maxParty: b.maxParty || null,
         status: "suggested", suggestedBy: S.user.uid, votes: {}, owns: { [S.user.uid]: p.plats }, notes: "",
       });
+      changes.push({ id, created: true });
       added++;
     }
     $("bulkDlg").close();
-    toast(`Library updated: ${marked + added} game${marked + added === 1 ? "" : "s"}`);
+    toast(`Library updated: ${marked + added} game${marked + added === 1 ? "" : "s"}`, 7000, async () => {
+      for (const c of changes) {
+        try { if (c.created) await B.deleteGame(c.id); else await B.patchGame(c.id, { [`owns.${S.user.uid}`]: c.prev.length ? c.prev : B.DEL }); } catch (e) { console.warn("undo", e); }
+      }
+      toast("Undone");
+    });
     logAct("owned", { count: marked + added });
     setTab("library");
   } catch (e) { fail(e); } finally { $("bulkSave").disabled = false; }
@@ -1811,7 +1946,7 @@ function renderStats(v) {
   const mostPlayed = Object.entries(nightGames).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const wanted = [...wish].sort((a, b) => score(b[1]) - score(a[1])).slice(0, 5).filter(([, g]) => score(g) > 0);
   const value = lib.reduce((t, [, g]) => t + (g.pcPrice?.retail || 0) * ownersOf(g).length, 0);
-  v.innerHTML = `<div class="sectionhead"><h2>Crew stats</h2><span class="muted">How the crew plays.</span></div>
+  v.innerHTML = crewSwitch() + `<div class="sectionhead"><h2>Crew stats</h2><span class="muted">How the crew plays.</span></div>
    <div class="kpis">
      <div class="kpi"><div class="big">${lib.length}</div><div class="l">games in the library</div></div>
      <div class="kpi"><div class="big">${ready.length}</div><div class="l">ready to play tonight</div></div>
@@ -1834,20 +1969,18 @@ function renderStats(v) {
 function openGuide() {
   $("guideBody").innerHTML = `<h2 id="guideTitle">How to use Party Up</h2>
    <p class="tip">Party Up is the crew's game inventory: what everyone owns, what we want, and what we can actually play together across PC, PlayStation and Xbox.</p>
-   <h3>1. Set up your profile</h3>
-   <ul><li>Tap your avatar (top right). Tick the platforms you play on; the first one is your main.</li><li>Pick your color, picture, timezone and a status line, and add your Steam / PSN / Xbox / Discord names so friends can add you.</li></ul>
-   <h3>2. Fill in your library</h3>
-   <ul><li>On <b>Library</b>, tap <b>I own…</b> and tick every game you have, with every platform you own it on. Games that aren't on the list yet get added.</li><li>Or open any game and tick the platforms under <b>I have it on</b>.</li><li>Switch to <b>Who owns what</b> for a table of every game and every person. Tap your column to pick the platforms you own a game on.</li><li>Use the <b>Everyone's games</b> menu to see one person's library.</li></ul>
-   <h3>3. Find something to play</h3>
-   <ul><li><b>Ready tonight</b> shows games that at least two people own and can play together.</li><li>Each card checks crossplay for you: <i>“All 3 can play together”</i> or who'd be split up.</li><li><b>🎲 Pick tonight</b> chooses one for you.</li></ul>
-   <h3>4. The wishlist</h3>
-   <ul><li>Games nobody owns yet live on <b>Wishlist</b>. Vote 👍 / 🤷 / 👎 and the most-wanted rise to the top.</li><li>PC prices update daily; <b>On sale</b> shows deals, and each game shows its lowest price ever.</li><li>When someone buys it and marks it owned, it moves to the Library.</li></ul>
-   <h3>5. Adding a game</h3>
-   <ul><li><b>Filters</b> opens a panel: platform, genre, party size, type, who owns it (like “I don't have it”), plus Ready tonight, On sale and more.</li><li><b>Compare</b> (in the Library) shows the games everyone you pick owns, whether you can play them together, and who's missing the rest. Crew cards have <b>Compare with me</b>.</li><li><b>Add a game</b>: type a name, or paste a Steam, Xbox, Epic or GOG store link.</li><li><b>Ideas</b> has ${BUILTIN.length} multiplayer games with crossplay already checked.</li><li>At the top, choose <b>My library</b> (a game you own: tick the platforms you have it on) or <b>Wishlist</b> (a game you'd like the crew to get).</li></ul>
-   <h3>6. Game nights</h3>
-   <ul><li>On <b>Nights</b>, plan a time and a game. Everyone taps In / Maybe / Out, and times show in each person's own timezone.</li><li><b>Add to calendar</b> puts it on your phone or PC calendar.</li></ul>
+   <h3>1. Set up</h3>
+   <ul><li>Tap your avatar (top right) and tick the platforms you play on. Add your Steam / PSN / Xbox / Discord names so friends can add you.</li><li>The <b>Get started</b> box on the Library walks you through the rest.</li></ul>
+   <h3>2. Mark the games you own</h3>
+   <ul><li>Tap <b>＋ Add</b> → <b>Tick several games I own</b> and tick everything you have, with every platform you own it on.</li><li>See a game a friend has? Tap <b>＋ I have this too</b> on it.</li><li>PC can be Steam / Epic, <b>PC·GP</b> (Game Pass / Xbox app) or <b>PC·L</b> (the game's own launcher, like Path of Titans).</li></ul>
+   <h3>3. See what you can play</h3>
+   <ul><li>Switch the Library between <b>Cards</b>, <b>List</b> (compact), <b>Who owns what</b> (a table) and <b>Compare</b> (pick people, see the games you all own).</li><li><b>Filters</b>: ownership (like “I don't have it”), platform, party size, genre, type, Ready tonight, On sale, sorting and whose games.</li><li><b>Tap any tag</b> (Full crossplay, PC·GP, Up to 4, Ready…) to see what it means.</li></ul>
+   <h3>4. Wishlist</h3>
+   <ul><li>Games nobody owns yet. In <b>＋ Add</b>, choose <b>Wishlist</b>. Vote 👍 / 🤷 / 👎; the most-wanted rise to the top, with PC prices and sales.</li><li>When someone marks it owned, it moves to the Library.</li></ul>
+   <h3>5. Game nights</h3>
+   <ul><li>On <b>Nights</b>, plan a time and a game; everyone taps In / Maybe / Out. <b>🎲 Pick a game</b> chooses one the crew can play.</li></ul>
    <h3>Also</h3>
-   <ul><li>The 🔔 shows what's new. <b>Stats</b> has awards and what the crew plays most.</li><li>Install it: in Chrome, use “Install app”; on iPhone, Share → Add to Home Screen.</li></ul>
+   <ul><li><b>＋ Add → Browse ideas</b>: ${BUILTIN.length} multiplayer games with crossplay already checked.</li><li><b>Crew → Stats</b>: awards and what the crew plays most. The 🔔 shows what's new.</li><li>Changed something by mistake? Tap <b>Undo</b> in the message at the bottom.</li><li>Install it: in Chrome, “Install app”; on iPhone, Share → Add to Home Screen.</li></ul>
    <div class="foot"><button class="ibtn primary" data-close>Got it</button></div>`;
   $("guideDlg").showModal();
   store.set("sq_guide_seen", true);
@@ -1926,7 +2059,7 @@ function nightCard(id, n, past) {
 function renderNights(v) {
   const up = upcomingNights();
   const past = Object.entries(S.nights).filter(([, n]) => n.when < Date.now() - 4 * HOUR).sort((a, b) => b[1].when - a[1].when).slice(0, 10);
-  v.innerHTML = `<div class="sectionhead"><h2>Game nights</h2><span class="muted">Pick a time, see who's in.</span><div class="spacer"></div><button class="ibtn primary" data-plan="">＋ Plan a night</button></div>
+  v.innerHTML = `<div class="sectionhead"><h2>Game nights</h2><span class="muted">Pick a time, see who's in.</span><div class="spacer"></div><button class="ibtn" id="pickBtn" data-pick="1">🎲 Pick a game</button><button class="ibtn primary" data-plan="">＋ Plan a night</button></div>
     <div class="nights">${up.map(([id, n]) => nightCard(id, n, false)).join("") || `<div class="empty"><h3>No game nights planned</h3><p>Hit <b>Plan a night</b>, pick a time and a game (or decide later), and everyone can say if they're in.</p></div>`}</div>
     ${past.length ? `<details class="pastlist"><summary>Past nights (${past.length})</summary><div class="nights">${past.map(([id, n]) => nightCard(id, n, true)).join("")}</div></details>` : `<div style="height:110px"></div>`}`;
 }
@@ -2181,9 +2314,11 @@ applyTheme();
 
 /* ---------- events ---------- */
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-ownerlib],[data-cellown],[data-libstatus],[data-view],[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f],[data-rsvp],[data-ics],[data-plan],[data-editnight],[data-delnight],[data-act],[data-cmp],[data-cmpall],[data-cmpwith],[data-fown],[data-fplat],[data-fparty],[data-fmode],[data-fgenre],[data-fclear],[data-fclose]");
+  const tipEl = e.target.closest("[data-tip], .card .tags .xp, .card .tags .plat, .lrow .xp, #gameDlg .tags .xp, #gameDlg .tags .plat, table.own .plat, .salebadge");
+  if (tipEl && TIPS[tipFor(tipEl)]) { e.preventDefault(); e.stopPropagation(); return toast(TIPS[tipFor(tipEl)], 6000); }
+  const t = e.target.closest("[data-ownerlib],[data-cellown],[data-libstatus],[data-view],[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f],[data-rsvp],[data-ics],[data-plan],[data-editnight],[data-delnight],[data-act],[data-cmp],[data-cmpall],[data-cmpwith],[data-fown],[data-fplat],[data-fparty],[data-fmode],[data-fgenre],[data-fclear],[data-fclose],[data-fsort],[data-fowner],[data-pick],[data-editme],[data-bulkopen],[data-onboarddone]");
   if (!t) return;
-  if (t.dataset.ownerlib) { S.owner = t.dataset.ownerlib; S.view = "cards"; return setTab("library"); }
+  if (t.dataset.ownerlib) { S.owner = t.dataset.ownerlib; if (["grid", "compare"].includes(S.view)) S.view = "cards"; return setTab("library"); }
   if (t.dataset.cellown) return cycleOwn(t.dataset.cellown);
   if (t.dataset.libstatus !== undefined) { S.libStatus = t.dataset.libstatus; return render(); }
   if (t.dataset.view) { S.view = t.dataset.view; store.set("sq_view", S.view); return render(); }
@@ -2210,16 +2345,20 @@ document.addEventListener("click", e => {
   if (t.dataset.fplat) { const cur = S.filters.plats || []; return setFilter({ plats: cur.includes(t.dataset.fplat) ? cur.filter(x => x !== t.dataset.fplat) : [...cur, t.dataset.fplat] }); }
   if (t.dataset.fgenre) { const cur = S.filters.genres || []; return setFilter({ genres: cur.includes(t.dataset.fgenre) ? cur.filter(x => x !== t.dataset.fgenre) : [...cur, t.dataset.fgenre] }); }
   if (t.dataset.fclear) return clearFilters();
+  if (t.dataset.fsort) return setFilter({ sort: t.dataset.fsort });
+  if (t.dataset.fowner !== undefined) { S.owner = t.dataset.fowner; return render(); }
+  if (t.dataset.pick) return pickTonight();
+  if (t.dataset.editme) return $("meBtn").click();
+  if (t.dataset.bulkopen) return openBulk();
+  if (t.dataset.onboarddone) { store.set("sq_onboard_done_" + S.user?.uid, true); return render(); }
   if (t.dataset.fclose) { S.fOpen = false; render(); return $("filterBtn").focus(); }
   if (t.dataset.open) return openGame(t.dataset.open);
 });
-document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.matches?.(".card[data-open]")) openGame(e.target.dataset.open); });
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.matches?.(".card[data-open], .lrow[data-open]")) openGame(e.target.dataset.open); });
 document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d) d.close(); }));
 $("q").oninput = render;
-$("sortSel").onchange = e => { S.filters.sort = e.target.value; store.set("sq_filters", S.filters); render(); };
 $("filterBtn").onclick = () => { S.fOpen = !S.fOpen; render(); };
 $("addBtn").onclick = () => openAdd("");
-$("pickBtn").onclick = pickTonight;
 $("lookupQ").oninput = () => { clearTimeout(lookupTimer); lookupTimer = setTimeout(runLookup, 350); };
 $("lookupQ").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); clearTimeout(lookupTimer); runLookup(); } };
 $("manualBtn").onclick = () => showForm({ title: $("lookupQ").value.trim() });
@@ -2241,14 +2380,14 @@ $("meForm").addEventListener("change", e => { if (e.target.name === "accent" && 
 $("signOutBtn").onclick = () => { $("meDlg").close(); B.signOut(); };
 $("meDlg").addEventListener("close", () => { if (!S._accentSaved) applyAccent(accentOf(me()) , !!me()); });
 $("nightForm").onsubmit = saveNight;
-$("ownerSel").onchange = e => { S.owner = e.target.value; render(); };
-$("bulkBtn").onclick = openBulk;
+$("bulkBtn").onclick = () => { $("addDlg").close(); openBulk(); };
+$("ideasBtn").onclick = () => { $("addDlg").close(); setTab("ideas"); };
 $("bulkSave").onclick = saveBulk;
 $("bulkQ").oninput = () => { const q = norm($("bulkQ").value); $("bulkList").querySelectorAll(".bulkrow").forEach(r => r.classList.toggle("hidden", !!q && !r.dataset.t.includes(q))); };
 $("guideBtn").onclick = openGuide;
 $("actBtn").onclick = openActivity;
 // restore filter UI
-$("sortSel").value = S.filters.sort || "score";
+
 document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed", !!S.filters[c.dataset.f]));
 
 /* ---------- boot ---------- */
@@ -2275,7 +2414,7 @@ document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed"
 })();
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-window.__sq = { S, activeFilters, compareView, setAddWhere, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput, parseStoreLink, readyInfo, wikidataFacts, ownOf, platsFor };
+window.__sq = { S, TIPS, onboardCard, activeFilters, compareView, setAddWhere, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput, parseStoreLink, readyInfo, wikidataFacts, ownOf, platsFor };
 </script>
 </body>
 </html>

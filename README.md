@@ -11,6 +11,9 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 ## ✨ Features
 
 - **Library + Wishlist**: the Library is everything the crew owns, with who owns it and on what; the Wishlist is games nobody owns yet, with votes and prices. Mark many games at once with **I own…**, see a **Who owns what** grid, filter to **Ready tonight** (2+ owners who can play together) or to one person's games.
+- **Simple layout**: four tabs (Library, Wishlist, Nights, Crew), a toolbar with just Search, Filters and ＋ Add, and a Cards / List / Who owns what / Compare switch on the Library. Phones start in the compact List view.
+- **＋ I have this too**: mark a game a friend owns in one tap, right on its card. Changes come with **Undo**.
+- **Tap a tag to learn what it means** (Full crossplay, PC·GP, Up to 4, Ready…), and a **Get started** checklist for new members.
 - **Filters panel**: one Filters button for platform owned on, genre, party size, type, ownership (like "I don't have it" or "Everyone owns it"), plus Ready tonight, On sale, Crossplay and more.
 - **Compare inventories**: pick two or more people to see the games you all own, whether you can play them together, and who's missing the rest. Crew cards have **Compare with me**.
 - **Add to My library or Wishlist**: choose at the top of Add a game; library adds ask which platforms you own it on.
@@ -35,9 +38,9 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 - **Prices & deals**: live PC price and the best current deal (with % off) from [CheapShark](https://www.cheapshark.com), refreshed every few days. Console price, Game Pass and PS Plus are tick-boxes anyone can fill in.
 - **Where to get it**: links to Steam, Epic, PlayStation Store, Xbox Store and the cheapest PC deal.
 - **Status tracking**: Suggested → Up next → Playing → Finished / Dropped, with shared notes (server name, mods, game night).
-- **Ideas tab**: browse the 110 checked games, filter by crossplay or type (co-op, survival, party, battle royale…), and add one in a tap.
+- **Ideas** (＋ Add → Browse ideas): browse the 110 checked games, filter by crossplay or type (co-op, survival, party, battle royale…), and add one in a tap.
 - **Crew tab**: everyone's platforms plus Steam / Epic / PSN / Xbox / Discord names with copy buttons, so adding each other is easy.
-- **🎲 Pick tonight**: picks a game at random, weighted towards the most-wanted games that the whole interested group can play together.
+- **🎲 Pick a game** (on Nights): picks a game the crew owns and can play together, falling back to the most-wanted wishlist games.
 - **Sorting**: most wanted, most owned, newest, cheapest or A–Z.
 - **Google sign-in with a join code**: only people with the code you set can see the list. The leader (whoever sets the group up) can remove people and change the code.
 - **Installable app (PWA)**, phone layout with bottom tabs, light / dark / system theme, controller logo.
@@ -92,4 +95,4 @@ Game data from **[RAWG](https://rawg.io)** and **[Wikipedia](https://www.wikiped
 
 ---
 
-_Last updated: October 2026 (v1.8.0). Full change history in `CHANGELOG.md`._
+_Last updated: October 2026 (v2.0.0). Full change history in `CHANGELOG.md`._
