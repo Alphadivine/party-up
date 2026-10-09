@@ -137,7 +137,7 @@ select.sel{height:40px;border:1px solid var(--line);background:var(--panel);bord
 .lrow:hover{border-color:var(--accent)}
 .lrow:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lrow.isready{border-left:4px solid var(--full)}
-.lrow .th{width:72px;height:40px;border-radius:7px;background:var(--chip) center/cover no-repeat;flex:none}
+.lrow .th{width:128px;height:60px;border-radius:8px;background:var(--panel2) center/cover no-repeat;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 .lrow .lmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .lrow .lt{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lrow .lmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px}
@@ -315,7 +315,7 @@ label.fld textarea{min-height:70px;resize:vertical}
 .cmpsum b{display:block;font-size:24px;line-height:1.1}
 .cmplist{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
 .cmprow{display:flex;gap:12px;align-items:center;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:8px 12px 8px 8px}
-.cmprow .th{width:64px;height:36px;border-radius:7px;background:var(--chip) center/cover no-repeat;flex:none}
+.cmprow .th{width:112px;height:52px;border-radius:8px;background:var(--panel2) center/cover no-repeat;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 .cmprow .cmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .cmprow .ctitle{border:0;background:none;padding:0;cursor:pointer;font-weight:700;color:var(--ink);text-align:left;font-size:15px}
 .cmprow .cfit{font-size:12.5px;font-weight:600}
@@ -372,6 +372,7 @@ nav.bottom{display:none}
 @media (max-width:760px){
   .tabs.desk{display:none}
   .brand small{display:none}
+  .brand{white-space:nowrap;font-size:18px}
   nav.bottom{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
   nav.bottom .tab{flex:1;flex-direction:column;gap:1px;font-size:11px;padding:6px 1px;min-width:0}
   nav.bottom .tab .ic{font-size:18px}
@@ -388,7 +389,10 @@ nav.bottom{display:none}
   .vsw .vs{display:inline}
   .vsw{margin-left:0;width:100%}
   .vsw button{flex:1;justify-content:center;padding:0 6px}
-  .lrow .th{width:52px;height:34px}
+  .lrow .th{width:76px;height:36px}
+  .lrow{gap:10px}
+  .lrow .lmeta{gap:4px}
+  .lrow .lact .ownbtn{height:30px;padding:0 9px;font-size:12px}
   .lrow .lact .vote{padding:0 7px}
   .cfoot .ownbtn{font-size:12.5px}
   .hide-sm{display:none}
@@ -564,7 +568,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "2.0.0";
+const VERSION = "2.0.2";
 
 /* ---------- constants ---------- */
 const PLATS = {

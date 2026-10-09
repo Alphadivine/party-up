@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10 — Better List thumbnails (v2.0.2)
+
+- Game art in List and Compare views is bigger and shaped like the store art, so the whole picture (logo included) shows instead of a cropped slice.
+- Tighter List rows on phones.
+
+## 2026-10 — Thumbnail fix (v2.0.1)
+
+- Fixed game art in List and Compare views showing the wrong (dark) corner of the picture instead of the whole image.
+- The "Party Up" name in the header no longer wraps onto two lines on phones.
+
 ## 2026-10 — Easier to use (v2.0.0)
 
 - **Slimmer toolbar**: just Search, **Filters** and **＋ Add**. The view switch (Cards / List / Who owns what / Compare) sits next to the Library heading. Sorting and "whose games" moved into the Filters panel, and a bar shows when you're looking at one person's games.

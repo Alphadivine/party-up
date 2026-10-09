@@ -95,4 +95,4 @@ Game data from **[RAWG](https://rawg.io)** and **[Wikipedia](https://www.wikiped
 
 ---
 
-_Last updated: October 2026 (v2.0.0). Full change history in `CHANGELOG.md`._
+_Last updated: October 2026 (v2.0.2). Full change history in `CHANGELOG.md`._
