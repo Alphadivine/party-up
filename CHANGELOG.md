@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10 — Own games on more than one platform (v1.6.0)
+
+- You can now own a game on several platforms (say PC and PlayStation). Game details show a checkbox for each platform: tick every one you have it on.
+- **Who owns what** grid: tapping your cell opens a platform picker (with "I don't own it"), and each person's cell shows all their platforms.
+- **I own…**: each game has platform buttons, so you can pick more than one; picking a platform ticks the game.
+- **Add a game**: "I own it on" is now a set of checkboxes that follows the game's platforms.
+- Crossplay checks, "Ready tonight" and stats use every platform you own a game on.
+- Existing ownership (one platform per person) keeps working; no database changes needed.
+
 ## 2026-10 — Who can play what, IGDB game data (v1.5.0)
 
 - Every card now shows who can play and on what: ✔ Quentin · XB, ✔ Sam · PC·GP, ✖ Mia · PS (plays separately). Library cards show it for everyone who owns the game, Wishlist cards for everyone interested, and game nights for everyone who's in. Game details show it for the interested players and the whole crew, with the reason when someone can't join.

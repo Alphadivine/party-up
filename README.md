@@ -28,7 +28,7 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 - **Timezone-aware game nights**: times show in your own timezone, with friends' local times when they're in a different one.
 - **Your color**: each person picks their own color (purple, blue, teal, green, orange, pink, red or gold). The whole app (backgrounds, cards and accents) takes on that color for them only, it syncs across their devices, and it shows as their avatar ring on the Crew tab and in vote lists.
 - **Voting**: 👍 I'm in, 🤷 maybe, 👎 not for me. The queue sorts by most wanted, with #1, #2… badges.
-- **Who owns it**: each person marks which platform they have it on (or that they don't own it), so you can see who still needs to buy it.
+- **Who owns it**: each person ticks every platform they have it on (PC and PlayStation, say), or that they don't own it, so you can see who still needs to buy it.
 - **Prices & deals**: live PC price and the best current deal (with % off) from [CheapShark](https://www.cheapshark.com), refreshed every few days. Console price, Game Pass and PS Plus are tick-boxes anyone can fill in.
 - **Where to get it**: links to Steam, Epic, PlayStation Store, Xbox Store and the cheapest PC deal.
 - **Status tracking**: Suggested → Up next → Playing → Finished / Dropped, with shared notes (server name, mods, game night).

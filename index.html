@@ -256,11 +256,17 @@ table.own th:first-child,table.own td:first-child{text-align:left;position:stick
 table.own thead th{font-size:12px;color:var(--muted);font-weight:600}
 table.own td button.cell{border:1px dashed var(--line);background:none;border-radius:6px;min-width:44px;min-height:32px;cursor:pointer;color:var(--muted);font-weight:700}
 table.own td .have{font-weight:700;font-size:12px}
+table.own td .platlist{display:inline-flex;gap:3px;flex-wrap:wrap;justify-content:center}
 table.own tr.isready td:first-child::before{content:"● ";color:var(--full)}
 .bulklist{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
 .bulkrow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--bg)}
 .bulkrow label{flex:1;display:flex;align-items:center;gap:8px;min-width:0;cursor:pointer}
-.bulkrow select{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:4px 6px}
+.bplats{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.bplats .bp{position:relative;cursor:pointer}
+.bplats .bp input{position:absolute;opacity:0;width:1px;height:1px}
+.bplats .bp span{display:inline-block;border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:12px;font-weight:700;color:var(--muted);min-width:36px;text-align:center}
+.bplats .bp input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.bplats .bp input:focus-visible+span{outline:2px solid var(--ink);outline-offset:2px}
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding-bottom:110px}
 .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px}
@@ -388,7 +394,7 @@ nav.bottom{display:none}
       <label class="fld">Crossplay note<input name="crossplayNote" placeholder="e.g. PC and Xbox only" maxlength="120"></label>
       <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">Type
         <div class="checks" id="addModes"></div></div>
-      <label class="checks" style="font-weight:600"><input type="checkbox" name="iown"> I own it on <select name="iownPlat" id="iownPlat" style="border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:4px 6px"></select></label>
+      <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">I own it on (leave empty if you don't own it)<div class="checks" id="iownPlat"></div></div>
       <div class="checks">
         <label><input type="checkbox" name="freeToPlay"> Free to play</label>
         <label><input type="checkbox" name="gamepass"> On Game Pass</label>
@@ -465,6 +471,11 @@ nav.bottom{display:none}
     <div class="foot"><span class="muted" id="bulkCount" style="margin-right:auto;align-self:center"></span><button class="ibtn ghost" data-close>Cancel</button><button class="ibtn primary" id="bulkSave">Save</button></div>
   </div>
 </dialog>
+<!-- own picker -->
+<dialog id="ownDlg" aria-labelledby="ownTitle" style="width:min(420px,calc(100vw - 20px))">
+  <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
+  <div class="dbody" id="ownBody"></div>
+</dialog>
 <!-- guide -->
 <dialog id="guideDlg" aria-labelledby="guideTitle">
   <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
@@ -492,7 +503,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.5.0";
+const VERSION = "1.6.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -738,7 +749,15 @@ function whoChips(fit, compact) {
   }).join("")}</div>`;
 }
 // Platforms a person can play this game on: what they marked as owned, else everything in their profile.
-const platsFor = (game, uid) => { const o = (game?.owns || {})[uid]; return o ? [o] : (S.members[uid]?.platforms || []); };
+// Ownership is stored per person as a list of platforms (older entries may be a single string).
+const ownOf = (g, uid) => { const o = (g?.owns || {})[uid]; return !o ? [] : (Array.isArray(o) ? o : [o]).filter(x => PLATS[x]); };
+const platsFor = (game, uid) => { const o = ownOf(game, uid); return o.length ? o : (S.members[uid]?.platforms || []); };
+const platShort = list => list.map(x => PLATS[x]?.short || x).join(" · ");
+// Platforms a game can be owned on (all four if the game's platforms aren't known)
+const ownOptions = g => Object.keys(PLATS).filter(k => !(g?.platforms || []).length || g.platforms.includes(baseOf(k)));
+async function setOwn(id, list) {
+  try { await B.patchGame(id, { [`owns.${S.user.uid}`]: list.length ? list : B.DEL }); } catch (e) { fail(e); }
+}
 function interestedPeople(game) {
   const v = game.votes || {};
   return Object.keys(S.members).filter(uid => v[uid] === "yes" || v[uid] === "maybe").map(uid => ({ uid, plats: platsFor(game, uid) })).filter(p => p.plats.length);
@@ -1107,7 +1126,7 @@ function storeLinks(g) {
 
 /* ---------- library helpers ---------- */
 // A game is in the crew Library once anyone owns it (free-to-play counts as owned by everyone).
-const ownersOf = g => Object.entries(g.owns || {}).filter(([u, pl]) => pl && S.members[u]).map(([u]) => u);
+const ownersOf = g => Object.keys(g.owns || {}).filter(u => S.members[u] && ownOf(g, u).length);
 const inLibrary = g => !!g.freeToPlay || ownersOf(g).length > 0;
 const gameTab = g => inLibrary(g) ? "library" : "wishlist";
 const onSale = g => !g.freeToPlay && (g.pcPrice?.savings || 0) >= 10;
@@ -1139,7 +1158,7 @@ function matches(g) {
   if (f.free && !g.freeToPlay) return false;
   if (S.tab === "library" && f.ready && !readyInfo(g)) return false;
   if (f.sale && !onSale(g)) return false;
-  if (S.tab === "library" && S.owner && !(g.owns || {})[S.owner] && !g.freeToPlay) return false;
+  if (S.tab === "library" && S.owner && !ownOf(g, S.owner).length && !g.freeToPlay) return false;
   if (S.tab === "library" && S.libStatus && (g.status || "suggested") !== S.libStatus) return false;
   if (f.sub && !(g.gamepass || g.psplus)) return false;
   if (f.mode && !(g.modes || []).includes(f.mode)) return false;
@@ -1280,7 +1299,7 @@ function renderCrew(v) {
       ${tz ? `<div class="localtimes">Local time ${esc(fmtTime(Date.now(), tz))} ${esc(tzAbbr(tz))} · ${esc(tzCity(tz))}</div>` : ""}
       <div class="tags" style="margin-top:3px">${(m.platforms || []).map(p => `<span class="plat ${p}">${PLATS[p].short}</span>`).join("") || `<span class="muted" style="font-size:12px">No platforms set</span>`}</div></div></div>
       ${handle("Steam", h.steam)}${handle("Epic", h.epic)}${handle("PSN", h.psn)}${handle("Xbox", h.xbox)}${handle("Discord", h.discord)}
-      <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12.5px">${Object.values(S.games).filter(g => (g.owns || {})[uid]).length} games owned · ${sugg} added</span><button class="ibtn ghost" data-ownerlib="${esc(uid)}" style="height:34px">View library</button></div>
+      <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12.5px">${Object.values(S.games).filter(g => ownOf(g, uid).length).length} games owned · ${sugg} added</span><button class="ibtn ghost" data-ownerlib="${esc(uid)}" style="height:34px">View library</button></div>
       ${isLeader() && uid !== S.user.uid ? `<button class="ibtn danger" data-kick="${esc(uid)}" style="align-self:flex-start">Remove from group</button>` : ""}
     </div>`; }).join("")}</div>
 `;
@@ -1290,15 +1309,15 @@ function renderCrew(v) {
 function openGame(id) {
   const g = S.games[id]; if (!g) return;
   const d = $("gameDlg");
-  const mine = (g.owns || {})[S.user.uid] || "";
+  const mine = ownOf(g, S.user.uid);
   const canEdit = isLeader() || g.suggestedBy === S.user.uid;
   const sugg = S.members[g.suggestedBy];
   const votesBy = k => Object.entries(g.votes || {}).filter(([, v]) => v === k).map(([u]) => S.members[u]).filter(Boolean);
-  const owners = Object.entries(g.owns || {}).filter(([u, p]) => p && S.members[u]);
+  const owners = ownersOf(g).map(u => [u, ownOf(g, u)]);
   const fitI = fitCheck(g, interestedPeople(g));
   const fitC = fitCheck(g, crewPeople(g));
   const xp = g.crossplay || "unknown";
-  const notOwn = Object.keys(S.members).filter(u => !(g.owns || {})[u]).length;
+  const notOwn = Object.keys(S.members).filter(u => !ownOf(g, u).length).length;
   d.innerHTML = `
    <div class="dhead ${coverOf(g).src ? "" : "noimg"}">${coverOf(g).src ? coverImg(g) : ""}<button class="dclose" data-close aria-label="Close">×</button></div>
    <div class="dbody">
@@ -1334,8 +1353,8 @@ function openGame(id) {
      </div>
      <div class="box"><h3>Where to get it</h3><div class="links">${storeLinks(g).map(([l, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join("") || `<span class="muted">No store links</span>`}</div></div>
      <div class="box"><h3>Who owns it</h3>
-       <label class="fld">I have it on<select id="ownSel"><option value="">I don't own it</option>${Object.entries(PLATS).map(([k, p]) => `<option value="${k}" ${mine === k ? "selected" : ""}>${p.label}</option>`).join("")}</select></label>
-       <div class="who">${owners.map(([u, p]) => `<span class="p">${avatar(S.members[u], "sm")}${esc(S.members[u].name.split(" ")[0])} · ${PLATS[p]?.short || esc(p)}</span>`).join("") || `<span class="muted" style="font-size:13px">Nobody's marked it yet</span>`}</div>
+       <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">I have it on (tick every platform you own it on)<div class="checks" id="ownChecks">${ownOptions(g).map(k => `<label><input type="checkbox" value="${k}" ${mine.includes(k) ? "checked" : ""}> ${PLATS[k].label}</label>`).join("")}</div></div>
+       <div class="who">${owners.map(([u, list]) => `<span class="p">${avatar(S.members[u], "sm")}${esc(S.members[u].name.split(" ")[0])} · ${esc(platShort(list))}</span>`).join("") || `<span class="muted" style="font-size:13px">Nobody's marked it yet</span>`}</div>
        ${notOwn ? `<div class="muted" style="font-size:13px">${notOwn} of ${Object.keys(S.members).length} would need to get it${g.freeToPlay ? " (it's free)" : g.gamepass ? " (or play via Game Pass)" : ""}.</div>` : ""}</div>
      <div class="box"><h3>Group notes</h3>
        <div class="two">
@@ -1358,7 +1377,10 @@ function openGame(id) {
    </div>`;
   if (!d.open) d.showModal();
   d.dataset.id = id;
-  $("ownSel").onchange = async e => { try { await B.patchGame(id, { [`owns.${S.user.uid}`]: e.target.value || B.DEL }); toast(e.target.value ? "Marked as owned" : "Ownership cleared"); } catch (er) { fail(er); } };
+  $("ownChecks").onchange = async () => {
+    const list = [...$("ownChecks").querySelectorAll("input:checked")].map(i => i.value);
+    await setOwn(id, list); toast(list.length ? `You own it on ${platShort(list)}` : "Ownership cleared");
+  };
   $("saveGame").onclick = async () => {
     const xpv = $("xpSel").value;
     const patch = { status: $("statSel").value, consolePrice: $("cpIn").value.trim(), gamepass: $("gpIn").checked, psplus: $("psIn").checked,
@@ -1467,10 +1489,8 @@ async function runLinkLookup(url, tok) {
   showForm(d);
 }
 function renderIownPlat(gamePlats) {
-  const mine = me()?.platforms || [];
-  const opts = Object.keys(PLATS).filter(k => !gamePlats.length || gamePlats.includes(baseOf(k)));
-  const def = mine.find(k => opts.includes(k)) || opts[0] || "pc";
-  $("iownPlat").innerHTML = (opts.length ? opts : Object.keys(PLATS)).map(k => `<option value="${k}" ${k === def ? "selected" : ""}>${PLATS[k].label}</option>`).join("");
+  const opts = ownOptions({ platforms: gamePlats });
+  $("iownPlat").innerHTML = opts.map(k => `<label><input type="checkbox" value="${k}"> ${PLATS[k].label}</label>`).join("");
 }
 
 async function pickHit(hit) {
@@ -1491,7 +1511,6 @@ function showForm(d) {
   f.crossplay.value = pending.crossplay || "unknown";
   f.crossplayNote.value = pending.crossplayNote || (pending.crossHint && !pending.crossplay ? "Store lists cross-platform multiplayer; check which platforms" : "");
   f.players.value = pending.players || ""; f.freeToPlay.checked = !!pending.freeToPlay;
-  f.iown.checked = false;
   renderIownPlat(pending.platforms || []);
   f.maxParty.value = pending.maxParty || (pending.builtin ? "" : parseMaxParty(pending.players)) || "";
   f.gamepass.checked = !!pending.gamepass; f.psplus.checked = !!pending.psplus; f.consolePrice.value = ""; f.pitch.value = "";
@@ -1522,10 +1541,11 @@ async function saveSuggestion(e) {
     status: "suggested", suggestedBy: S.user.uid, votes: { [S.user.uid]: "yes" }, owns: {}, notes: "",
     maxParty: parseInt(f.maxParty.value, 10) > 0 ? Math.min(parseInt(f.maxParty.value, 10), 100) : null,
   };
-  if (f.iown.checked && f.iownPlat.value) data.owns = { [S.user.uid]: f.iownPlat.value };
+  const iown = [...$("iownPlat").querySelectorAll("input:checked")].map(i => i.value);
+  if (iown.length) data.owns = { [S.user.uid]: iown };
   if (pending?.steamAppID) data.steamAppID = String(pending.steamAppID);
   $("addSave").disabled = true;
-  try { await B.addGame(id, data); $("addDlg").close(); toast(data.owns[S.user.uid] ? `Added ${title} to the library` : `Added ${title} to the wishlist`); logAct("suggest", { gameId: id, title }); refreshPrice(id, false); setTab(inLibrary(data) ? "library" : "wishlist"); }
+  try { await B.addGame(id, data); $("addDlg").close(); toast(iown.length ? `Added ${title} to the library` : `Added ${title} to the wishlist`); logAct("suggest", { gameId: id, title }); refreshPrice(id, false); setTab(inLibrary(data) ? "library" : "wishlist"); }
   catch (er) { err.textContent = er.message === "exists" ? `${title} is already on the list.` : (er.code === "permission-denied" ? "You don't have permission to add games." : er.message); err.classList.remove("hidden"); }
   finally { $("addSave").disabled = false; }
 }
@@ -1557,57 +1577,62 @@ function ownershipGrid(list) {
   if (!list.length) return `<div class="empty"><h3>No matches</h3><p>Try clearing the search or filters.</p></div>`;
   return `<div class="gridwrap"><table class="own"><thead><tr><th scope="col">Game</th>${ms.map(([u, m]) => `<th scope="col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px">${avatar(m, "sm")}<span>${u === S.user.uid ? "You" : esc(m.name.split(" ")[0])}</span></div></th>`).join("")}<th scope="col">Ready</th></tr></thead><tbody>
     ${list.map(g => { const r = readyInfo(g); return `<tr class="${r ? "isready" : ""}"><td><button class="linkbtn" data-open="${esc(g._id)}" style="border:0;background:none;padding:0;cursor:pointer;font-weight:600;color:var(--ink);text-align:left">${esc(g.title)}</button></td>
-      ${ms.map(([u]) => { const pl = (g.owns || {})[u];
-        if (u === S.user.uid) return `<td><button class="cell" data-cellown="${esc(g._id)}" aria-label="${pl ? "You own it on " + PLATS[pl]?.label : "Mark as owned"}" ${pl ? `style="border-style:solid;border-color:var(--accent);color:var(--ink)"` : ""}>${pl ? PLATS[pl]?.short || pl : g.freeToPlay ? "Free" : "＋"}</button></td>`;
-        return `<td>${pl ? `<span class="have plat ${pl}">${PLATS[pl]?.short || pl}</span>` : g.freeToPlay ? `<span class="muted">Free</span>` : `<span class="muted" aria-label="Doesn't own it">·</span>`}</td>`; }).join("")}
+      ${ms.map(([u]) => { const pl = ownOf(g, u);
+        if (u === S.user.uid) return `<td><button class="cell" data-cellown="${esc(g._id)}" aria-label="${pl.length ? "You own it on " + platShort(pl) + ". Change" : "Mark as owned"}" ${pl.length ? `style="border-style:solid;border-color:var(--accent);color:var(--ink)"` : ""}>${pl.length ? esc(platShort(pl)) : g.freeToPlay ? "Free" : "＋"}</button></td>`;
+        return `<td>${pl.length ? `<span class="platlist">${pl.map(x => `<span class="have plat ${x}">${PLATS[x]?.short || x}</span>`).join(" ")}</span>` : g.freeToPlay ? `<span class="muted">Free</span>` : `<span class="muted" aria-label="Doesn't own it">·</span>`}</td>`; }).join("")}
       <td>${r ? `<span class="xp full">${r.n}</span>` : `<span class="muted">·</span>`}</td></tr>`; }).join("")}
   </tbody></table></div>`;
 }
-async function cycleOwn(id) {
+// Small picker for "which platforms do I own this on?" (grid cells and cards)
+function openOwn(id) {
   const g = S.games[id]; if (!g) return;
-  const opts = Object.keys(PLATS).filter(k => !(g.platforms || []).length || g.platforms.includes(baseOf(k)));
-  const mine = me()?.platforms || [];
-  const order = mine.filter(k => opts.includes(k)).length ? mine.filter(k => opts.includes(k)) : opts;
-  const cur = (g.owns || {})[S.user.uid];
-  const i = cur ? order.indexOf(cur) : -1;
-  const next = i + 1 < order.length ? order[i + 1] : undefined;
-  try { await B.patchGame(id, { [`owns.${S.user.uid}`]: next || B.DEL }); } catch (e) { fail(e); }
+  const mine = ownOf(g, S.user.uid);
+  $("ownBody").innerHTML = `<h2 id="ownTitle" style="font-size:20px">${esc(g.title)}</h2>
+    <div class="muted" style="font-size:13.5px">Tick every platform you own it on.</div>
+    <div class="checks" id="ownPick">${ownOptions(g).map(k => `<label><input type="checkbox" value="${k}" ${mine.includes(k) ? "checked" : ""}> ${PLATS[k].label}</label>`).join("")}</div>
+    <div class="foot"><button class="ibtn ghost" id="ownClear">I don't own it</button><div class="spacer"></div><button class="ibtn primary" id="ownSave">Save</button></div>`;
+  $("ownDlg").showModal();
+  $("ownClear").onclick = async () => { await setOwn(id, []); $("ownDlg").close(); };
+  $("ownSave").onclick = async () => { await setOwn(id, [...$("ownPick").querySelectorAll("input:checked")].map(i => i.value)); $("ownDlg").close(); };
 }
+const cycleOwn = openOwn;
 
 /* ---------- bulk "I own these" ---------- */
 function openBulk() {
   const mine = me()?.platforms || [];
   const rows = [];
   const inList = new Set();
-  for (const [id, g] of Object.entries(S.games)) { inList.add(norm(g.title)); if (!(g.owns || {})[S.user.uid] && !g.freeToPlay) rows.push({ key: "g:" + id, title: g.title, plats: g.platforms || [], listed: true }); }
+  for (const [id, g] of Object.entries(S.games)) { inList.add(norm(g.title)); if (!ownOf(g, S.user.uid).length && !g.freeToPlay) rows.push({ key: "g:" + id, title: g.title, plats: g.platforms || [], listed: true }); }
   for (const b of BUILTIN) if (!inList.has(norm(b.title)) && !b.freeToPlay) rows.push({ key: "b:" + b.title, title: b.title, plats: b.platforms || [], listed: false });
   rows.sort((a, b) => (b.listed - a.listed) || a.title.localeCompare(b.title));
   $("bulkList").innerHTML = rows.map(r => {
-    const opts = Object.keys(PLATS).filter(k => !r.plats.length || r.plats.includes(baseOf(k)));
+    const opts = ownOptions({ platforms: r.plats });
     const def = mine.find(k => opts.includes(k)) || opts[0];
-    return `<div class="bulkrow" data-t="${esc(norm(r.title))}"><label><input type="checkbox" value="${esc(r.key)}"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.title)}</span>${r.listed ? `<span class="tag">On list</span>` : ""}</label>
-      <select aria-label="Platform for ${esc(r.title)}">${opts.map(k => `<option value="${k}" ${k === def ? "selected" : ""}>${PLATS[k].short}</option>`).join("")}</select></div>`;
+    return `<div class="bulkrow" data-t="${esc(norm(r.title))}"><label><input type="checkbox" class="pick" value="${esc(r.key)}"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.title)}</span>${r.listed ? `<span class="tag">On list</span>` : ""}</label>
+      <span class="bplats" role="group" aria-label="Platforms for ${esc(r.title)}">${opts.map(k => `<label class="bp"><input type="checkbox" value="${k}" ${k === def ? "checked" : ""}><span>${PLATS[k].short}</span></label>`).join("")}</span></div>`;
   }).join("") || `<div class="muted">You've marked everything already.</div>`;
   $("bulkQ").value = ""; updBulkCount();
-  $("bulkList").onchange = updBulkCount;
+  $("bulkList").onchange = e => { if (e.target.closest(".bplats") && e.target.checked) e.target.closest(".bulkrow").querySelector("input.pick").checked = true; updBulkCount(); };
   $("bulkDlg").showModal(); $("bulkQ").focus();
 }
-function updBulkCount() { const n = $("bulkList").querySelectorAll("input:checked").length; $("bulkCount").textContent = n ? `${n} selected` : ""; }
+function updBulkCount() { const n = $("bulkList").querySelectorAll("input.pick:checked").length; $("bulkCount").textContent = n ? `${n} selected` : ""; }
 async function saveBulk() {
-  const picks = [...$("bulkList").querySelectorAll(".bulkrow")].filter(r => r.querySelector("input").checked).map(r => ({ key: r.querySelector("input").value, plat: r.querySelector("select").value }));
+  const picks = [...$("bulkList").querySelectorAll(".bulkrow")].filter(r => r.querySelector("input.pick").checked)
+    .map(r => ({ key: r.querySelector("input.pick").value, plats: [...r.querySelectorAll(".bplats input:checked")].map(i => i.value) }))
+    .filter(p => p.plats.length);
   if (!picks.length) { $("bulkDlg").close(); return; }
   $("bulkSave").disabled = true; let added = 0, marked = 0;
   try {
     for (const p of picks) {
-      if (p.key.startsWith("g:")) { await B.patchGame(p.key.slice(2), { [`owns.${S.user.uid}`]: p.plat }); marked++; continue; }
+      if (p.key.startsWith("g:")) { await B.patchGame(p.key.slice(2), { [`owns.${S.user.uid}`]: p.plats }); marked++; continue; }
       const b = BUILTIN.find(x => x.title === p.key.slice(2)); if (!b) continue;
-      const id = slug(b.title); if (S.games[id]) { await B.patchGame(id, { [`owns.${S.user.uid}`]: p.plat }); marked++; continue; }
+      const id = slug(b.title); if (S.games[id]) { await B.patchGame(id, { [`owns.${S.user.uid}`]: p.plats }); marked++; continue; }
       await B.addGame(id, {
         title: b.title, description: "", cover: b.cover || "", platforms: b.platforms, crossplay: b.crossplay, crossplayNote: b.crossplayNote,
         groups: encG(b.groups), crossProgression: b.crossProgression ?? null, players: b.players, modes: b.mode || [], genres: [], released: "", storeUrls: {},
         stores: b.stores || {}, freeToPlay: !!b.freeToPlay, gamepass: !!b.stores?.gamepass, psplus: !!b.stores?.psplus, consolePrice: "", pitch: "",
         xpSource: b.source || "", rawgId: null, steamAppID: b.steamAppId ? String(b.steamAppId) : null, maxParty: b.maxParty || null,
-        status: "suggested", suggestedBy: S.user.uid, votes: {}, owns: { [S.user.uid]: p.plat }, notes: "",
+        status: "suggested", suggestedBy: S.user.uid, votes: {}, owns: { [S.user.uid]: p.plats }, notes: "",
       });
       added++;
     }
@@ -1625,7 +1650,7 @@ function renderStats(v) {
   const past = Object.values(S.nights).filter(n => n.when < Date.now());
   const ready = lib.filter(([, g]) => readyInfo(g));
   const per = ms.map(([u, m]) => ({ u, m,
-    owned: games.filter(([, g]) => (g.owns || {})[u]).length,
+    owned: games.filter(([, g]) => ownOf(g, u).length).length,
     added: games.filter(([, g]) => g.suggestedBy === u).length,
     nights: past.filter(n => (n.rsvps || {})[u] === "in").length,
     votes: games.filter(([, g]) => (g.votes || {})[u] === "yes").length }));
@@ -1634,7 +1659,7 @@ function renderStats(v) {
   const bars = (rows, max) => rows.map(([l, n]) => `<div class="bar"><span>${esc(l)}</span><span class="t"><span style="width:${max ? Math.round(n / max * 100) : 0}%"></span></span><span class="n">${n}</span></div>`).join("");
   const count = f => { const c = {}; for (const [, g] of lib) for (const x of f(g)) c[x] = (c[x] || 0) + 1; return Object.entries(c).sort((a, b) => b[1] - a[1]); };
   const modes = count(g => (g.modes || []).map(x => MODE_LABEL[x] || x)).slice(0, 6);
-  const plats = (() => { const c = {}; for (const [, g] of games) for (const pl of Object.values(g.owns || {})) if (pl) c[PLATS[pl]?.label || pl] = (c[PLATS[pl]?.label || pl] || 0) + 1; return Object.entries(c).sort((a, b) => b[1] - a[1]); })();
+  const plats = (() => { const c = {}; for (const [, g] of games) for (const u of Object.keys(g.owns || {})) for (const pl of ownOf(g, u)) c[PLATS[pl]?.label || pl] = (c[PLATS[pl]?.label || pl] || 0) + 1; return Object.entries(c).sort((a, b) => b[1] - a[1]); })();
   const xp = { full: 0, partial: 0, none: 0, unknown: 0 }; for (const [, g] of lib) xp[g.crossplay || "unknown"]++;
   const nightGames = {}; for (const n of past) if (n.gameId && S.games[n.gameId]) nightGames[S.games[n.gameId].title] = (nightGames[S.games[n.gameId].title] || 0) + 1;
   const mostPlayed = Object.entries(nightGames).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -1666,7 +1691,7 @@ function openGuide() {
    <h3>1. Set up your profile</h3>
    <ul><li>Tap your avatar (top right). Tick the platforms you play on; the first one is your main.</li><li>Pick your color, picture, timezone and a status line, and add your Steam / PSN / Xbox / Discord names so friends can add you.</li></ul>
    <h3>2. Fill in your library</h3>
-   <ul><li>On <b>Library</b>, tap <b>I own…</b> and tick every game you have, with the platform. Games that aren't on the list yet get added.</li><li>Or open any game and set <b>I have it on</b>.</li><li>Switch to <b>Who owns what</b> for a table of every game and every person. Tap your column to mark a game (tap again to change platform or clear it).</li><li>Use the <b>Everyone's games</b> menu to see one person's library.</li></ul>
+   <ul><li>On <b>Library</b>, tap <b>I own…</b> and tick every game you have, with every platform you own it on. Games that aren't on the list yet get added.</li><li>Or open any game and tick the platforms under <b>I have it on</b>.</li><li>Switch to <b>Who owns what</b> for a table of every game and every person. Tap your column to pick the platforms you own a game on.</li><li>Use the <b>Everyone's games</b> menu to see one person's library.</li></ul>
    <h3>3. Find something to play</h3>
    <ul><li><b>Ready tonight</b> shows games that at least two people own and can play together.</li><li>Each card checks crossplay for you: <i>“All 3 can play together”</i> or who'd be split up.</li><li><b>🎲 Pick tonight</b> chooses one for you.</li></ul>
    <h3>4. The wishlist</h3>
@@ -2043,6 +2068,7 @@ $("lookupQ").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); cle
 $("manualBtn").onclick = () => showForm({ title: $("lookupQ").value.trim() });
 $("addBack").onclick = () => { $("addForm").classList.add("hidden"); $("addStep1").classList.remove("hidden"); };
 $("addForm").onsubmit = saveSuggestion;
+$("addPlats").addEventListener("change", () => { const keep = [...$("iownPlat").querySelectorAll("input:checked")].map(i => i.value); renderIownPlat([...$("addPlats").querySelectorAll("input:checked")].map(i => i.value)); $("iownPlat").querySelectorAll("input").forEach(i => { if (keep.includes(i.value)) i.checked = true; }); });
 $("meBtn").onclick = openMe;
 $("meForm").onsubmit = saveMe;
 $("pfPick").onclick = () => $("pfFile").click();
@@ -2091,7 +2117,7 @@ document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed"
 })();
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput, parseStoreLink, readyInfo, wikidataFacts };
+window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput, parseStoreLink, readyInfo, wikidataFacts, ownOf, platsFor };
 </script>
 </body>
 </html>
