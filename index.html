@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Party Up</title>
-<meta name="description" content="Suggest games to play together, vote, and see who can actually crossplay.">
+<meta name="description" content="Track the games your crew owns, compare libraries, and see who can actually crossplay.">
 <meta name="theme-color" content="#16111f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -109,7 +109,7 @@ select.sel{height:40px;border:1px solid var(--line);background:var(--panel);bord
 .xp.none{background:var(--none-bg);color:var(--none)}
 .xp.unknown{background:var(--unk-bg);color:var(--muted)}
 .plat{font-size:11px;font-weight:700;border-radius:5px;padding:2px 6px;border:1.5px solid currentColor}
-.plat.pc{color:var(--pc)} .plat.playstation{color:var(--ps)} .plat.xbox{color:var(--xb)} .plat.pcms{color:var(--pcms)}
+.plat.pc{color:var(--pc)} .plat.playstation{color:var(--ps)} .plat.xbox{color:var(--xb)} .plat.pcms{color:var(--pcms)} .plat.pcown{color:var(--pc)}
 .desc{color:var(--muted);font-size:13.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
 .fit{font-size:13px;display:flex;gap:6px;align-items:flex-start}
 .fit.ok{color:var(--full)} .fit.warn{color:var(--part)} .fit.bad{color:var(--none)}
@@ -249,6 +249,26 @@ label.fld textarea{min-height:70px;resize:vertical}
 .viewtoggle{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;height:40px}
 .viewtoggle button{border:0;background:var(--panel);padding:0 12px;cursor:pointer;font-weight:600;color:var(--muted)}
 .viewtoggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.viewtoggle button[aria-pressed="true"] .muted{color:inherit;opacity:.85}
+.addwhere{height:44px;margin:0 0 12px;width:100%}
+#addStep1 .search{flex:none}
+.addwhere button{flex:1;font-size:14px}
+.cmppick{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.cmppick .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 4px}
+.cmppick .chip:not([data-cmp]){padding:5px 11px}
+.cmpsum{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+.cmpsum .box{flex:1 1 150px;padding:12px 14px}
+.cmpsum b{display:block;font-size:24px;line-height:1.1}
+.cmplist{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.cmprow{display:flex;gap:12px;align-items:center;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:8px 12px 8px 8px}
+.cmprow .th{width:64px;height:36px;border-radius:7px;background:var(--chip) center/cover no-repeat;flex:none}
+.cmprow .cmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.cmprow .ctitle{border:0;background:none;padding:0;cursor:pointer;font-weight:700;color:var(--ink);text-align:left;font-size:15px}
+.cmprow .cfit{font-size:12.5px;font-weight:600}
+.cmprow .cfit.ok{color:var(--full)}.cmprow .cfit.warn{color:var(--part)}.cmprow .cfit.bad{color:var(--none)}
+.cmprow .missing{font-size:12.5px;color:var(--muted)}
+.cmprow .whofit{margin:0}
+@media (max-width:560px){.cmprow .th{display:none}}
 .gridwrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);margin-bottom:110px}
 table.own{border-collapse:collapse;width:100%;font-size:13.5px}
 table.own th,table.own td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
@@ -332,7 +352,7 @@ nav.bottom{display:none}
   <div class="toolbar" id="toolbar">
     <div class="search"><span aria-hidden="true">⌕</span><input id="q" placeholder="Search the list…" aria-label="Search games"></div>
     <select class="sel" id="ownerSel" aria-label="Owned by"></select>
-    <div class="viewtoggle" id="viewToggle" role="group" aria-label="View"><button data-view="cards" aria-pressed="true">Cards</button><button data-view="grid" aria-pressed="false">Who owns what</button></div>
+    <div class="viewtoggle" id="viewToggle" role="group" aria-label="View"><button data-view="cards" aria-pressed="true">Cards</button><button data-view="grid" aria-pressed="false">Who owns what</button><button data-view="compare" aria-pressed="false">Compare</button></div>
     <select class="sel" id="sortSel" aria-label="Sort">
       <option value="score">Most wanted</option>
       <option value="owned">Most owned</option>
@@ -366,11 +386,12 @@ nav.bottom{display:none}
 
 <!-- game detail -->
 <dialog id="gameDlg" aria-labelledby="gTitle"></dialog>
-<!-- suggest -->
+<!-- add a game -->
 <dialog id="addDlg" aria-labelledby="addTitle">
   <div class="dhead noimg"><button class="dclose" data-close aria-label="Close">×</button></div>
   <div class="dbody">
     <h2 id="addTitle">Add a game</h2>
+    <div class="viewtoggle addwhere" id="addWhere" role="group" aria-label="Add to"><button type="button" data-where="library" aria-pressed="true">My library <span class="muted">· I own it</span></button><button type="button" data-where="wishlist" aria-pressed="false">Wishlist <span class="muted">· want it</span></button></div>
     <div id="addStep1" class="box" style="border:0;padding:0">
       <div class="search"><span aria-hidden="true">⌕</span><input id="lookupQ" placeholder="Game name or a Steam / Xbox / Epic store link" autocomplete="off"></div>
       <div class="muted" id="lookupNote" style="font-size:12.5px"></div>
@@ -394,16 +415,16 @@ nav.bottom{display:none}
       <label class="fld">Crossplay note<input name="crossplayNote" placeholder="e.g. PC and Xbox only" maxlength="120"></label>
       <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">Type
         <div class="checks" id="addModes"></div></div>
-      <div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">I own it on (leave empty if you don't own it)<div class="checks" id="iownPlat"></div></div>
+      <div class="fld" id="iownWrap" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">I own it on (tick every platform you have it on)<div class="checks" id="iownPlat"></div></div>
       <div class="checks">
         <label><input type="checkbox" name="freeToPlay"> Free to play</label>
         <label><input type="checkbox" name="gamepass"> On Game Pass</label>
         <label><input type="checkbox" name="psplus"> In PS Plus</label>
       </div>
       <label class="fld">Console price (optional)<input name="consolePrice" placeholder="e.g. $39.99 on PS Store" maxlength="60"></label>
-      <label class="fld">Why should we play it? (optional)<textarea name="pitch" maxlength="500" placeholder="Your pitch to the crew"></textarea></label>
+      <label class="fld" id="pitchWrap">Why should we get it? (optional)<textarea name="pitch" maxlength="500" placeholder="Your pitch to the crew"></textarea></label>
       <div class="err hidden" id="addErr"></div>
-      <div class="foot"><button type="button" class="ibtn ghost" id="addBack">Back</button><button class="ibtn primary" id="addSave">Suggest it</button></div>
+      <div class="foot"><button type="button" class="ibtn ghost" id="addBack">Back</button><button class="ibtn primary" id="addSave">Add to my library</button></div>
     </form>
   </div>
 </dialog>
@@ -503,17 +524,20 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.6.0";
+const VERSION = "1.7.0";
 
 /* ---------- constants ---------- */
 const PLATS = {
   pc:          { label: "PC (Steam / Epic)",   short: "PC" },
   pcms:        { label: "PC (Game Pass / Xbox app)", short: "PC·GP" },
+  pcown:       { label: "PC (game's own launcher)", short: "PC·L", ownOnly: true }, // e.g. Path of Titans' Alderon launcher; only for "I own it"
   playstation: { label: "PlayStation",         short: "PS" },
   xbox:        { label: "Xbox",                short: "XB" },
 };
 const BASE_PLATS = ["pc", "playstation", "xbox"];
-const baseOf = p => p === "pcms" ? "pc" : p;
+const baseOf = p => p === "pcms" || p === "pcown" ? "pc" : p;
+// Crossplay-wise, a game's own launcher is the same PC version as Steam / Epic.
+const xpKey = p => p === "pcown" ? "pc" : p;
 const MODES = ["co-op","pvp","pve","survival","party","battle-royale","mmo","split-screen"];
 const MODE_LABEL = {"co-op":"Co-op","pvp":"PvP","pve":"PvE","survival":"Survival","party":"Party","battle-royale":"Battle royale","mmo":"MMO","split-screen":"Split-screen"};
 const STATUS = {
@@ -711,7 +735,7 @@ function fitCheck(game, people) {
   const groups = decG(game.groups) || defaultGroups(game.crossplay);
   const total = people.length;
   if (!groups) {
-    const common = on(able[0]).filter(x => able.every(p => on(p).includes(x)));
+    const common = on(able[0]).filter(x => able.every(p => on(p).some(y => xpKey(y) === xpKey(x))));
     if (common.length) {
       const who = [...able.map(p => ({ uid: p.uid, plat: common[0], ok: true })), ...missingWho];
       if (!notOn.length) return { state: "ok", text: total === 1 ? "You can play it" : `All ${total} can play on ${short(common[0])}`, who };
@@ -720,7 +744,7 @@ function fitCheck(game, people) {
     return { state: "unknown", text: game.crossplayNote ? `Check: ${game.crossplayNote}` : "Crossplay not confirmed yet",
       who: [...able.map(p => ({ uid: p.uid, plat: on(p)[0], ok: null, why: "crossplay unknown" })), ...missingWho] };
   }
-  const inGroup = (x, g) => g.includes(x) || (x === "pcms" && g.includes("pc") && !groups.some(h => h.includes("pcms")));
+  const inGroup = (x, g) => g.includes(xpKey(x)) || (x === "pcms" && g.includes("pc") && !groups.some(h => h.includes("pcms")));
   let best = [], bestG = null;
   for (const g of groups) {
     const fit = able.filter(p => on(p).some(x => inGroup(x, g)));
@@ -1224,7 +1248,7 @@ function render() {
   renderTabs();
   $("toolbar").classList.toggle("hidden", !["library", "wishlist"].includes(S.tab));
   const lib = S.tab === "library";
-  $("ownerSel").classList.toggle("hidden", !lib); $("viewToggle").classList.toggle("hidden", !lib);
+  $("ownerSel").classList.toggle("hidden", !lib || S.view === "compare"); $("viewToggle").classList.toggle("hidden", !lib);
   document.querySelector('[data-f="ready"]').classList.toggle("hidden", !lib);
   $("ownerSel").innerHTML = `<option value="">Everyone's games</option>` + Object.entries(S.members).sort((a, b) => a[1].name.localeCompare(b[1].name)).map(([u, m]) => `<option value="${esc(u)}" ${S.owner === u ? "selected" : ""}>${u === S.user.uid ? "My games" : esc(m.name.split(" ")[0]) + "'s games"}</option>`).join("");
   $("viewToggle").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", S.view === b.dataset.view));
@@ -1250,6 +1274,7 @@ function render() {
     html += `<div class="chiprow" style="margin:-2px 0 12px">${[["", "All"], ...Object.entries(STATUS).map(([k, x]) => [k, x.label])].filter(([k]) => !k || sc[k]).map(([k, l]) => `<button class="chip" data-libstatus="${k}" aria-pressed="${(S.libStatus || "") === k}">${l}${k ? ` · ${sc[k]}` : ""}</button>`).join("")}</div>`;
   }
   if (lib && S.view === "grid" && entries.length) { v.innerHTML = html + ownershipGrid(shown); return; }
+  if (lib && S.view === "compare") { const keep = S.owner; S.owner = ""; const all = sortGames(entries.filter(([, g]) => matches(g)).map(([id, g]) => ({ ...g, _id: id }))); S.owner = keep; v.innerHTML = html + compareView(all); return; }
   html += `<div class="grid">`;
   if (!entries.length) {
     html += lib
@@ -1269,7 +1294,7 @@ function renderIdeas(v) {
     (!f.q || norm(b.title).includes(norm(f.q))) &&
     (!f.xp || b.crossplay === f.xp) &&
     (!f.mode || (b.mode || []).includes(f.mode)));
-  v.innerHTML = `<div class="sectionhead"><h2>Ideas</h2><span class="muted">${BUILTIN.length} multiplayer games, crossplay last checked ${esc(fmtDate(window.BUILTIN_CHECKED))}. One tap suggests it to the crew.</span></div>
+  v.innerHTML = `<div class="sectionhead"><h2>Ideas</h2><span class="muted">${BUILTIN.length} multiplayer games, crossplay last checked ${esc(fmtDate(window.BUILTIN_CHECKED))}. Tap Add to put it in your library or on the wishlist.</span></div>
    <div class="toolbar" style="padding-top:0">
      <div class="search"><span aria-hidden="true">⌕</span><input id="ideaQ" placeholder="Search ideas…" value="${esc(f.q)}"></div>
      <select class="sel" id="ideaXp"><option value="">Any crossplay</option><option value="full" ${f.xp === "full" ? "selected" : ""}>Full crossplay</option><option value="partial" ${f.xp === "partial" ? "selected" : ""}>Partial</option><option value="none" ${f.xp === "none" ? "selected" : ""}>None</option></select>
@@ -1279,7 +1304,7 @@ function renderIdeas(v) {
       <div style="flex:1;min-width:0"><div class="t">${esc(b.title)}</div>
         <div class="tags" style="margin:3px 0"><span class="xp ${b.crossplay}">${XP_LABEL[b.crossplay]}</span>${platTags(b.platforms)}${b.freeToPlay ? `<span class="tag">Free</span>` : ""}</div>
         <div class="sub">${esc(b.players)} · ${esc(b.crossplayNote)} · <a href="${esc(trailerUrl(b.title))}" target="_blank" rel="noopener">Trailer ↗</a></div></div>
-      ${added.has(norm(b.title)) ? `<span class="tag">In list</span>` : `<button class="ibtn" data-idea="${esc(b.title)}">＋ Suggest</button>`}
+      ${added.has(norm(b.title)) ? `<span class="tag">In list</span>` : `<button class="ibtn" data-idea="${esc(b.title)}">＋ Add</button>`}
     </div>`).join("") || `<div class="empty"><h3>No matches</h3></div>`}</div>`;
   const upd = () => { S.ideaFilter = { q: $("ideaQ").value, xp: $("ideaXp").value, mode: $("ideaMode").value }; const pos = $("ideaQ").selectionStart; renderIdeas(v); const i = $("ideaQ"); if (document.activeElement !== i && S._ideaTyping) { i.focus(); i.setSelectionRange(pos, pos); } };
   $("ideaQ").oninput = () => { S._ideaTyping = true; upd(); }; $("ideaXp").onchange = () => { S._ideaTyping = false; upd(); }; $("ideaMode").onchange = () => { S._ideaTyping = false; upd(); };
@@ -1299,7 +1324,7 @@ function renderCrew(v) {
       ${tz ? `<div class="localtimes">Local time ${esc(fmtTime(Date.now(), tz))} ${esc(tzAbbr(tz))} · ${esc(tzCity(tz))}</div>` : ""}
       <div class="tags" style="margin-top:3px">${(m.platforms || []).map(p => `<span class="plat ${p}">${PLATS[p].short}</span>`).join("") || `<span class="muted" style="font-size:12px">No platforms set</span>`}</div></div></div>
       ${handle("Steam", h.steam)}${handle("Epic", h.epic)}${handle("PSN", h.psn)}${handle("Xbox", h.xbox)}${handle("Discord", h.discord)}
-      <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12.5px">${Object.values(S.games).filter(g => ownOf(g, uid).length).length} games owned · ${sugg} added</span><button class="ibtn ghost" data-ownerlib="${esc(uid)}" style="height:34px">View library</button></div>
+      <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:12.5px">${Object.values(S.games).filter(g => ownOf(g, uid).length).length} games owned · ${sugg} added</span><span class="row" style="gap:6px">${uid !== S.user.uid ? `<button class="ibtn ghost" data-cmpwith="${esc(uid)}" style="height:34px">Compare with me</button>` : ""}<button class="ibtn ghost" data-ownerlib="${esc(uid)}" style="height:34px">View library</button></span></div>
       ${isLeader() && uid !== S.user.uid ? `<button class="ibtn danger" data-kick="${esc(uid)}" style="align-self:flex-start">Remove from group</button>` : ""}
     </div>`; }).join("")}</div>
 `;
@@ -1325,7 +1350,7 @@ function openGame(id) {
        <div class="tags" style="margin-top:8px"><span class="xp ${xp}">${XP_LABEL[xp]}</span>${platTags(g.platforms)}
        ${(g.modes || []).map(m => `<span class="tag">${MODE_LABEL[m] || esc(m)}</span>`).join("")}
        ${(g.genres || []).map(x => `<span class="tag">${esc(x)}</span>`).join("")}</div>
-       <div class="muted" style="font-size:13px;margin-top:8px">${sugg ? `Suggested by ${esc(sugg.name)}` : "Suggested"} ${timeAgo(tsMs(g.suggestedAt))}${g.released ? ` · Released ${esc(g.released.slice(0, 4))}` : ""}</div>
+       <div class="muted" style="font-size:13px;margin-top:8px">${sugg ? `Added by ${esc(sugg.name)}` : "Added"} ${timeAgo(tsMs(g.suggestedAt))}${g.released ? ` · Released ${esc(g.released.slice(0, 4))}` : ""}</div>
        <div class="row" style="margin-top:10px"><a class="tlink" href="${esc(trailerUrl(g.title))}" target="_blank" rel="noopener">▶ Watch trailer</a><button class="ibtn" data-plan="${esc(id)}" style="height:32px">◷ Plan a game night</button></div></div>
      ${g.pitch ? `<div class="box" style="background:var(--accent-soft);border-color:transparent"><h3>The pitch</h3><div>“${esc(g.pitch)}”</div></div>` : ""}
      ${g.description ? `<div style="white-space:pre-line;color:var(--muted)">${esc(g.description)}</div>` : ""}
@@ -1408,10 +1433,11 @@ async function vote(id, val) {
   } catch (e) { fail(e); }
 }
 
-/* ---------- suggest flow ---------- */
+/* ---------- add flow ---------- */
 let lookupTimer, lookupToken = 0, pending = null;
-function openAdd(prefill) {
+function openAdd(prefill, where) {
   pending = null;
+  setAddWhere(where || (S.tab === "wishlist" ? "wishlist" : "library"));
   $("addStep1").classList.remove("hidden"); $("addForm").classList.add("hidden"); $("addErr").classList.add("hidden");
   $("lookupQ").value = prefill || ""; $("lookupRes").innerHTML = "";
   $("lookupNote").textContent = CONFIG.GAME_API ? "Details from IGDB · crossplay from the built-in list · or paste a store link" : CONFIG.RAWG_KEY ? "Details from RAWG · crossplay from the built-in list · or paste a store link" : "Details from Wikipedia + Wikidata · crossplay from the built-in list · or paste a store link";
@@ -1492,6 +1518,25 @@ function renderIownPlat(gamePlats) {
   const opts = ownOptions({ platforms: gamePlats });
   $("iownPlat").innerHTML = opts.map(k => `<label><input type="checkbox" value="${k}"> ${PLATS[k].label}</label>`).join("");
 }
+// When adding to your library, tick your own platform(s) to start with.
+function autoTickIown() {
+  if (S.addWhere !== "library" || $("iownPlat").querySelector("input:checked")) return;
+  const mine = me()?.platforms || [];
+  const boxes = [...$("iownPlat").querySelectorAll("input")];
+  const hit = boxes.find(i => mine.includes(i.value)) || (boxes.length === 1 ? boxes[0] : null);
+  if (hit) hit.checked = true;
+}
+function setAddWhere(w) {
+  S.addWhere = w === "wishlist" ? "wishlist" : "library";
+  const lib = S.addWhere === "library";
+  $("addWhere").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.where === S.addWhere));
+  $("addTitle").textContent = lib ? "Add to my library" : "Add to the wishlist";
+  $("addSave").textContent = lib ? "Add to my library" : "Add to wishlist";
+  $("iownWrap").classList.toggle("hidden", !lib);
+  $("pitchWrap").classList.toggle("hidden", lib);
+  $("addErr").classList.add("hidden");
+  autoTickIown();
+}
 
 async function pickHit(hit) {
   $("lookupRes").innerHTML = `<div class="row muted"><span class="spin"></span> Getting details for ${esc(hit.title)}…</div>`;
@@ -1512,6 +1557,7 @@ function showForm(d) {
   f.crossplayNote.value = pending.crossplayNote || (pending.crossHint && !pending.crossplay ? "Store lists cross-platform multiplayer; check which platforms" : "");
   f.players.value = pending.players || ""; f.freeToPlay.checked = !!pending.freeToPlay;
   renderIownPlat(pending.platforms || []);
+  setAddWhere(S.addWhere);
   f.maxParty.value = pending.maxParty || (pending.builtin ? "" : parseMaxParty(pending.players)) || "";
   f.gamepass.checked = !!pending.gamepass; f.psplus.checked = !!pending.psplus; f.consolePrice.value = ""; f.pitch.value = "";
   $("addPlats").innerHTML = BASE_PLATS.map(p => `<label><input type="checkbox" value="${p}" ${(pending.platforms || []).includes(p) ? "checked" : ""}> ${PLATS[p].label.replace(" (Steam / Epic)", "")}</label>`).join("");
@@ -1538,14 +1584,17 @@ async function saveSuggestion(e) {
     genres: pending?.genres || [], released: pending?.released || "", storeUrls: pending?.storeUrls || {}, stores: (BUILTIN.find(b => b.title === pending?.builtin) || {}).stores || {},
     freeToPlay: f.freeToPlay.checked, gamepass: f.gamepass.checked, psplus: f.psplus.checked, consolePrice: f.consolePrice.value.trim(),
     pitch: f.pitch.value.trim(), xpSource: pending?.xpSource || "", rawgId: pending?.rawgId || null, steamAppID: pending?.steamAppID || null,
-    status: "suggested", suggestedBy: S.user.uid, votes: { [S.user.uid]: "yes" }, owns: {}, notes: "",
+    status: "suggested", suggestedBy: S.user.uid, votes: S.addWhere === "library" ? {} : { [S.user.uid]: "yes" }, owns: {}, notes: "",
     maxParty: parseInt(f.maxParty.value, 10) > 0 ? Math.min(parseInt(f.maxParty.value, 10), 100) : null,
   };
-  const iown = [...$("iownPlat").querySelectorAll("input:checked")].map(i => i.value);
+  const toLib = S.addWhere === "library";
+  const iown = toLib ? [...$("iownPlat").querySelectorAll("input:checked")].map(i => i.value) : [];
+  if (toLib && !iown.length) { err.textContent = "Tick the platform(s) you own it on, or switch to Wishlist at the top."; err.classList.remove("hidden"); return; }
   if (iown.length) data.owns = { [S.user.uid]: iown };
+  if (toLib) data.pitch = "";
   if (pending?.steamAppID) data.steamAppID = String(pending.steamAppID);
   $("addSave").disabled = true;
-  try { await B.addGame(id, data); $("addDlg").close(); toast(iown.length ? `Added ${title} to the library` : `Added ${title} to the wishlist`); logAct("suggest", { gameId: id, title }); refreshPrice(id, false); setTab(inLibrary(data) ? "library" : "wishlist"); }
+  try { await B.addGame(id, data); $("addDlg").close(); toast(toLib ? `Added ${title} to your library` : `Added ${title} to the wishlist`); logAct("add", { gameId: id, title, where: toLib ? "library" : "wishlist" }); refreshPrice(id, false); setTab(inLibrary(data) ? "library" : "wishlist"); }
   catch (er) { err.textContent = er.message === "exists" ? `${title} is already on the list.` : (er.code === "permission-denied" ? "You don't have permission to add games." : er.message); err.classList.remove("hidden"); }
   finally { $("addSave").disabled = false; }
 }
@@ -1583,6 +1632,53 @@ function ownershipGrid(list) {
       <td>${r ? `<span class="xp full">${r.n}</span>` : `<span class="muted">·</span>`}</td></tr>`; }).join("")}
   </tbody></table></div>`;
 }
+/* ---------- compare inventories ---------- */
+// Who is being compared: saved per browser; defaults to everyone.
+function cmpPeople() {
+  const ids = Object.keys(S.members);
+  let pick = (S.cmp || store.get("sq_cmp", null) || ids).filter(u => S.members[u]);
+  if (!S.cmp && !store.get("sq_cmp", null)) pick = ids;
+  return pick;
+}
+function setCmp(list) { S.cmp = [...new Set(list)]; store.set("sq_cmp", S.cmp); render(); }
+function compareView(list) {
+  const pick = cmpPeople();
+  const nm = u => u === S.user.uid ? "You" : esc((S.members[u]?.name || "?").split(" ")[0]);
+  const ms = Object.entries(S.members).sort((a, b) => (a[0] === S.user.uid ? -1 : b[0] === S.user.uid ? 1 : a[1].name.localeCompare(b[1].name)));
+  const counts = u => Object.values(S.games).filter(g => ownOf(g, u).length).length;
+  let h = `<div class="cmppick" role="group" aria-label="People to compare">${ms.map(([u, m]) => `<button class="chip" data-cmp="${esc(u)}" aria-pressed="${pick.includes(u)}">${avatar(m, "sm")}${nm(u)} · ${counts(u)}</button>`).join("")}
+    <button class="chip" data-cmpall="1">Everyone</button></div>`;
+  if (pick.length < 2) return h + `<div class="empty"><h3>Pick at least two people</h3><p>Tap names above to compare their libraries.</p></div>`;
+  const all = [], some = [];
+  for (const g of list) {
+    const owners = pick.filter(u => ownOf(g, u).length);
+    if (g.freeToPlay || owners.length === pick.length) all.push(g);
+    else if (owners.length) some.push({ g, owners });
+  }
+  const fitOf = g => fitCheck(g, pick.map(u => ({ uid: u, plats: platsFor(g, u) })));
+  const rank = { ok: 0, warn: 1, bad: 2 };
+  const allF = all.map(g => ({ g, f: fitOf(g) })).sort((a, b) => (rank[a.f?.state] ?? 3) - (rank[b.f?.state] ?? 3));
+  const together = allF.filter(x => x.f?.state === "ok").length;
+  some.sort((a, b) => b.owners.length - a.owners.length || a.g.title.localeCompare(b.g.title));
+  const names = pick.length === 2 ? `${nm(pick[0])} and ${nm(pick[1])}` : `all ${pick.length} of you`;
+  const thumb = g => { const c = coverOf(g); return `<span class="th" aria-hidden="true" style="${c.src ? `background-image:url('${esc(c.src).replace(/'/g, "%27")}')` : ""}"></span>`; };
+  h += `<div class="cmpsum"><div class="box"><b>${all.length}</b><span class="muted">${pick.length === 2 ? "you both own" : "you all own"}</span></div><div class="box"><b>${together}</b><span class="muted">you can play together</span></div><div class="box"><b>${some.length}</b><span class="muted">only some of you own</span></div></div>`;
+  h += `<div class="sectionhead"><h2 style="font-size:16px">Everyone owns</h2><span class="muted">Games ${names} have${all.some(g => g.freeToPlay) ? " (free-to-play counts)" : ""}</span></div><div class="cmplist">`;
+  h += allF.length ? allF.map(({ g, f }) => `<div class="cmprow">${thumb(g)}<div class="cmain"><button class="ctitle" data-open="${esc(g._id)}">${esc(g.title)}${g.freeToPlay ? ` <span class="tag">Free</span>` : ""}</button>
+      <span class="cfit ${f?.state || ""}">${f?.state === "ok" ? "✔ Can play together" : esc(f?.text || "Crossplay unknown")}</span>${whoChips(f, true)}</div></div>`).join("")
+    : `<div class="muted" style="font-size:13.5px">No games in common yet${list.length ? "" : ". Mark what you own with “I own…”"}.</div>`;
+  h += `</div>`;
+  if (some.length) {
+    h += `<div class="sectionhead"><h2 style="font-size:16px">Only some own</h2><span class="muted">Who has it, and who'd need to buy it</span></div><div class="cmplist">`;
+    h += some.map(({ g, owners }) => { const miss = pick.filter(u => !owners.includes(u));
+      return `<div class="cmprow">${thumb(g)}<div class="cmain"><button class="ctitle" data-open="${esc(g._id)}">${esc(g.title)}</button>
+        <div class="who whofit">${owners.map(u => `<span class="p yes"><span aria-hidden="true">✔</span> ${nm(u)} · ${esc(platShort(ownOf(g, u)))}</span>`).join("")}</div>
+        <span class="missing">Missing: ${miss.map(nm).join(", ")}${onSale(g) ? ` · <b>on sale ${Math.round(g.pcPrice.savings)}% off</b>` : ""}</span></div></div>`; }).join("");
+    h += `</div>`;
+  }
+  return h;
+}
+
 // Small picker for "which platforms do I own this on?" (grid cells and cards)
 function openOwn(id) {
   const g = S.games[id]; if (!g) return;
@@ -1697,7 +1793,7 @@ function openGuide() {
    <h3>4. The wishlist</h3>
    <ul><li>Games nobody owns yet live on <b>Wishlist</b>. Vote 👍 / 🤷 / 👎 and the most-wanted rise to the top.</li><li>PC prices update daily; <b>On sale</b> shows deals, and each game shows its lowest price ever.</li><li>When someone buys it and marks it owned, it moves to the Library.</li></ul>
    <h3>5. Adding a game</h3>
-   <ul><li><b>Add a game</b>: type a name, or paste a Steam, Xbox, Epic or GOG store link.</li><li><b>Ideas</b> has ${BUILTIN.length} multiplayer games with crossplay already checked.</li><li>Tick <b>I own it</b> while adding to put it straight in the library.</li></ul>
+   <ul><li><b>Compare</b> (in the Library) shows the games everyone you pick owns, whether you can play them together, and who's missing the rest. Crew cards have <b>Compare with me</b>.</li><li><b>Add a game</b>: type a name, or paste a Steam, Xbox, Epic or GOG store link.</li><li><b>Ideas</b> has ${BUILTIN.length} multiplayer games with crossplay already checked.</li><li>At the top, choose <b>My library</b> (a game you own: tick the platforms you have it on) or <b>Wishlist</b> (a game you'd like the crew to get).</li></ul>
    <h3>6. Game nights</h3>
    <ul><li>On <b>Nights</b>, plan a time and a game. Everyone taps In / Maybe / Out, and times show in each person's own timezone.</li><li><b>Add to calendar</b> puts it on your phone or PC calendar.</li></ul>
    <h3>Also</h3>
@@ -1854,7 +1950,8 @@ function actText(e) {
   const who = `<b>${esc((S.members[e.by]?.name || "Someone").split(" ")[0])}</b>`;
   const t = e.title ? `<b>${esc(e.title)}</b>` : "a game";
   switch (e.type) {
-    case "suggest": return `${who} suggested ${t}`;
+    case "suggest": return `${who} added ${t}`;
+    case "add": return e.where === "library" ? `${who} added ${t} to their library` : `${who} added ${t} to the wishlist`;
     case "vote": return `${who} is in for ${t}`;
     case "status": return `${who} moved ${t} to ${esc(STATUS[e.status]?.label || e.status)}`;
     case "night": return `${who} planned a game night for ${esc(fmtNight(e.when))}${e.title ? ` · ${t}` : ""}`;
@@ -1867,7 +1964,7 @@ function actText(e) {
 function renderFeed(markSeen) {
   const seen = S._seenBefore ?? store.get("sq_seen_" + GROUP, Date.now());
   $("feed").innerHTML = S.activity.map(e => `<button class="ev ${e.by !== S.user.uid && actMs(e) > seen ? "new" : ""}" data-act="${esc(e.id)}">${avatar(S.members[e.by] || { name: "?" }, "sm")}<span style="min-width:0"><div class="t">${actText(e)}</div><div class="s">${esc(timeAgo(actMs(e)) || "just now")}</div></span></button>`).join("")
-    || `<div class="muted" style="padding:20px 0">Nothing yet. Suggestions, votes, game nights and new members show up here.</div>`;
+    || `<div class="muted" style="padding:20px 0">Nothing yet. New games, votes, game nights and new members show up here.</div>`;
   if (markSeen) store.set("sq_seen_" + GROUP, Date.now());
   updateBell();
 }
@@ -1905,7 +2002,7 @@ async function openMe() {
   $("meDlg").showModal();
 }
 function renderPlatChecks(el, sel) {
-  const order = [...sel, ...Object.keys(PLATS).filter(k => !sel.includes(k))];
+  const order = [...sel.filter(k => PLATS[k] && !PLATS[k].ownOnly), ...Object.keys(PLATS).filter(k => !sel.includes(k) && !PLATS[k].ownOnly)];
   el.innerHTML = order.map(k => `<label><input type="checkbox" value="${k}" ${sel.includes(k) ? "checked" : ""}> ${PLATS[k].label}</label>`).join("");
   el.dataset.order = JSON.stringify(sel);
   el.querySelectorAll("input").forEach(i => i.onchange = () => {
@@ -1964,7 +2061,7 @@ async function shrinkImage(file) {
 /* ---------- gate (sign in / create / join) ---------- */
 function gate(html) { $("app").classList.add("hidden"); $("tabsMob").classList.add("hidden"); const g = $("gate"); g.classList.remove("hidden"); g.innerHTML = `<div class="gatecard">${html}</div>`; }
 function showSignIn() {
-  gate(`<h1>Party Up</h1><p>Suggest games, vote on what to play next, and see who can actually crossplay.</p>
+  gate(`<h1>Party Up</h1><p>Track the games your crew owns, compare libraries, plan game nights, and see who can actually crossplay.</p>
     <button class="ibtn primary" id="signInBtn" style="height:46px">${B.mode === "local" ? "Start (demo mode)" : "Sign in with Google"}</button>
     ${B.mode === "local" ? `<p style="font-size:13px">Demo mode: Firebase isn't configured, so data stays in this browser.</p>` : ""}
     <div class="err hidden" id="gateErr"></div>`);
@@ -2034,12 +2131,15 @@ applyTheme();
 
 /* ---------- events ---------- */
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-ownerlib],[data-cellown],[data-libstatus],[data-view],[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f],[data-rsvp],[data-ics],[data-plan],[data-editnight],[data-delnight],[data-act]");
+  const t = e.target.closest("[data-ownerlib],[data-cellown],[data-libstatus],[data-view],[data-tab],[data-vote],[data-open],[data-idea],[data-copy],[data-kick],[data-close],[data-price],[data-f],[data-rsvp],[data-ics],[data-plan],[data-editnight],[data-delnight],[data-act],[data-cmp],[data-cmpall],[data-cmpwith]");
   if (!t) return;
   if (t.dataset.ownerlib) { S.owner = t.dataset.ownerlib; S.view = "cards"; return setTab("library"); }
   if (t.dataset.cellown) return cycleOwn(t.dataset.cellown);
   if (t.dataset.libstatus !== undefined) { S.libStatus = t.dataset.libstatus; return render(); }
   if (t.dataset.view) { S.view = t.dataset.view; store.set("sq_view", S.view); return render(); }
+  if (t.dataset.cmp) { const cur = cmpPeople(); return setCmp(cur.includes(t.dataset.cmp) ? cur.filter(u => u !== t.dataset.cmp) : [...cur, t.dataset.cmp]); }
+  if (t.dataset.cmpall) return setCmp(Object.keys(S.members));
+  if (t.dataset.cmpwith) { S.view = "compare"; store.set("sq_view", "compare"); S.cmp = [S.user.uid, t.dataset.cmpwith]; store.set("sq_cmp", S.cmp); return setTab("library"); }
   if (t.dataset.rsvp) return rsvp(t.dataset.night, t.dataset.rsvp);
   if (t.dataset.ics) return downloadIcs(t.dataset.ics);
   if ("plan" in t.dataset) { if ($("gameDlg").open) $("gameDlg").close(); return openPlan(t.dataset.plan || null); }
@@ -2068,7 +2168,8 @@ $("lookupQ").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); cle
 $("manualBtn").onclick = () => showForm({ title: $("lookupQ").value.trim() });
 $("addBack").onclick = () => { $("addForm").classList.add("hidden"); $("addStep1").classList.remove("hidden"); };
 $("addForm").onsubmit = saveSuggestion;
-$("addPlats").addEventListener("change", () => { const keep = [...$("iownPlat").querySelectorAll("input:checked")].map(i => i.value); renderIownPlat([...$("addPlats").querySelectorAll("input:checked")].map(i => i.value)); $("iownPlat").querySelectorAll("input").forEach(i => { if (keep.includes(i.value)) i.checked = true; }); });
+$("addPlats").addEventListener("change", () => { const keep = [...$("iownPlat").querySelectorAll("input:checked")].map(i => i.value); renderIownPlat([...$("addPlats").querySelectorAll("input:checked")].map(i => i.value)); $("iownPlat").querySelectorAll("input").forEach(i => { if (keep.includes(i.value)) i.checked = true; }); autoTickIown(); });
+$("addWhere").onclick = e => { const b = e.target.closest("[data-where]"); if (b) setAddWhere(b.dataset.where); };
 $("meBtn").onclick = openMe;
 $("meForm").onsubmit = saveMe;
 $("pfPick").onclick = () => $("pfFile").click();
@@ -2117,7 +2218,7 @@ document.querySelectorAll("[data-f]").forEach(c => c.setAttribute("aria-pressed"
 })();
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-window.__sq = { S, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput, parseStoreLink, readyInfo, wikidataFacts, ownOf, platsFor };
+window.__sq = { S, compareView, setAddWhere, fitCheck, builtinFor, norm, VERSION, parseMaxParty, partyCheck, zonedToEpoch, toTzInput, parseStoreLink, readyInfo, wikidataFacts, ownOf, platsFor };
 </script>
 </body>
 </html>

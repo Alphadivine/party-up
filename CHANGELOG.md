@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10 — Add to your library, compare inventories, own-launcher games (v1.7.0)
+
+- **Add a game** now starts with a choice at the top: **My library · I own it** or **Wishlist · want it**. Library adds ask which platform(s) you own it on (your own is pre-ticked); wishlist adds keep the "Why should we get it?" note and your 👍. Opening Add from the Wishlist tab starts on Wishlist; anywhere else starts on My library.
+- No more "Suggest" wording: buttons say **Add**, details say **Added by**, and the activity feed says "added X to their library" or "added X to the wishlist".
+- **Compare** (third view in the Library, next to Cards and Who owns what): tick two or more people to see the games you all own and whether you can play them together, then the games only some of you own, with who's missing each one (and a sale note if it's on sale). Crew cards have a **Compare with me** button.
+- New ownership option **PC (game's own launcher)** (shows as PC·L) for games like Path of Titans that come from their own launcher. It counts as PC for crossplay, and it's only offered under "I own it", not as a profile platform.
+- Fixed: the search box in the Add dialog could stretch very tall.
+
 ## 2026-10 — Own games on more than one platform (v1.6.0)
 
 - You can now own a game on several platforms (say PC and PlayStation). Game details show a checkbox for each platform: tick every one you have it on.
