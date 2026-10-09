@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10 — Filters panel (v1.8.0)
+
+- New **Filters** button on the Library and Wishlist opens a panel with every filter in one place. A badge shows how many are on, and **Clear all** resets them. Filters are remembered on your device.
+- **Ownership** (Library): Anyone, I own it, **I don't have it** (games friends own that you're missing), Everyone owns it, Only one person owns it.
+- **Owned on** (Library): PC (Steam / Epic), PC Game Pass, PC own launcher, PlayStation, Xbox, with counts. On the Wishlist this becomes **Available on**.
+- **Party size**: fits 2+, 3+, 4+, 5+, 6+ or 8+ players (games with no known limit are included).
+- **Genre**: chips built from the genres of the games in the list, with counts.
+- **Type** (co-op, PvP, survival…) moved from the dropdown into the panel, along with Ready tonight, On sale, Crossplay, Whole crew fits, Free and Game Pass / PS Plus.
+- The panel shows "Showing X of Y games" as you filter.
+
 ## 2026-10 — Add to your library, compare inventories, own-launcher games (v1.7.0)
 
 - **Add a game** now starts with a choice at the top: **My library · I own it** or **Wishlist · want it**. Library adds ask which platform(s) you own it on (your own is pre-ticked); wishlist adds keep the "Why should we get it?" note and your 👍. Opening Add from the Wishlist tab starts on Wishlist; anywhere else starts on My library.

@@ -11,6 +11,7 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 ## ✨ Features
 
 - **Library + Wishlist**: the Library is everything the crew owns, with who owns it and on what; the Wishlist is games nobody owns yet, with votes and prices. Mark many games at once with **I own…**, see a **Who owns what** grid, filter to **Ready tonight** (2+ owners who can play together) or to one person's games.
+- **Filters panel**: one Filters button for platform owned on, genre, party size, type, ownership (like "I don't have it" or "Everyone owns it"), plus Ready tonight, On sale, Crossplay and more.
 - **Compare inventories**: pick two or more people to see the games you all own, whether you can play them together, and who's missing the rest. Crew cards have **Compare with me**.
 - **Add to My library or Wishlist**: choose at the top of Add a game; library adds ask which platforms you own it on.
 - **Who can play what**: every card shows each person and the platform they'd play on, with ✔ / ✖ and the reason when someone can't join.
@@ -37,7 +38,7 @@ Party Up is a single self-contained `index.html` (plus a data file). No build st
 - **Ideas tab**: browse the 110 checked games, filter by crossplay or type (co-op, survival, party, battle royale…), and add one in a tap.
 - **Crew tab**: everyone's platforms plus Steam / Epic / PSN / Xbox / Discord names with copy buttons, so adding each other is easy.
 - **🎲 Pick tonight**: picks a game at random, weighted towards the most-wanted games that the whole interested group can play together.
-- **Filters**: crossplay only, "whole crew fits", free, Game Pass / PS Plus, type, plus sort by most wanted, newest, cheapest or A–Z.
+- **Sorting**: most wanted, most owned, newest, cheapest or A–Z.
 - **Google sign-in with a join code**: only people with the code you set can see the list. The leader (whoever sets the group up) can remove people and change the code.
 - **Installable app (PWA)**, phone layout with bottom tabs, light / dark / system theme, controller logo.
 
@@ -91,4 +92,4 @@ Game data from **[RAWG](https://rawg.io)** and **[Wikipedia](https://www.wikiped
 
 ---
 
-_Last updated: October 2026 (v1.7.0). Full change history in `CHANGELOG.md`._
+_Last updated: October 2026 (v1.8.0). Full change history in `CHANGELOG.md`._
