@@ -421,7 +421,7 @@ const CONFIG = {
   RAWG_KEY: "",          // free key from https://rawg.io/apidocs (optional; Wikipedia is used without it)
   DEFAULT_GROUP: "squad" // use ?group=NAME on the URL to run a separate group off the same database
 };
-const VERSION = "1.3.1";
+const VERSION = "1.3.2";
 
 /* ---------- constants ---------- */
 const PLATS = {
@@ -610,39 +610,49 @@ function defaultGroups(crossplay, platforms) {
 
 /* ---------- "can the crew play together" ---------- */
 // people: [{uid, plat}] → {state:'ok'|'warn'|'bad'|'unknown', text}
+// people: [{uid, plats:[...]}] (or legacy {uid, plat}). Each person may own several platforms;
+// we pick, per person, the platform that lets the most people play together.
 function fitCheck(game, people) {
+  people = people.map(p => ({ uid: p.uid, plats: (p.plats || [p.plat]).filter(Boolean) })).filter(p => p.plats.length);
   if (!people.length) return null;
   const avail = new Set(game.platforms || []);
-  const notOn = people.filter(p => avail.size && !avail.has(baseOf(p.plat)));
-  const groups = decG(game.groups) || defaultGroups(game.crossplay);
+  const on = p => p.plats.filter(x => !avail.size || avail.has(baseOf(x)));
   const name = uid => (S.members[uid]?.name || "Someone").split(" ")[0];
-  if (notOn.length === people.length) return { state: "bad", text: "Not on anyone's platform" };
-  const able = people.filter(p => !notOn.includes(p));
+  const short = x => PLATS[x]?.short || x;
+  const notOn = people.filter(p => !on(p).length);
+  const able = people.filter(p => on(p).length);
+  const onList = () => [...avail].map(short).join("/");
+  if (!able.length) return { state: "bad", text: people.length === 1 ? `Not on your platforms (${onList()} only)` : `Not on anyone's platforms (${onList()} only)` };
+  const missing = notOn.length ? ` · ${notOn.map(p => name(p.uid)).join(", ")} ${notOn.length === 1 ? "doesn't have" : "don't have"} ${onList()}` : "";
+  const groups = decG(game.groups) || defaultGroups(game.crossplay);
+  const total = people.length;
   if (!groups) {
-    const plats = new Set(able.map(p => p.plat));
-    if (plats.size <= 1 && !notOn.length) return { state: "ok", text: `All ${people.length} on the same platform` };
+    // crossplay unknown/partial without detail: fine only if everyone shares one platform
+    const common = on(able[0]).filter(x => able.every(p => on(p).includes(x)));
+    if (common.length && !notOn.length) return { state: "ok", text: total === 1 ? "You can play it" : `All ${total} can play on ${short(common[0])}` };
+    if (common.length) return { state: "warn", text: `${able.length} of ${total} can play on ${short(common[0])}${missing}` };
     return { state: "unknown", text: game.crossplayNote ? `Check: ${game.crossplayNote}` : "Crossplay not confirmed yet" };
   }
-  const gi = p => groups.findIndex(g => g.includes(p.plat) || (p.plat === "pcms" && g.includes("pc") && !groups.some(h => h.includes("pcms"))));
-  const buckets = new Map();
-  for (const p of able) { const i = gi(p); const k = i < 0 ? "x" + p.plat : i; if (!buckets.has(k)) buckets.set(k, []); buckets.get(k).push(p); }
-  let best = []; for (const b of buckets.values()) if (b.length > best.length) best = b;
-  const out = people.filter(p => !best.includes(p));
-  if (!out.length) return { state: "ok", text: people.length === 1 ? "You can play it" : `All ${people.length} can play together` };
-  if (best.length < 2) return { state: "bad", text: "Separate versions: " + people.map(p => `${name(p.uid)} (${PLATS[p.plat]?.short || p.plat})`).join(" · ") };
-  const why = out.map(p =>`${name(p.uid)} (${PLATS[p.plat]?.short || p.plat}${notOn.includes(p) ? ", not available" : ""})`).join(", ");
-  return { state: best.length >= 2 ? "warn" : "bad", text: `${best.length} of ${people.length} together · split: ${why}` };
+  const inGroup = (x, g) => g.includes(x) || (x === "pcms" && g.includes("pc") && !groups.some(h => h.includes("pcms")));
+  let best = [], bestG = null;
+  for (const g of groups) {
+    const fit = able.filter(p => on(p).some(x => inGroup(x, g)));
+    if (fit.length > best.length) { best = fit; bestG = g; }
+  }
+  if (best.length === total) return { state: "ok", text: total === 1 ? "You can play it" : `All ${total} can play together` };
+  if (best.length === able.length && notOn.length) return { state: best.length >= 2 ? "warn" : "bad", text: `${best.length} of ${total} can play together${missing}` };
+  if (best.length < 2) return { state: "bad", text: "Separate versions: " + able.map(p => `${name(p.uid)} (${on(p).map(short).join("/")})`).join(" · ") + missing };
+  const split = able.filter(p => !best.includes(p)).map(p => `${name(p.uid)} (${on(p).map(short).join("/")})`).join(", ");
+  return { state: "warn", text: `${best.length} of ${total} together · split: ${split}${missing}` };
 }
+// Platforms a person can play this game on: what they marked as owned, else everything in their profile.
+const platsFor = (game, uid) => { const o = (game?.owns || {})[uid]; return o ? [o] : (S.members[uid]?.platforms || []); };
 function interestedPeople(game) {
-  const v = game.votes || {}; const own = game.owns || {};
-  return Object.keys(S.members)
-    .filter(uid => v[uid] === "yes" || v[uid] === "maybe")
-    .map(uid => ({ uid, plat: own[uid] || (S.members[uid].platforms || [])[0] }))
-    .filter(p => p.plat);
+  const v = game.votes || {};
+  return Object.keys(S.members).filter(uid => v[uid] === "yes" || v[uid] === "maybe").map(uid => ({ uid, plats: platsFor(game, uid) })).filter(p => p.plats.length);
 }
 function crewPeople(game) {
-  const own = game.owns || {};
-  return Object.keys(S.members).map(uid => ({ uid, plat: own[uid] || (S.members[uid].platforms || [])[0] })).filter(p => p.plat);
+  return Object.keys(S.members).map(uid => ({ uid, plats: platsFor(game, uid) })).filter(p => p.plats.length);
 }
 function parseMaxParty(s) {
   s = String(s || "").toLowerCase(); let m;
@@ -1141,6 +1151,7 @@ function openGame(id) {
          <label class="fld">Console price<input id="cpIn" value="${esc(g.consolePrice || "")}" placeholder="e.g. $39.99 PS Store" maxlength="60"></label>
        </div>
        <div class="checks"><label><input type="checkbox" id="gpIn" ${g.gamepass ? "checked" : ""}> On Game Pass</label><label><input type="checkbox" id="psIn" ${g.psplus ? "checked" : ""}> In PS Plus</label></div>
+       ${canEdit ? `<div class="fld" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)">Available on<div class="checks" id="platIn">${BASE_PLATS.map(pl => `<label><input type="checkbox" value="${pl}" ${(g.platforms || []).includes(pl) ? "checked" : ""}> ${PLATS[pl].label.replace(" (Steam / Epic)", "")}</label>`).join("")}</div></div>` : ""}
        <label class="fld">Max party size<input id="mpIn" type="number" min="1" max="100" inputmode="numeric" value="${maxPartyOf(g) || ""}" placeholder="No limit set"></label>
        <div class="two">
          <label class="fld">Crossplay<select id="xpSel">${["unknown", "full", "partial", "none"].map(k => `<option value="${k}" ${xp === k ? "selected" : ""}>${XP_LABEL[k]}</option>`).join("")}</select></label>
@@ -1161,6 +1172,7 @@ function openGame(id) {
     const patch = { status: $("statSel").value, consolePrice: $("cpIn").value.trim(), gamepass: $("gpIn").checked, psplus: $("psIn").checked,
       crossplay: xpv, crossplayNote: $("xnIn").value.trim(), notes: $("notesIn").value.trim() };
     const mp = parseInt($("mpIn").value, 10); patch.maxParty = mp > 0 ? Math.min(mp, 100) : null;
+    if ($("platIn")) patch.platforms = [...$("platIn").querySelectorAll("input:checked")].map(i => i.value);
     if (xpv !== (g.crossplay || "unknown")) patch.groups = encG(defaultGroups(xpv));
     if (patch.status !== (g.status || "suggested") && patch.status === "playing") patch.playedAt = Date.now();
     try {
@@ -1322,7 +1334,7 @@ function nightCard(id, n, past) {
   const r = n.rsvps || {}; const mine = r[S.user.uid];
   const by = k => Object.entries(r).filter(([u, v]) => v === k && S.members[u]).map(([u]) => S.members[u]);
   const ins = by("in");
-  const inPeople = Object.keys(r).filter(u => r[u] === "in" && S.members[u]).map(u => ({ uid: u, plat: (g?.owns || {})[u] || (S.members[u].platforms || [])[0] })).filter(p => p.plat);
+  const inPeople = Object.keys(r).filter(u => r[u] === "in" && S.members[u]).map(u => ({ uid: u, plats: platsFor(g, u) })).filter(p => p.plats.length);
   const fit = g && inPeople.length ? fitCheck(g, inPeople) : null;
   const party = g ? partyCheck(g, ins.length, "in") : null;
   const canEdit = isLeader() || n.createdBy === S.user.uid;

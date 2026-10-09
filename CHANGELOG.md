@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10 — Fix "Not on anyone's platform" (v1.3.2)
+
+- Fixed: the "can we play together" check only looked at each person's main platform, so a game on Xbox showed "Not on anyone's platform" for people whose main platform was PC even though they also own an Xbox. It now considers every platform in each person's profile (or the one they marked as owning) and picks whichever lets the most people play together.
+- Clearer messages: "Not on anyone's platforms (XB only)", "1 of 2 can play on XB · Sam doesn't have XB".
+- The person who suggested a game (or the leader) can now fix its platforms in the game's details, for games whose platforms were guessed wrong.
+
 ## 2026-10 — Whole theme follows your color (v1.3.1)
 
 - Your color now tints the whole app, not just buttons: backgrounds, cards, borders and text tints all follow it, in dark and light mode. Every color keeps text readable (4.5:1 or better).
